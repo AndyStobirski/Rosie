@@ -1,0 +1,58 @@
+﻿using System;
+
+class Character {
+    private string name;
+    private int hitPoints;
+    private int armorClass;
+    private int attackBonus;
+    private int damage;
+
+    public Character(string name, int hitPoints, int armorClass, int attackBonus, int damage) {
+        this.name = name;
+        this.hitPoints = hitPoints;
+        this.armorClass = armorClass;
+        this.attackBonus = attackBonus;
+        this.damage = damage;
+    }
+
+    public bool IsAlive() {
+        return hitPoints > 0;
+    }
+
+    public void Attack(Character target) {
+        int roll = new Random().Next(1, 21);
+        int attackValue = roll + attackBonus;
+
+        if (attackValue >= target.armorClass) {
+            int damageRoll = new Random().Next(1, damage);
+            target.hitPoints -= damageRoll;
+            Console.WriteLine(name + " hits " + target.name + " for " + damageRoll + " damage!");
+        } else {
+            Console.WriteLine(name + " misses " + target.name + "!");
+        }
+    }
+}
+
+class Combat {
+    public static void Main() {
+        Character player = new Character("Player", 10, 12, 3, 6);
+        Character enemy = new Character("Enemy", 8, 10, 2, 4);
+
+        while (player.IsAlive() && enemy.IsAlive()) {
+            player.Attack(enemy);
+            if (enemy.IsAlive()) {
+                enemy.Attack(player);
+            }
+        }
+
+        if (player.IsAlive()) {
+            Console.WriteLine("You win!");
+        } else {
+            Console.WriteLine("You lose!");
+        }
+    }
+}
+
+================================
+
+data_treasure.cpp contains item definitions
