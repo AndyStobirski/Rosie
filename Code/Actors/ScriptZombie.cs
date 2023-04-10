@@ -1,7 +1,5 @@
 ﻿using Rosie.Entities;
-using System.Collections.Generic;
-using System.Linq;
-using Rosie.Misc;
+using Rosie.Enums;
 
 namespace Rosie.Code.Actors
 {
@@ -19,12 +17,17 @@ namespace Rosie.Code.Actors
             {
                 if (monster.CanAttack(player))
                 {
+                    State = NPC_STATE.Combat;
                     monster.Attack(player);
                 }
                 else
                 {
-                    DirectMoveTowardsPlayer();
+                    DirectMoveTowardsPoint(player.X, player.Y);
                 }
+            }
+            else
+            {
+                Wander();
             }
         }
 

@@ -12,6 +12,8 @@ namespace Rosie.Entities
         public Script script;
         public int ExperienceValue { get; private set; }
 
+
+
         /// <summary>
         /// Constructor 
         /// </summary>
@@ -42,6 +44,8 @@ namespace Rosie.Entities
 
             X = pX;
             Y = pY;
+
+            RosieGame.AddMessage("Monster moved to {0},{1}", X, Y);
         }
 
         #region Overriden Methods 

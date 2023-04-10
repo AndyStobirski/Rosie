@@ -128,22 +128,51 @@ namespace Rosie.Code.Misc
         /// <summary>
         /// Return a random empty point in a random room
         /// </summary>
+        /// <param name="pLocation">A location with a room</param>
+        /// <param name="pWayPoint">The waypoint associated with the above room</param>
         /// <returns></returns>
-        public static Point GetRandomRoomPoint()
+        public static void GetRandomRoomPoint(out Point pLocation, out WayPoint pWayPoint)
         {
-            var p = new Point();
+            pLocation = new Point();
 
             do
             {
-                var room = currentLevel.Rooms[rnd.Next(0, currentLevel.Rooms.Count)];
-                p = new Point(
+                var rommIdx = rnd.Next(0, currentLevel.Rooms.Count);
+
+                var room = currentLevel.Rooms[rommIdx];
+                pWayPoint = currentLevel.WayPoints[rommIdx];
+                pLocation = new Point(
                     rnd.Next(room.Left, room.Right)
                     , rnd.Next(room.Top, room.Bottom)
                     );
 
-            } while (!(Map[p.X, p.Y] is Floor) && !Map[p.X, p.Y].Passable());
+            } while (!(Map[pLocation.X, pLocation.Y] is Floor) && !Map[pLocation.X, pLocation.Y].Passable());
 
-            return p;
+        }
+
+
+        /// <summary>
+        /// Return a random empty point in a random room
+        /// </summary>
+        /// <returns></returns>
+        public static Point GetRandomRoomPoint()
+        {
+            Point pLocation = new Point();
+
+            do
+            {
+                var rommIdx = rnd.Next(0, currentLevel.Rooms.Count);
+
+                var room = currentLevel.Rooms[rommIdx];
+                pLocation = new Point(
+                    rnd.Next(room.Left, room.Right)
+                    , rnd.Next(room.Top, room.Bottom)
+                    );
+
+            } while (!(Map[pLocation.X, pLocation.Y] is Floor) && !Map[pLocation.X, pLocation.Y].Passable());
+
+            return pLocation;
+
         }
 
 
@@ -179,16 +208,34 @@ namespace Rosie.Code.Misc
             return (int)Math.Sqrt(dx * dx + dy * dy);
         }
 
+
+        /// <summary>
+        /// Set every open cell to viewed, so the map will display it.
+        /// </summary>
+        public static void MakeMapVisible()
+        {
+            for (int x = 0; x < currentLevel.Map.GetLength(0); x++)
+            {
+                for (int y = 0; y < currentLevel.Map.GetLength(1); y++)
+                {
+                    if (currentLevel.Map[x, y] != null)
+                    {
+                        currentLevel.Map[x, y].Viewed = 1;
+                    }
+                }
+            }
+        }
+
         /// <summary>
         /// Change the state of the door on the specified cell
         /// </summary>
         /// <param name="pX"></param>
         /// <param name="pY"></param>
         /// <param name="pSetToOpen"></param>
-        public static void DoorStaeChange(int pX, int pY, bool pSetToOpen)
+        public static void DoorStateChange(int pX, int pY, bool pSetToOpen)
         {
 
-            if (!IsCellValid(pX, pY) || Map[pX, pY] is not iOpenable)
+            if (!IsCellValid(pX, pY) || !(Map[pX, pY] is iOpenable))
             {
                 if (pSetToOpen)
                 {
@@ -198,6 +245,8 @@ namespace Rosie.Code.Misc
                 {
                     RosieGame.AddMessage(MessageStrings.Close_No);
                 }
+
+                return;
             }
 
             var door = Map[pX, pY] as iOpenable;

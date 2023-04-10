@@ -58,7 +58,7 @@ namespace Rosie.Code
             //
             var com = new Command(CommandType.Move, false,
                  keys.keypad1, keys.keypad2, keys.keypad3
-                , keys.keypad4, keys.keypad6
+                , keys.keypad4, keys.keypad5, keys.keypad6
                 , keys.keypad7, keys.keypad8, keys.keypad9
             );
             commands.Add(com);

@@ -3,6 +3,7 @@ using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 using Rosie.Code;
 using Rosie.Entities;
+using Rosie.Enums;
 using Rosie.Misc;
 using System;
 using System.Diagnostics;
@@ -41,10 +42,6 @@ namespace Rosie
 
             //Hardcode the frame rate
             TargetElapsedTime = TimeSpan.FromSeconds(1d / 30d);
-
-
-
-
 
         }
 
@@ -376,7 +373,7 @@ namespace Rosie
                             );
 
                         // Draw the topmost item
-                        if (tile.Items.Any())
+                        if (visible && tile.Items.Any())
                         {
                             DrawTile(
                                 tile.Items.Last().Gfx
@@ -395,6 +392,11 @@ namespace Rosie
                                 , tile.Inhabitant.HitPointsCurrent
                                 , tile.Inhabitant.HitPointsMax
                                 );
+
+                            if (tile.Inhabitant is NPC)
+                            {
+                                DrawNPCState(rect, (tile.Inhabitant as NPC).script.State);
+                            }
                         }
                     }
                 }
@@ -409,7 +411,7 @@ namespace Rosie
 
                 //draw mouse reticule
                 DrawTile(
-                    1649
+                    (int)GFXValues.MOUSE_RETICULE
                         , new Rectangle(
                             _Rosie.GameCameraOffset.X + (p.X * _Rosie.TileSize.Width)
                             , _Rosie.GameCameraOffset.Y + (p.Y * _Rosie.TileSize.Height)
@@ -419,6 +421,10 @@ namespace Rosie
                 , Color.White
                 );
             }
+
+            // draw hitpoints of monsters / players
+            // we do this last as it we can esnure any data is on top and not
+            // drawn over by other processes./
 
 
         }
@@ -439,19 +445,27 @@ namespace Rosie
             int barHeight = 3;
 
 
-            //max hit points
-            _spriteBatch.Draw(pixel, new Rectangle(pTargetRect.X, pTargetRect.Y - barHeight, _Rosie.TileSize.Width, barHeight), Color.Red);
-
             if (pCurrent >= 0)
             {
                 int current = (int)(((pCurrent * 1.0) / pMax) * _Rosie.TileSize.Width);
 
+                //max hit points
                 _spriteBatch.Draw(pixel, new Rectangle(pTargetRect.X, pTargetRect.Y - barHeight, _Rosie.TileSize.Width, barHeight), Color.Red);
 
+                //current hitpoints
                 _spriteBatch.Draw(pixel, new Rectangle(pTargetRect.X, pTargetRect.Y - barHeight, current, barHeight), Color.Green);
 
 
             }
+        }
+
+        protected void DrawNPCState(Rectangle pTargetRect, NPC_STATE State)
+        {
+            var gfx = (int)State + 1645;
+
+            pTargetRect.Y -= 8;
+
+            DrawTile(gfx, pTargetRect, Color.White);
         }
 
         #endregion
@@ -461,7 +475,7 @@ namespace Rosie
         {
             int drawMessageStart = _Rosie.GameCameraOffset.Y + _Rosie.GameCameraSize.Y * _Rosie.TileSize.Height;
             int ctr = 0;
-            foreach (string message in RosieGame.Messages.Take(5))
+            foreach (string message in RosieGame.Messages.Take(15))
             {
                 _spriteBatch.DrawString(_font, message, new Vector2(1, drawMessageStart + ctr++ * 15), Color.White);
             }

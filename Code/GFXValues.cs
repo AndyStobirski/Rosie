@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-
-namespace Rosie.Code
+﻿namespace Rosie.Code
 {
     /// <summary>
     /// Indexes of sprites on the sprite sheet used by the game
@@ -29,9 +25,14 @@ namespace Rosie.Code
         TREASURE_GOLDPIECE = 1084,
 
         STAIRCASE_DOWN = 1381,
-        STAIRCASE_UP = 1387
+        STAIRCASE_UP = 1387,
 
+        MONSTER_STATE_SLEEP = 1651,
+        MONSTER_STATE_EXPLORING = 1650,
+        MONSTER_STATE_ALERT = 1649,
+        MONSTER_STATE_COMBAT = 1648,
 
+        MOUSE_RETICULE = 1649
 
     }
 

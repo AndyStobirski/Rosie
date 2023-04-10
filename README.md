@@ -10,7 +10,7 @@ At the present time, it's more of a collection of the concepts that make a rogue
 
 * Maze generation
 * Player Field of vision
-* Monster AI (rudimentary: move towards player on sight, attack)
+* Monster AI (rudimentary: move towards player on sight, attack, wandering between rooms)
 * Combat system
 * Messages
 * Minimap
@@ -63,3 +63,4 @@ Game structure
 * Pixel font from [here](https://github.com/00-Evan/shattered-pixel-dungeon/blob/master/core/src/main/assets/fonts/pixel_font.ttf).
 * [Monster Attacks](http://roguebasin.com/index.php/Monster_attacks) from RogueBasin
 * [VS2022 Code Cleanup on save](https://devblogs.microsoft.com/visualstudio/bringing-code-cleanup-on-save-to-visual-studio-2022-17-1-preview-2/)
+* [NotePad++ GraphViz plugin](https://github.com/jrebacz/NppGraphViz) was handy for testing the waypoints used by the Monster AI System

@@ -30,7 +30,7 @@ namespace Rosie.Code.Map
 
         public List<Rectangle> Rooms { get; set; }
 
-
+        public List<WayPoint> WayPoints { get; set; }
 
         protected Random _rnd = new Random();
 
@@ -93,21 +93,29 @@ namespace Rosie.Code.Map
 
             NPC m;
 
+            Point location;
+            WayPoint wp;
+
+
             for (int ctr = 0; ctr < pMaxMonsters; ctr++)
             {
-                m = new NPC(MapUtils.GetRandomRoomPoint())
+                MapUtils.GetRandomRoomPoint(out location, out wp);
+
+                m = new NPC(location)
                 {
                     Gfx = (int)GFXValues.MONSTER_SKELETON
                     ,
                     Speed = 10
                     ,
-                    VisionRange = 10
+                    VisionRange = 3
                     ,
                     HitPointsMax = 5,
 
                     HitPointsCurrent = 5
                 };
+
                 m.script = new ScriptZombie(m);
+                m.script.SetTargetWayPoint(wp);
                 m.WeaponPrimary = new Spear();
                 m.ActorCompletedTurn += Monster_ActorMoved;
                 m.Died += Monster_Died;

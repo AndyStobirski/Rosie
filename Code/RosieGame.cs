@@ -11,6 +11,7 @@ using Rosie.Misc;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.IO;
 using System.Linq;
 
 namespace Rosie
@@ -127,7 +128,7 @@ namespace Rosie
 
 
 
-        public static void AddMessage(string pMessageBody, params string[] pArgs)
+        public static void AddMessage(string pMessageBody, params object[] pArgs)
         {
             Messages.Insert(0, string.Format(pMessageBody, pArgs));
         }
@@ -181,7 +182,7 @@ namespace Rosie
             {
                 Room_Min = new Size(4, 4),
                 Room_Max = new Size(10, 10),
-                MaxRooms = 3,
+                MaxRooms = 15,
                 MapSize = new Size(50, 50),
                 RoomDistance = 3,
                 Corridor_Max = 10,
@@ -202,7 +203,7 @@ namespace Rosie
             player.ActorCompletedTurn += Player_ActorMoved;
 
             currentLevel = levels.First();
-            currentLevel.InitActors(player, 3);
+            currentLevel.InitActors(player, 10);
 
             GameState = Enums.GameStates.PlayerTurn;
 
@@ -213,14 +214,36 @@ namespace Rosie
             CalculateGameCameraDefinition();
 
 
+            MapUtils.MakeMapVisible();
+
             //  Randomly add treasure
+
             for (int ctr = 0; ctr < 10; ctr++)
             {
                 var p = MapUtils.GetRandomRoomPoint();
                 currentLevel.AddItem(new GoldCoins(rnd.Next(1, 100)) { X = p.X, Y = p.Y });
             }
 
+            //
+            //  Write waypoint data
+            //
+            using (StreamWriter sw = new StreamWriter(@"c:\temp\waypoints.txt"))
+            {
+                sw.WriteLine("digraph g");
+                sw.WriteLine("{");
+                sw.WriteLine("node [shape=box]");
+                sw.WriteLine("graph [splines=ortho]");
 
+                foreach (var wp in currentLevel.WayPoints)
+                {
+                    foreach (var cp in wp.ConnectedPoints)
+                    {
+                        sw.WriteLine(string.Format("\t{0} -> {1}", currentLevel.WayPoints.IndexOf(wp), currentLevel.WayPoints.IndexOf(cp)));
+                    }
+                }
+
+                sw.WriteLine("}");
+            }
 
         }
 
@@ -273,7 +296,7 @@ namespace Rosie
         private readonly keys[] DirectionKeys = new keys[]
 {
             keys.keypad1, keys.keypad2, keys.keypad3
-            , keys.keypad4,  keys.keypad6
+            , keys.keypad4, keys.keypad5, keys.keypad6
             , keys.keypad7, keys.keypad8, keys.keypad9
 };
 
@@ -282,7 +305,7 @@ namespace Rosie
         readonly Point[] Directions =
             {
                   new Point(-1, 1),  new Point(0, 1),   new Point(1, 1)
-                , new Point(-1, 0),                     new Point(1, 0)
+                , new Point(-1, 0),  new Point(0, 0),   new Point(1, 0)
                 , new Point(-1, -1), new Point(0, -1),  new Point(1,-1)
             };
 
@@ -374,13 +397,13 @@ namespace Rosie
 
                 case CommandType.Open:
                     dir = GetVectorFromDirection(data.Last());
-                    MapUtils.DoorStaeChange(player.X + dir.X, player.Y + dir.Y, true);
+                    MapUtils.DoorStateChange(player.X + dir.X, player.Y + dir.Y, true);
                     break;
 
 
                 case CommandType.Close:
                     dir = GetVectorFromDirection(data.Last());
-                    MapUtils.DoorStaeChange(player.X + dir.X, player.Y + dir.Y, false);
+                    MapUtils.DoorStateChange(player.X + dir.X, player.Y + dir.Y, false);
                     break;
 
 

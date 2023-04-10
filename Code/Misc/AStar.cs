@@ -1,6 +1,5 @@
 ﻿using Microsoft.Xna.Framework;
 using Rosie.Code.Environment;
-using Rosie.Misc;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -30,6 +29,11 @@ namespace Rosie
         private HashSet<RouteCell> Temp;
         private List<RouteCell> Route;
 
+        public AStar(Tile[,] map)
+        {
+            _map = map;
+        }
+
 
         /// <summary>
         /// Calculate the AStar route tween the two points, and return the first point of that route
@@ -41,11 +45,10 @@ namespace Rosie
         /// <param name="pY1">Target pos</param>
         /// <param name="pTargetPoint">The point to move to on successful nav</param>
         /// <returns>Was a route found to the target coords</returns>
-        public bool Calculate(Tile[,] map, int pX, int pY, int pX1, int pY1, out Point pTargetPoint)
+        public bool Calculate(int pX, int pY, int pX1, int pY1, out Point pTargetPoint)
         {
             pTargetPoint = new Point();
 
-            _map = map;
             _start = new Point(pX, pY);
             _finish = new Point(pX1, pY1); ;
             _exploredTiles = new HashSet<RouteCell>(new PointComparer()) { new RouteCell(_start.X, _start.Y) { Value = 0 } };
@@ -87,6 +90,9 @@ namespace Rosie
                     //by the player, environments etc and this will be
                     //indicated by no cells being added to TEMP on a pass
                     //Trace.WriteLine("Route not traversable");
+
+                    RosieGame.AddMessage("AStar can't find route");
+
                     return false;
                 }
 
@@ -99,9 +105,9 @@ namespace Rosie
             }
             while (!Found);
 
-            var move = CalculateRoute();
 
-            pTargetPoint = new Point(move.X, move.Y);
+
+            pTargetPoint = CalculateRoute();
 
             return true;
 
@@ -109,7 +115,7 @@ namespace Rosie
 
         /// <summary>
         /// A route has been found bteween the two points, now process it into a single point
-        /// returning the first point of that route
+        /// returning the first point of that route. Work from finish to start.
         /// </summary>
         /// <returns></returns>
         private Point CalculateRoute()
@@ -119,28 +125,69 @@ namespace Rosie
 
             Route = new List<RouteCell>() { current };
 
+
+            //
+            //  go through the _exploredTiles list and look for a cell with a VALUE of 1 lower than
+            //  the current and add that to the Route list
+            //
             do
             {
 
-                current = _exploredTiles.First(r =>
+                current = _exploredTiles.FirstOrDefault(r =>
 
                  (
-                        (Math.Abs(r.X - current.X) == 1 && Math.Abs(r.Y - current.Y) == 0)
-                        || (Math.Abs(r.X - current.X) == 0 && Math.Abs(r.Y - current.Y) == 1)
+                        (Math.Abs(r.X - current.X) == 1 && Math.Abs(r.Y - current.Y) <= 1)
+                        || (Math.Abs(r.X - current.X) == 0 && Math.Abs(r.Y - current.Y) <= 1)
 
                     ) && r.Value == (current.Value - 1)
 
                 );
 
+                if (current == null)
+                    break;
+
                 Route.Add(current);
 
             } while (current.Value > 0);    //changing this value to 0 includes the start point
 
-            var pt = Route[Route.Count() - 2];
+            if (Route.Count == 1)
+            {
+                return new Point(Route.First().X, Route.First().Y);
+            }
+            else
+            {
+                var pt = Route[Route.Count() - 2];
+                return new Point(pt.X, pt.Y);
+            }
 
-            return new Point(pt.X, pt.Y);
 
         }
+
+
+        /// <summary>
+        /// Find the nearest cell to the start point
+        /// </summary>
+        /// <returns></returns>
+        private Point CalculateRoute1()
+        {
+
+            RouteCell current = _exploredTiles.First(rc => rc.X == _start.X && rc.Y == _start.Y);
+
+            RouteCell next = _exploredTiles.FirstOrDefault(r =>
+
+                 (
+                        (Math.Abs(r.X - current.X) == 1 && Math.Abs(r.Y - current.Y) <= 1)
+                        || (Math.Abs(r.X - current.X) == 0 && Math.Abs(r.Y - current.Y) <= 1)
+
+                    ) && r.Value == (current.Value + 1)
+
+                );
+
+
+            return new Point(next.X, next.Y);
+
+        }
+
 
         private void AddPoint(int pX, int pY, int pValue)
         {

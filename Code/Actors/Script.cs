@@ -2,6 +2,7 @@
 using Rosie.Code.Environment;
 using Rosie.Code.Misc;
 using Rosie.Entities;
+using Rosie.Enums;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -14,10 +15,20 @@ namespace Rosie.Code.Actors
     /// </summary>
     public abstract class Script
     {
+        private static Random rnd = new Random();
+
+        public WayPoint CurrentWayPoint { get; set; }
+        public WayPoint TargetWayPoint { get; set; }
+
+        private AStar aStar;
+
+        public NPC_STATE State { get; set; }
+
         protected NPC monster;
         public Script(NPC pMon)
         {
             monster = pMon;
+            aStar = new AStar(RosieGame.currentLevel.Map);
         }
 
         /// <summary>
@@ -35,11 +46,11 @@ namespace Rosie.Code.Actors
         /// <summary>
         /// return the point with the lowest manhattan distance relative to the player
         /// </summary>
-        protected void DirectMoveTowardsPlayer()
+        protected void DirectMoveTowardsPoint(int pX, int pY)
         {
             var p = MapUtils.GetSurroundingPoints(monster.X, monster.Y)
                     .Where(p => MapUtils.IsWalkable(p.X, p.Y))
-                    .OrderBy(p => MapUtils.CellDistance(p.X, p.Y, player.X, player.Y))
+                    .OrderBy(p => MapUtils.CellDistance(p.X, p.Y, pX, pY))
                     .First();
 
             monster.Move(p.X, p.Y);
@@ -56,13 +67,39 @@ namespace Rosie.Code.Actors
                 List<Point> bres = null;
                 if (LineOfSight(player.X, player.Y, monster.X, monster.Y, ref bres))
                 {
+                    State = NPC_STATE.Alert;
                     return true;
                 }
             }
             return false;
         }
 
+        public void SetTargetWayPoint(WayPoint pWayPoint)
+        {
+            TargetWayPoint = pWayPoint.ConnectedPoints[rnd.Next(pWayPoint.ConnectedPoints.Count)];
+            RosieGame.AddMessage("Monster Target Waypoint {0}", TargetWayPoint.ToString());
+        }
 
+        public void Wander()
+        {
+
+            if ((monster.X == TargetWayPoint.X && monster.Y == TargetWayPoint.Y))
+            {
+                SetTargetWayPoint(TargetWayPoint);
+
+
+            }
+
+            State = NPC_STATE.Exploring;
+
+            Point p;
+            if (aStar.Calculate(monster.X, monster.Y, TargetWayPoint.X, TargetWayPoint.Y, out p))
+            {
+                monster.Move(p.X, p.Y);
+            }
+
+
+        }
 
         protected void Swap<T>(ref T lhs, ref T rhs) { T temp; temp = lhs; lhs = rhs; rhs = temp; }
 

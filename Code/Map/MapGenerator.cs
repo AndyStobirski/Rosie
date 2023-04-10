@@ -14,6 +14,9 @@ namespace Rosie.Map
     /// 
     /// Notes:
     ///     1. The method Corridor_Build() adds doors to the beginning and end of a coridoor
+    ///     2. It generators Waypoints which are nodes used in NPC navigation - waypoints are
+    ///        placed in the centre of rooms and contain a list of connected waypoints, items
+    ///        in the next room connected by a corridoor.
     /// 
     /// </summary>
     class MapGenerator : Generator
@@ -24,9 +27,12 @@ namespace Rosie.Map
         /// <returns>Instance of CurrentLevel class</returns>
         public override Level Build()
         {
+
+            WayPoints = new();
             Build_OneStartRoom();
             AddWalls();
             Level.Rooms = rctBuiltRooms;
+            Level.WayPoints = WayPoints;
 
             return Level;
         }
@@ -71,12 +77,43 @@ namespace Rosie.Map
         /// <summary>
         /// Corridor to be built stored here
         /// </summary>
-        private List<Point> lPotentialCorridor;
+        private List<Point> lCurrentCorridor;
 
         /// <summary>
         /// Room to be built stored here
         /// </summary>
         private Rectangle rctCurrentRoom;
+
+        /// <summary>
+        /// The Waypoint used in the current room
+        /// </summary>
+        private WayPoint currentWayPoint;
+
+        #region Waypoint
+
+        // The following properties are used in waypoint calculation
+
+        /// <summary>
+        /// The structure off which the current corridor is being built;
+        /// </summary>
+        private CorridorContactPoint corridorStartPoint;
+
+        /// <summary>
+        /// If a corridor is being build off a start room, it's stored here
+        /// </summary>
+        private Rectangle rctCorridorStartRoom;
+
+        /// <summary>
+        /// The structure which the current corridor terminates on
+        /// </summary>
+        private CorridorContactPoint corridorEndPoint;
+
+        /// <summary>
+        /// The room that a corridor hits when it's finished building
+        /// </summary>
+        private Rectangle rctCorridorEndRoom;
+
+        #endregion
 
 
         #region builder public properties
@@ -111,7 +148,10 @@ namespace Rosie.Map
         [Category("Map"), DisplayName("Break Out"), Description("")]
         public int BreakOut { get; set; }
 
-
+        /// <summary>
+        /// Add doors to map
+        /// </summary>
+        public bool AddDoors { get; set; } = false;
 
         #endregion
 
@@ -166,7 +206,7 @@ namespace Rosie.Map
         /// </summary>
         private void Clear()
         {
-            lPotentialCorridor = new List<Point>();
+            lCurrentCorridor = new List<Point>();
             rctBuiltRooms = new List<Rectangle>();
             lBuilltCorridors = new List<Point>();
 
@@ -181,6 +221,10 @@ namespace Rosie.Map
         /// a room off it, and repeat until MaxRooms has been reached. The map
         /// is started of by placing a room in approximately the centre of the map
         /// using the method PlaceStartRoom()
+        /// 
+        /// This method also connects together waypoints if a corridor built off a room
+        /// ends in a room which is pre-existing or has been built specificially.
+        /// 
         /// </summary>
         /// <returns>Bool indicating if the map was built, i.e. the property BreakOut was not
         /// exceed</returns>
@@ -206,7 +250,7 @@ namespace Rosie.Map
                 if (Corridor_GetStart(out Location, out Direction))
                 {
 
-                    CorBuildOutcome = CorridorMake_Straight(ref Location, ref Direction, _rnd.Next(1, Corridor_MaxTurns)
+                    CorBuildOutcome = Corridor_Make(ref Location, ref Direction, _rnd.Next(1, Corridor_MaxTurns)
                         , _rnd.Next(0, 100) > 50 ? true : false);
 
                     switch (CorBuildOutcome)
@@ -222,14 +266,46 @@ namespace Rosie.Map
                             {
                                 Corridor_Build();
                                 Room_Build();
+
+                                if (corridorStartPoint == CorridorContactPoint.room)
+                                {
+                                    //we have connected an existing room to a newly built room
+                                    corridorEndPoint = CorridorContactPoint.room;
+                                    rctCorridorEndRoom = rctCurrentRoom;
+                                }
                             }
                             break;
                     }
+
+                    //do waypoint calculations
+                    if (corridorStartPoint == CorridorContactPoint.room && corridorEndPoint == CorridorContactPoint.room)
+                    {
+                        if (!rctCorridorEndRoom.IsEmpty)
+                        {
+                            //as a waypoint is added at the same time as a room, they will have the same index
+                            var startIndex = rctBuiltRooms.IndexOf(rctCorridorStartRoom);
+                            var endIndex = rctBuiltRooms.IndexOf(rctCorridorEndRoom);
+
+                            var startWayPoint = WayPoints[startIndex];
+                            var endWayPoint = WayPoints[endIndex];
+
+                            startWayPoint.ConnectedPoints.Add(endWayPoint);
+                            endWayPoint.ConnectedPoints.Add(startWayPoint);
+
+
+                        }
+                    }
+
                 }
             }
 
             return true;
         }
+
+
+        /*
+         
+            // DEPRECATED
 
         /// <summary>
         /// Randomly choose a room and attempt to build a corridor terminated by
@@ -262,7 +338,7 @@ namespace Rosie.Map
                 if (Corridor_GetStart(out Location, out Direction))
                 {
 
-                    CorBuildOutcome = CorridorMake_Straight(ref Location, ref Direction, _rnd.Next(1, Corridor_MaxTurns)
+                    CorBuildOutcome = Corridor_Make(ref Location, ref Direction, _rnd.Next(1, Corridor_MaxTurns)
                         , _rnd.Next(0, 100) > 50 ? true : false);
 
                     switch (CorBuildOutcome)
@@ -274,10 +350,13 @@ namespace Rosie.Map
                             break;
 
                         case CorridorItemHit.completed:
+
+                            //corridor testing has finished and it hasn't hasn't hit anything
                             if (Room_AttemptBuildOnCorridor(Direction))
                             {
                                 Corridor_Build();
                                 Room_Build();
+
                             }
                             break;
                     }
@@ -287,6 +366,8 @@ namespace Rosie.Map
             return true;
 
         }
+
+        */
 
         #endregion
 
@@ -309,6 +390,10 @@ namespace Rosie.Map
             Room_Build();
         }
 
+
+        /*
+        
+        // DEPRCATED
 
         /// <summary>
         /// Randomly place two rooms on either the left/right or top bottom/bottom edges of the map
@@ -382,7 +467,7 @@ namespace Rosie.Map
 
                 if (Corridor_GetStart(out Location, out Direction))
                 {
-                    CorBuildOutcome = CorridorMake_Straight(ref Location, ref Direction, 100, true);
+                    CorBuildOutcome = Corridor_Make(ref Location, ref Direction, 100, true);
 
                     switch (CorBuildOutcome)
                     {
@@ -394,6 +479,9 @@ namespace Rosie.Map
                 }
             }
         }
+
+        */
+
 
         /// <summary>
         /// Make a room off the last point of Corridor, using
@@ -410,7 +498,7 @@ namespace Rosie.Map
             };
 
             //startbuilding room from this point
-            Point lc = lPotentialCorridor.Last();
+            Point lc = lCurrentCorridor.Last();
 
             if (pDirection.X == 0) //north/south direction
             {
@@ -442,16 +530,17 @@ namespace Rosie.Map
         /// </summary>
         /// <param name="Location">Out: Location of point on room edge</param>
         /// <param name="Location">Out: Direction of point</param>
-        /// <returns>If Location is legal</returns>
-        private void Room_GetEdge(out Point pLocation, out Point pDirection)
+        /// <param name="pRoomBuiltOff">The room this start point is originiating from</param>
+        /// <returns>Was it able to build?</returns>
+        private Rectangle Room_GetEdge(out Point pLocation, out Point pDirection)
         {
 
-            rctCurrentRoom = rctBuiltRooms[_rnd.Next(0, rctBuiltRooms.Count())];
+            Rectangle pRoomBuiltOff = rctBuiltRooms[_rnd.Next(0, rctBuiltRooms.Count())];
 
             //pick a random point within a room
             //the +1 / -1 on the values are to stop a corner from being chosen
-            pLocation = new Point(_rnd.Next(rctCurrentRoom.Left + 1, rctCurrentRoom.Right - 1)
-                                  , _rnd.Next(rctCurrentRoom.Top + 1, rctCurrentRoom.Bottom - 1));
+            pLocation = new Point(_rnd.Next(pRoomBuiltOff.Left + 1, pRoomBuiltOff.Right - 1)
+                                  , _rnd.Next(pRoomBuiltOff.Top + 1, pRoomBuiltOff.Bottom - 1));
 
 
             //get a random direction
@@ -463,12 +552,10 @@ namespace Rosie.Map
                 pLocation.X += pDirection.X;
                 pLocation.Y += pDirection.Y;
 
-                if (!Point_Valid(pLocation.X, pLocation.Y))
-                    return;
-
                 //until we meet an empty cell
             } while (Point_Get(pLocation.X, pLocation.Y) != null);
 
+            return pRoomBuiltOff;
         }
 
         #endregion
@@ -477,6 +564,9 @@ namespace Rosie.Map
 
         /// <summary>
         /// Randomly get a point on an existing corridor
+        /// 
+        /// Sets the variables corridorStartPoint which are used by waypoints
+        /// 
         /// </summary>
         /// <param name="Location">Out: location of point</param>
         /// <returns>Bool indicating success</returns>
@@ -504,6 +594,9 @@ namespace Rosie.Map
             pLocation.X += pDirection.X;
             pLocation.Y += pDirection.Y;
 
+            corridorStartPoint = CorridorContactPoint.corridor;
+
+
         }
 
         /// <summary>
@@ -513,34 +606,44 @@ namespace Rosie.Map
         private void Corridor_Build()
         {
 
-            for (int ctr = 0; ctr < lPotentialCorridor.Count; ctr++)
+            for (int ctr = 0; ctr < lCurrentCorridor.Count; ctr++)
             {
-                var p = lPotentialCorridor[ctr];
+                var p = lCurrentCorridor[ctr];
 
 
-                //For implementation in a later version
-                if (ctr == 0 || ctr == lPotentialCorridor.Count - 1)
+
+                if (AddDoors)
                 {
-                    var d = new Door();
-                    d.IsOpen = _rnd.Next(2) == 1;
+                    //For implementation in a later version
+                    if (ctr == 0 || ctr == lCurrentCorridor.Count - 1)
+                    {
+                        var d = new Door();
+                        d.IsOpen = _rnd.Next(2) == 1;
 
-                    Point_Set(p.X, p.Y, d);
+                        Point_Set(p.X, p.Y, d);
+                    }
+                    else
+                    {
+                        Point_Set(p.X, p.Y, new Floor());
+                        lBuilltCorridors.Add(p);
+                    }
                 }
                 else
                 {
                     Point_Set(p.X, p.Y, new Floor());
                     lBuilltCorridors.Add(p);
+
                 }
-
-
             }
 
-
-            lPotentialCorridor.Clear();
+            lCurrentCorridor.Clear();
         }
 
         /// <summary>
         /// Get a starting point for a corridor, randomly choosing between a room and a corridor.
+        /// 
+        /// Sets the variables corridorStartPoint and rctCorridorStartRoom which are used by waypoints
+        /// 
         /// </summary>
         /// <param name="Location">Out: pLocation of point</param>
         /// <param name="Location">Out: pDirection of point</param>
@@ -548,17 +651,28 @@ namespace Rosie.Map
         private bool Corridor_GetStart(out Point pLocation, out Point pDirection)
         {
             rctCurrentRoom = new Rectangle();
-            lPotentialCorridor = new List<Point>();
+            lCurrentCorridor = new List<Point>();
 
             if (lBuilltCorridors.Count > 0)
             {
                 if (_rnd.Next(0, 100) >= BuildProb)
-                    Room_GetEdge(out pLocation, out pDirection);
+                {
+                    rctCorridorStartRoom = Room_GetEdge(out pLocation, out pDirection);
+                    corridorStartPoint = CorridorContactPoint.room;
+
+                }
                 else
+                {
                     Corridor_GetEdge(out pLocation, out pDirection);
+                    corridorStartPoint = CorridorContactPoint.corridor;
+                }
             }
-            else//no corridors present, so build off a room
-                Room_GetEdge(out pLocation, out pDirection);
+            else
+            {
+                //no corridors present, so build off a room
+                rctCorridorStartRoom = Room_GetEdge(out pLocation, out pDirection);
+                corridorStartPoint = CorridorContactPoint.room;
+            }
 
             //finally check the point we've found
             return Corridor_PointTest(pLocation, pDirection) == CorridorItemHit.OK;
@@ -566,15 +680,21 @@ namespace Rosie.Map
         }
 
         /// <summary>
-        /// Attempt to make a corridor, storing it in the lPotentialCorridor list
+        /// Attempt to make a corridor, storing it in the lCurrentCorridor list.
+        /// 
+        /// If corridor building is succesful, pStart and pDirection are updated to be the
+        /// final point and direction of that point, respectively.
         /// </summary>
-        /// <param name="pStart">Start point of corridor</param>
-        /// <param name="pTurns">Number of turns to make</param>
-        private CorridorItemHit CorridorMake_Straight(ref Point pStart, ref Point pDirection, int pTurns, bool pPreventBackTracking)
+        /// <param name="pStart">Starting point of corridor</param>
+        /// <param name="pDirection">Starting direction of coridoor</param>
+        /// <param name="pTurns">Number of turns the corridor is to have </param>
+        /// <param name="pPreventBackTracking">Prevent the corridor from going back on itself</param>
+        /// <returns>Corridor building success?</returns>
+        private CorridorItemHit Corridor_Make(ref Point pStart, ref Point pDirection, int pTurns, bool pPreventBackTracking)
         {
 
-            lPotentialCorridor = new List<Point>();
-            lPotentialCorridor.Add(pStart);
+            lCurrentCorridor = new List<Point>();
+            lCurrentCorridor.Add(pStart);
 
             int corridorlength;
             Point startdirection = new Point(pDirection.X, pDirection.Y);
@@ -598,7 +718,7 @@ namespace Rosie.Map
                     if (outcome != CorridorItemHit.OK)
                         return outcome;
                     else
-                        lPotentialCorridor.Add(pStart);
+                        lCurrentCorridor.Add(pStart);
                 }
 
                 if (pTurns > 1)
@@ -613,7 +733,10 @@ namespace Rosie.Map
 
         /// <summary>
         /// Test the provided point to see if it has empty cells on either side
-        /// of it. This is to stop corridors being built adjacent to a room.
+        /// of it. This is to stop corridors being built adjacent to a room, check if it has made conatct with a room
+        /// 
+        /// Sets the variables corridorEndPoint and rctCorridorEndRoom which are used by waypoints
+        /// 
         /// </summary>
         /// <param name="pPoint">Point to test</param>
         /// <param name="pDirection">Direction it is moving in</param>
@@ -621,20 +744,44 @@ namespace Rosie.Map
         private CorridorItemHit Corridor_PointTest(Point pPoint, Point pDirection)
         {
 
-            if (!Point_Valid(pPoint.X, pPoint.Y))//invalid point hit, exit
+            if (!Point_Valid(pPoint.X, pPoint.Y))
+            {
+                corridorEndPoint = CorridorContactPoint.none;
+                //invalid point hit, exit
                 return CorridorItemHit.invalid;
-            else if (lBuilltCorridors.Contains(pPoint))//in an existing corridor
+            }
+            else if (lBuilltCorridors.Contains(pPoint))
+            {
+                corridorEndPoint = CorridorContactPoint.corridor;
+                //in an existing corridor
                 return CorridorItemHit.existingcorridor;
-            else if (lPotentialCorridor.Contains(pPoint))//hit self
+            }
+            else if (lCurrentCorridor.Contains(pPoint))
+            {
+                corridorEndPoint = CorridorContactPoint.corridor;
+                // hit self
                 return CorridorItemHit.self;
-            else if (rctCurrentRoom != null && rctCurrentRoom.Contains(pPoint))//the corridors origin room has been reached, exit
+            }
+            else if (rctCurrentRoom.Contains(pPoint))
+            {
+                corridorEndPoint = CorridorContactPoint.room;
+                rctCorridorEndRoom = rctCurrentRoom;
+
+                //the corridors origin room has been reached, exit
                 return CorridorItemHit.originroom;
+            }
             else
             {
                 //is point in a room
                 foreach (Rectangle r in rctBuiltRooms)
                     if (r.Contains(pPoint))
+                    {
+
+                        corridorEndPoint = CorridorContactPoint.room;
+                        rctCorridorEndRoom = r;
+
                         return CorridorItemHit.existingroom;
+                    }
             }
 
 
@@ -747,6 +894,7 @@ namespace Rosie.Map
                 if (rctCurrentRoom.Contains(p))
                     return false;
 
+            // shrink it back to it's normal size
             rctCurrentRoom.Inflate(-CorridorDistance, -CorridorDistance);
 
             return true;
@@ -754,6 +902,9 @@ namespace Rosie.Map
 
         /// <summary>
         /// Add the global Room to the rooms collection and draw it on the map
+        /// 
+        /// Adds a WayPoint to the WayPoints listt
+        /// 
         /// </summary>
         private void Room_Build()
         {
@@ -765,6 +916,12 @@ namespace Rosie.Map
             for (int x = rctCurrentRoom.Left; x <= rctCurrentRoom.Right; x++)
                 for (int y = rctCurrentRoom.Top; y <= rctCurrentRoom.Bottom; y++)
                     Level.Map[x, y] = new Floor();
+
+
+            // the middle of the current room
+            WayPoints.Add(new WayPoint(rctCurrentRoom.Left + rctCurrentRoom.Width / 2, rctCurrentRoom.Top + rctCurrentRoom.Height / 2));
+
+            currentWayPoint = WayPoints.Last();
 
         }
 
@@ -813,6 +970,11 @@ namespace Rosie.Map
 
 
         #endregion
+
+        enum CorridorContactPoint
+        {
+            room, corridor, none
+        }
 
 
     }

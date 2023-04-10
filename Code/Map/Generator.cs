@@ -1,7 +1,9 @@
 ﻿using Microsoft.Xna.Framework;
+using Rosie.Code.Environment;
 using Rosie.Code.Map;
 using Rosie.Misc;
 using System;
+using System.Collections.Generic;
 using System.ComponentModel;
 
 namespace Rosie.Map
@@ -39,6 +41,8 @@ namespace Rosie.Map
 
         [Category("Cave Generation"), Description("The size of the map"), DisplayName("Map Size")]
         public Size MapSize { get; set; }
+
+        public List<WayPoint> WayPoints { get; set; }
 
     }
 }

@@ -87,6 +87,11 @@
         Move, Take, Drop, Equip, Open, Close
     }
 
+    public enum NPC_STATE
+    {
+        Combat, Alert, Exploring, Sleeping
+
+    }
 
 
 }
