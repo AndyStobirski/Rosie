@@ -1,17 +1,25 @@
 ﻿using Rosie.Enums;
+using Rosie.Misc;
 
 namespace Rosie.Code.Actors
 {
     public class ScriptBasic : Script
     {
+
         public ScriptBasic() : base()
         {
 
         }
 
+
         public override void Act()
         {
-            if (CanSeePlayer())
+
+            if (State == NPC_STATE.Sleeping)
+            {
+                Sleep();
+            }
+            else if (CanSeePlayer())
             {
                 if (monster.CanAttack(player))
                 {
@@ -25,7 +33,17 @@ namespace Rosie.Code.Actors
             }
             else
             {
-                Wander();
+
+                if (Roller.Roll(d20) > SleepProb)
+                {
+                    SetSleep();
+                }
+                else
+                {
+                    Wander();
+                }
+
+
             }
         }
     }

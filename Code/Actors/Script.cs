@@ -17,6 +17,8 @@ namespace Rosie.Code.Actors
     {
         private static Random rnd = new Random();
 
+        protected static Roll d20 = new Roll(20, 0);
+
 
         /// <summary>
         /// The location the monster is trying to get
@@ -43,6 +45,17 @@ namespace Rosie.Code.Actors
         /// How long the monser is to sleep for
         /// </summary>
         protected int SleepCounter = 0;
+
+        /// <summary>
+        /// Probability will sleep
+        /// </summary>
+        protected int SleepProb = 10;
+
+        /// <summary>
+        /// How long does it sleep foor
+        /// </summary>
+        protected int SleepCount { get; set; }
+
 
         /// <summary>
         /// Current behaviour state
@@ -125,7 +138,6 @@ namespace Rosie.Code.Actors
             {
                 SetTargetWayPoint(TargetWayPoint);
             }
-
             State = NPC_STATE.Exploring;
 
 
@@ -143,13 +155,26 @@ namespace Rosie.Code.Actors
                     SetTargetWayPoint(TargetWayPoint);
                     RosieGame.AddMessage("Monster stuck choosing a new wander location");
                 }
-
             }
+        }
+
+        protected void SetSleep()
+        {
+
+            SleepCount = 25;
+            State = NPC_STATE.Sleeping;
+            RosieGame.AddMessage("Monster feel asleep");
         }
 
         protected void Sleep()
         {
+            SleepCount--;
 
+            if (SleepCount <= 0)
+            {
+                State = NPC_STATE.Idle;
+                RosieGame.AddMessage("Monster woke up");
+            }
         }
 
 

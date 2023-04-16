@@ -93,7 +93,7 @@
 
     public enum NPC_STATE
     {
-        Combat, Alert, Exploring, Sleeping
+        Combat, Alert, Exploring, Sleeping, Idle
 
     }
 

@@ -12,7 +12,7 @@ namespace Rosie.Entities
         public Script script;
         public int ExperienceValue { get; private set; }
 
-
+        public string MonsterType { get; set; }
 
         /// <summary>
         /// Constructor 

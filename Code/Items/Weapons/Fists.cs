@@ -1,7 +1,4 @@
 ﻿using Rosie.Code.Misc;
-using System;
-using System.Collections.Generic;
-using System.Text;
 
 namespace Rosie.Code.Items.Weapons
 {
@@ -9,7 +6,7 @@ namespace Rosie.Code.Items.Weapons
     {
         public Fists()
         {
-            Damage = new Roll(1, 2, 0);
+            Damage = new Roll(2, 0);
             Name = "Fist";
             Range = 1;
         }

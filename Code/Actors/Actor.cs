@@ -17,7 +17,7 @@ namespace Rosie.Entities
     /// </summary>
     public abstract class Actor
     {
-        static Roll d20 = new Roll(1, 20, 0);
+        static Roll d20 = new Roll(20, 0);
 
         /// <summary>
         /// The lower the number the faster the character, e.g. a character with twice the speed of another will

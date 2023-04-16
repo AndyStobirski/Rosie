@@ -151,29 +151,7 @@ namespace Rosie.Code.Misc
         }
 
 
-        /// <summary>
-        /// Return a random empty point in a random room
-        /// </summary>
-        /// <returns></returns>
-        public static Point GetRandomRoomPoint()
-        {
-            Point pLocation = new Point();
 
-            do
-            {
-                var rommIdx = rnd.Next(0, currentLevel.Rooms.Count);
-
-                var room = currentLevel.Rooms[rommIdx];
-                pLocation = new Point(
-                    rnd.Next(room.Left, room.Right)
-                    , rnd.Next(room.Top, room.Bottom)
-                    );
-
-            } while (!(Map[pLocation.X, pLocation.Y] is Floor) && !Map[pLocation.X, pLocation.Y].Passable());
-
-            return pLocation;
-
-        }
 
 
         public static void MoveActor(int pOldX, int pOldY, int pNewX, int pNewY, Actor pActor)

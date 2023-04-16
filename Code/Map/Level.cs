@@ -128,6 +128,7 @@ namespace Rosie.Code.Map
                 };
 
 
+                m.Name = GibberishGenerator.GenerateName(true);
                 m.script.SetTargetWayPoint(wp);
                 m.WeaponPrimary = new Spear();
                 m.ActorCompletedTurn += Monster_ActorMoved;
@@ -174,14 +175,9 @@ namespace Rosie.Code.Map
             //
             for (int ctr = 0; ctr < 10; ctr++)
             {
-                var p = MapUtils.GetRandomRoomPoint();
+                var p = GetRandomEmptyRoomPoint();
                 AddItem(new GoldCoins(_rnd.Next(1, 100)) { X = p.X, Y = p.Y });
             }
-
-
-
-
-
         }
 
         /// <summary>
@@ -209,6 +205,36 @@ namespace Rosie.Code.Map
 
         }
 
+        public Point GetRandomEmptyRoomPoint()
+        {
+            Point pLocation = new Point();
+
+            do
+            {
+                var rommIdx = _rnd.Next(Rooms.Count);
+
+                var room = Rooms[rommIdx];
+                pLocation = new Point(
+                    _rnd.Next(room.Left, room.Right)
+                    , _rnd.Next(room.Top, room.Bottom)
+                    );
+
+                if (Map[pLocation.X, pLocation.Y] is Floor)
+                {
+
+                    var floor = Map[pLocation.X, pLocation.Y] as Floor;
+
+                    if (floor.Passable() && floor.Inhabitant == null && floor.Items.Count == 0)
+                    {
+                        break;
+                    }
+                }
+
+            } while (true);
+
+            return pLocation;
+
+        }
 
 
     }

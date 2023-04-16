@@ -2,11 +2,7 @@
 # Rosie
 A [RogueLike](https://en.wikipedia.org/wiki/Roguelike) named after my dog, which consists of modified code from my RogueLike repository. This is a work in progress and will change  a lot over time. I have no plan or structure for this, I'm making it up as I go along and enjoying myself as I do it.
 
-At the present time, it's more of a collection of the concepts that make a roguelike loosely strung together. It consists of one level whose random number generator has been hardcoded to 12345 (to aid testing) - (Generator.cs > _rnd)
-
-## Features
-
-### Current
+It's  barely an alpha and has has the following features:
 
 * Maze generation
 * Player Field of vision
@@ -20,17 +16,18 @@ At the present time, it's more of a collection of the concepts that make a rogue
 * Treasure placement and pickup
 * Addded input handling system
 * Added door open / close mechanics via the iOpenable interface
-* Added stairr cases / movement between levels
+* Added stair cases / movement between levels
 
-### To Do
+## To Do
 * Inventory Management: throw
 * Add items: potions, scrolls, rings
 * Animations - projectiles
 * Food
 * Item effects
-* Clean up movement between 
+* Clean up movement between levl code
+* Add code to increase complexity of levels, variation of monster types related to depth
 
-### Long Term
+## Long Term
  * Add articles in wiki - note that at the momenet as it's currently in so much flux that there's a chance I might chop up and burn something that has been meticulously documented.
  * Improve weapons
  * Environmental features e.g. Lava, water

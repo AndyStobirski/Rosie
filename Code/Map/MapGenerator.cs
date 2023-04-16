@@ -42,11 +42,11 @@ namespace Rosie.Map
             // 
             //  Add Stair Cases
             //
-            Point stair = GetRandomRoomPoint();
+            Point stair = Level.GetRandomEmptyRoomPoint();
             Level.Map[stair.X, stair.Y] = new Staircase(true); //up
             Level.StairCase_Up = new Point(stair.X, stair.Y); //up
 
-            stair = GetRandomRoomPoint();
+            stair = Level.GetRandomEmptyRoomPoint();
             Level.Map[stair.X, stair.Y] = new Staircase(false); //up
             Level.StairCase_Down = new Point(stair.X, stair.Y); //up
 
@@ -996,25 +996,6 @@ namespace Rosie.Map
         }
 
 
-        public Point GetRandomRoomPoint()
-        {
-            Point pLocation = new Point();
-
-            do
-            {
-                var rommIdx = _rnd.Next(0, Level.Rooms.Count);
-
-                var room = Level.Rooms[rommIdx];
-                pLocation = new Point(
-                    _rnd.Next(room.Left, room.Right)
-                    , _rnd.Next(room.Top, room.Bottom)
-                    );
-
-            } while (!(Level.Map[pLocation.X, pLocation.Y] is Floor) && !Level.Map[pLocation.X, pLocation.Y].Passable());
-
-            return pLocation;
-
-        }
 
         public override Level Build()
         {

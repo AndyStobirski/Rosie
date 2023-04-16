@@ -122,6 +122,19 @@ namespace Rosie
         /// </summary>
         static public Level currentLevel;
 
+        static private int _maxLevel;
+        public int MaxLevel
+        {
+            get
+            {
+
+                if (currentLevelIndex > _maxLevel)
+                    _maxLevel = currentLevelIndex;
+
+                return _maxLevel;
+            }
+        }
+
         /// <summary>
         /// Current level index
         /// </summary>
@@ -181,13 +194,12 @@ namespace Rosie
 
         public Level CreateNewLevel()
         {
-
             var level = mapGenerator.Build(100, 100);
             return level;
         }
 
         /// <summary>
-        /// Get the required level
+        /// Get the required level, creating it if necessary
         /// </summary>
         /// <param name="pLevelIndex"></param>
         public void GetLevel(int pLevelIndex)
@@ -197,7 +209,7 @@ namespace Rosie
             {
                 currentLevel = CreateNewLevel();
                 levels.Add(currentLevel);
-                currentLevel.InitLevel(player, 0);
+                currentLevel.InitLevel(player, 5);
                 player.X = currentLevel.StairCase_Up.X;
                 player.Y = currentLevel.StairCase_Up.Y;
 
@@ -229,7 +241,7 @@ namespace Rosie
 
                     levels.Add(CreateNewLevel());
                     currentLevel = levels.Last();
-                    currentLevel.InitLevel(player, 0);
+                    currentLevel.InitLevel(player, 5);
                 }
                 else
                 {
@@ -255,12 +267,9 @@ namespace Rosie
             player.X = pX;
             player.Y = pY;
             currentLevel.Map[pX, pY].Inhabitant = player;
-
             _fov = new FOVRecurse(player, Map);
-
             CalculateGameCameraDefinition();
             MapUtils.MakeMapVisible();
-
         }
 
 
@@ -272,6 +281,7 @@ namespace Rosie
             // TODO Need to refine the code that follows
 
             mapGenerator = new MapGenerator();
+            mapGenerator.MaxRooms = 5;
             //{
             //    Room_Min = new Size(4, 4),
             //    Room_Max = new Size(10, 10),
@@ -404,6 +414,7 @@ namespace Rosie
                         , "AEQ: " + (player.ArmourEquiped == null ? " - " : player.ArmourEquiped.Name)
                         , "WEQ: " + (player.WeaponPrimary == null ? " - " : player.WeaponPrimary.Name)
                         , "LVL : " + (currentLevelIndex + 1).ToString("X")
+                        , "MXL : " + (MaxLevel+1).ToString()
                     }
                 );
         }
