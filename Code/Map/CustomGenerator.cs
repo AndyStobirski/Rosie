@@ -30,6 +30,11 @@ namespace Rosie.Map
 
         }
 
+        public override Level Build(int pWidth, int pHeight)
+        {
+            throw new System.NotImplementedException();
+        }
+
         public override Point GetStartLocation()
         {
             return new Point(15, 15);

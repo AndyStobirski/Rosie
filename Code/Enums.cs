@@ -67,7 +67,11 @@
         keyZ = 90,
 
 
-        key0 = 48
+        key0 = 48,
+
+
+        keyLessThan = 188,
+        keyGreaterThan = 190
 
 
     }
@@ -84,7 +88,7 @@
 
     public enum CommandType
     {
-        Move, Take, Drop, Equip, Open, Close
+        Move, Take, Drop, Equip, Open, Close, StairsMove
     }
 
     public enum NPC_STATE

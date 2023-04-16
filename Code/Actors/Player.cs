@@ -57,21 +57,6 @@ namespace Rosie.Entities
 
         }
 
-        public string Properties()
-        {
-            return String.Join("\r\n",
-                new string[]
-                    {
-                        Name
-                        , "HP: " + string.Format("{0}/{1}", HitPointsCurrent, HitPointsMax)
-                        , "XP: " + ExperiencePoints
-                        , "PT: " + string.Format("{0},{1}", X, Y)
-                        , "GD: " + Gold.ToString("X")
-                        , "AEQ: " + (ArmourEquiped == null ? " - " : ArmourEquiped.Name)
-                        , "WEQ: " + (WeaponPrimary == null ? " - " : WeaponPrimary.Name)
-                    }
-                );
-        }
 
         public void TakeItem(Item pItem)
         {

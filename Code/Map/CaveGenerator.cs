@@ -201,5 +201,10 @@ namespace Rosie.Map
             }
             return null;
         }
+
+        public override Level Build(int pWidth, int pHeight)
+        {
+            throw new System.NotImplementedException();
+        }
     }
 }

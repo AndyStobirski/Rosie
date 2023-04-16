@@ -640,6 +640,11 @@ namespace Rosie.Map
             return p;
         }
 
+        public override Level Build(int pWidth, int pHeight)
+        {
+            throw new NotImplementedException();
+        }
+
 
         #endregion
 

@@ -18,19 +18,24 @@ namespace Rosie.Entities
         /// Constructor 
         /// </summary>
         /// <param name="pP">Monster location</param>
-        public NPC(Point pP)
+        public NPC(Point pP, Script pNPCScript)
         {
             X = pP.X;
             Y = pP.Y;
             VisionRange = 5;
             Name = "Monster";
             ExperienceValue = 10;
+
+            script = pNPCScript;
+            script.setMonster(this);
         }
 
         public void Act()
         {
             script.Act();
         }
+
+
 
 
         /// <summary>
@@ -45,7 +50,7 @@ namespace Rosie.Entities
             X = pX;
             Y = pY;
 
-            RosieGame.AddMessage("Monster moved to {0},{1}", X, Y);
+            //RosieGame.AddMessage("Monster moved to {0},{1}", X, Y);
         }
 
         #region Overriden Methods 

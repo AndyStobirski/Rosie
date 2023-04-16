@@ -16,6 +16,9 @@
         PLAYER_WIZARD = 583,
 
         MONSTER_SKELETON = 332,
+        MONSTER_ORC = 285,
+        MONSTER_ORCWARRIOR = 286,
+        MONSTER_ORCKNIGHT = 287,
 
         WEAPON_DAGGER = 722,
         WEAPON_SPEAR = 1091,
@@ -32,7 +35,7 @@
         MONSTER_STATE_ALERT = 1649,
         MONSTER_STATE_COMBAT = 1648,
 
-        MOUSE_RETICULE = 1649
+        MOUSE_RETICULE = 1649,
 
     }
 

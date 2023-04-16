@@ -36,6 +36,8 @@ namespace Rosie.Map
         /// </summary>
         public Level Level { get; set; }
         public abstract Level Build();
+
+        public abstract Level Build(int pWidth, int pHeight);
         public abstract Point GetStartLocation();
 
 

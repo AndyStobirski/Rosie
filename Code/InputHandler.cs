@@ -63,7 +63,7 @@ namespace Rosie.Code
             );
             commands.Add(com);
 
-            //
+            //take
             com = new Command(CommandType.Take, false, keys.keyT);
             commands.Add(com);
 
@@ -90,6 +90,10 @@ namespace Rosie.Code
             //close
             com = new Command(CommandType.Close, true, keys.keyC);
             com.AddStep(new Step() { dataType = DisplayInformation.ChooseDirection });
+            commands.Add(com);
+
+            //Use stairs
+            com = new Command(CommandType.StairsMove, true, keys.keyS);
             commands.Add(com);
 
         }
@@ -190,17 +194,6 @@ namespace Rosie.Code
             }
         }
 
-
-        public event EventHandler<RequestDataEventArgs> RequestData;
-
-        public class RequestDataEventArgs : EventArgs
-        {
-            string Data { get; set; }
-        }
-
-
-
-
         public event EventHandler<GameCommandEventArgs> GameCommandIssued;
         public class GameCommandEventArgs : EventArgs
         {
@@ -213,9 +206,6 @@ namespace Rosie.Code
             public CommandType Command { private set; get; }
             public int[] Data { private set; get; }
         }
-
-
-
     }
 
     /// <summary>

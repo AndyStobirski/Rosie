@@ -57,6 +57,8 @@ namespace Rosie.Misc
                             .Aggregate((x, y) => x * y);
         }
 
+        public bool ContainsActor(Actor pActor) { return _actors.Contains(pActor); }
+
         /// <summary>
         /// Calculate the actors who's turn it is move. This code will always return
         /// a list of actors, as it will omit any steps that contain no moving actors

@@ -1,8 +1,8 @@
 using Microsoft.Xna.Framework;
-using Rosie.Misc;
-using System;
 using Rosie.Code.Environment;
 using Rosie.Code.Map;
+using Rosie.Misc;
+using System;
 
 namespace Rosie.Map
 {
@@ -146,6 +146,10 @@ namespace Rosie.Map
             return new Point(x, y);
         }
 
+        public override Level Build(int pWidth, int pHeight)
+        {
+            throw new NotImplementedException();
+        }
     }
 
 }

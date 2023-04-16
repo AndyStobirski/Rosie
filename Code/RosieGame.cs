@@ -1,7 +1,5 @@
 ﻿using Microsoft.Xna.Framework;
-using Rosie.Code;
 using Rosie.Code.Environment;
-using Rosie.Code.Items;
 using Rosie.Code.Map;
 using Rosie.Code.Misc;
 using Rosie.Entities;
@@ -19,9 +17,11 @@ namespace Rosie
     /// <summary>
     /// The main game container
     /// </summary>
-    public class RosieGame
+    public partial class RosieGame
     {
         private Random rnd = new Random();
+
+        private MapGenerator mapGenerator = new MapGenerator();
 
         #region Keymodifiers
 
@@ -75,7 +75,7 @@ namespace Rosie
         /// <summary>
         /// Size of the GameMap in tiles
         /// </summary>
-        public Size MapSize => new Size(Map.GetLength(0), Map.GetLength(1));
+        public Size MapSize => Map == null ? null : new Size(Map.GetLength(0), Map.GetLength(1));
 
         /// <summary>
         /// Defines the rectangle which contains the camera view
@@ -84,6 +84,9 @@ namespace Rosie
 
         #endregion
 
+        /// <summary>
+        /// Game turns
+        /// </summary>
         public int TurnCounter { get; set; }
 
 
@@ -107,7 +110,7 @@ namespace Rosie
 
         #endregion
 
-        public Tile[,] Map => currentLevel.Map;
+        public Tile[,] Map => currentLevel?.Map;
 
 
         List<Level> levels = new List<Level>();
@@ -118,6 +121,11 @@ namespace Rosie
         /// a series of constructors
         /// </summary>
         static public Level currentLevel;
+
+        /// <summary>
+        /// Current level index
+        /// </summary>
+        public int currentLevelIndex => levels.IndexOf(currentLevel);
 
         /// <summary>
         /// Why static? So this can be easily accessed by the class Monster
@@ -171,6 +179,91 @@ namespace Rosie
         public GameStates GameState { get; set; }
 
 
+        public Level CreateNewLevel()
+        {
+
+            var level = mapGenerator.Build(100, 100);
+            return level;
+        }
+
+        /// <summary>
+        /// Get the required level
+        /// </summary>
+        /// <param name="pLevelIndex"></param>
+        public void GetLevel(int pLevelIndex)
+        {
+
+            if (levels.Count == 0)
+            {
+                currentLevel = CreateNewLevel();
+                levels.Add(currentLevel);
+                currentLevel.InitLevel(player, 0);
+                player.X = currentLevel.StairCase_Up.X;
+                player.Y = currentLevel.StairCase_Up.Y;
+
+            }
+            else if (pLevelIndex == -1)
+            {
+
+                if ((currentLevelIndex + pLevelIndex) >= 0)
+                {
+
+                    RosieGame.AddMessage(Code.MessageStrings.Stairs_Up);
+
+                    currentLevel = levels[currentLevelIndex + pLevelIndex];
+
+                    //moving up
+                    player.X = currentLevel.StairCase_Down.X;
+                    player.Y = currentLevel.StairCase_Down.Y;
+                }
+                else
+                {
+                    RosieGame.AddMessage(Code.MessageStrings.Stairs_CantLeave);
+                }
+            }
+            else if (pLevelIndex == 1)
+            {
+
+                if ((currentLevelIndex + pLevelIndex) > levels.Count() - 1)
+                {
+
+                    levels.Add(CreateNewLevel());
+                    currentLevel = levels.Last();
+                    currentLevel.InitLevel(player, 0);
+                }
+                else
+                {
+                    currentLevel = levels[currentLevelIndex + pLevelIndex];
+                }
+
+                //moving down
+                player.X = currentLevel.StairCase_Up.X;
+                player.Y = currentLevel.StairCase_Up.Y;
+            }
+
+
+            PlacePlayerInCurrentLevel(player.X, player.Y);
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="pX"></param>
+        /// <param name="pY"></param>
+        public void PlacePlayerInCurrentLevel(int pX, int pY)
+        {
+            player.X = pX;
+            player.Y = pY;
+            currentLevel.Map[pX, pY].Inhabitant = player;
+
+            _fov = new FOVRecurse(player, Map);
+
+            CalculateGameCameraDefinition();
+            MapUtils.MakeMapVisible();
+
+        }
+
+
         /// <summary>
         /// Constructor
         /// </summary>
@@ -178,54 +271,32 @@ namespace Rosie
         {
             // TODO Need to refine the code that follows
 
-            var cg = new MapGenerator()
-            {
-                Room_Min = new Size(4, 4),
-                Room_Max = new Size(10, 10),
-                MaxRooms = 15,
-                MapSize = new Size(50, 50),
-                RoomDistance = 3,
-                Corridor_Max = 10,
-                Corridor_MaxTurns = 5
-            };
-            //var cg = new CorridorCaveGenerator();
+            mapGenerator = new MapGenerator();
+            //{
+            //    Room_Min = new Size(4, 4),
+            //    Room_Max = new Size(10, 10),
+            //    MaxRooms = 2,
+            //    MapSize = new Size(100, 100),
+            //    RoomDistance = 3,
+            //    Corridor_Max = 10,
+            //    Corridor_MaxTurns = 5
+            //};
 
-            levels.Add(cg.Build());
 
-            //  Init the player
-            var pt = cg.GetStartLocation();
-            player = new Player
-            {
-                X = pt.X,
-                Y = pt.Y
-            };
-
+            //
+            //  Player
+            //
+            player = new Player();
             player.ActorCompletedTurn += Player_ActorMoved;
-
-            currentLevel = levels.First();
-            currentLevel.InitActors(player, 10);
 
             GameState = Enums.GameStates.PlayerTurn;
 
-            currentLevel.Map[player.X, player.Y].Inhabitant = player;
-
-            _fov = new FOVRecurse(player, Map);
-
-            CalculateGameCameraDefinition();
+            GetLevel(0);
 
 
-            MapUtils.MakeMapVisible();
-
-            //  Randomly add treasure
-
-            for (int ctr = 0; ctr < 10; ctr++)
-            {
-                var p = MapUtils.GetRandomRoomPoint();
-                currentLevel.AddItem(new GoldCoins(rnd.Next(1, 100)) { X = p.X, Y = p.Y });
-            }
 
             //
-            //  Write waypoint data
+            //  Write waypoint data for testing
             //
             using (StreamWriter sw = new StreamWriter(@"c:\temp\waypoints.txt"))
             {
@@ -252,7 +323,6 @@ namespace Rosie
         /// </summary>
         public void Tick()
         {
-
             IEnumerable<Actor> _ActorsToMove = currentLevel.ActorsToMove().ToList();
 
             if (_ActorsToMove == null)
@@ -268,7 +338,6 @@ namespace Rosie
             {
                 ((NPC)a).Act();
             }
-
         }
 
         /// <summary>
@@ -290,16 +359,12 @@ namespace Rosie
 
 
         #region mouse / key handling
-
-        // Numpad 1 to 9, excluding 5
-
         private readonly keys[] DirectionKeys = new keys[]
-{
-            keys.keypad1, keys.keypad2, keys.keypad3
-            , keys.keypad4, keys.keypad5, keys.keypad6
-            , keys.keypad7, keys.keypad8, keys.keypad9
-};
-
+            {
+                keys.keypad1, keys.keypad2, keys.keypad3
+                , keys.keypad4, keys.keypad5, keys.keypad6
+                , keys.keypad7, keys.keypad8, keys.keypad9
+            };
 
 
         readonly Point[] Directions =
@@ -316,106 +381,6 @@ namespace Rosie
             return Directions[idx];
         }
 
-
-        /// <summary>
-        /// Excecute the game command
-        /// </summary>
-        /// <param name="command"></param>
-        /// <param name="data"></param>
-        /// <exception cref="NotImplementedException"></exception>
-        public void GameCommand(CommandType command, int[] data)
-        {
-
-            Point dir = Point.Zero;
-
-            switch (command)
-            {
-                case CommandType.Move:
-
-                    dir = GetVectorFromDirection(data.First());
-                    if (MapUtils.IsWalkable(player.X + dir.X, player.Y + dir.Y))
-                    {
-                        player.Move(dir.X, dir.Y);
-                    }
-                    else if (MapUtils.ContainsMonster(player.X + dir.X, player.Y + dir.Y))
-                    {
-                        var m = Map[player.X + dir.X, player.Y + dir.Y].Inhabitant;
-                        if (player.CanAttack(m))
-                        {
-                            player.Attack(m);
-                        }
-                    }
-                    break;
-
-                case CommandType.Take:
-
-                    Item tItem = null;
-                    if (MapUtils.ItemTake(player.X, player.Y, out tItem))
-                    {
-                        RosieGame.AddMessage(Code.MessageStrings.Take_True, tItem.Name);
-                        player.TakeItem(tItem);
-                    }
-                    else
-                    {
-                        RosieGame.AddMessage(Code.MessageStrings.Take_False);
-                    }
-                    break;
-
-                case CommandType.Drop:
-
-                    //
-                    int dropItem = (int)data.Last();
-
-                    var item = player.Inventory[dropItem - (int)keys.keyA];
-                    player.DropItem(item);
-
-                    MapUtils.PlayerDropItem(item, player.X, player.Y);
-                    AddMessage(MessageStrings.Drop_DropItem, item.Name);
-
-                    break;
-
-                case CommandType.Equip:
-
-                    int equipIndex = (int)data.Last();
-
-                    var equipItem = player.Inventory[equipIndex - (int)keys.keyA];
-
-                    if (equipItem is Armour || equipItem is Weapon)
-                    {
-                        if (equipItem is Armour)
-                        {
-                            player.EquipArmour(equipItem as Armour);
-                        }
-                        else
-                        {
-                            player.EquipWeapon(equipItem as Weapon);
-                        }
-
-                        AddMessage(MessageStrings.Equip_Equip, equipItem.Name);
-                    }
-                    break;
-
-                case CommandType.Open:
-                    dir = GetVectorFromDirection(data.Last());
-                    MapUtils.DoorStateChange(player.X + dir.X, player.Y + dir.Y, true);
-                    break;
-
-
-                case CommandType.Close:
-                    dir = GetVectorFromDirection(data.Last());
-                    MapUtils.DoorStateChange(player.X + dir.X, player.Y + dir.Y, false);
-                    break;
-
-
-                default:
-                    throw new NotImplementedException("GameCommand: " + command.ToString());
-
-            }
-
-            CalculateFieldOfVision();
-            GameState = GameStates.EnemyTurn;
-        }
-
         /// <summary>
         /// A click has occured on the game window
         /// </summary>
@@ -424,6 +389,23 @@ namespace Rosie
         public void MouseClick(int pX, int pY)
         {
             Debug.WriteLine(string.Format("Mouse click X:{0}, Y:{1}", pX, pY));
+        }
+
+        public string PlayerProperties()
+        {
+            return String.Join("\r\n",
+                new string[]
+                {
+                        player.Name
+                        , "HP: " + string.Format("{0}/{1}", player.HitPointsCurrent, player.HitPointsMax)
+                        , "XP: " + player.ExperiencePoints
+                        , "PT: " + string.Format("{0},{1}", player.X, player.Y)
+                        , "GD: " + player.Gold.ToString("X")
+                        , "AEQ: " + (player.ArmourEquiped == null ? " - " : player.ArmourEquiped.Name)
+                        , "WEQ: " + (player.WeaponPrimary == null ? " - " : player.WeaponPrimary.Name)
+                        , "LVL : " + (currentLevelIndex + 1).ToString("X")
+                    }
+                );
         }
 
         #endregion

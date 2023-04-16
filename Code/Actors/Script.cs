@@ -17,17 +17,47 @@ namespace Rosie.Code.Actors
     {
         private static Random rnd = new Random();
 
-        public WayPoint CurrentWayPoint { get; set; }
+
+        /// <summary>
+        /// The location the monster is trying to get
+        /// </summary>
         public WayPoint TargetWayPoint { get; set; }
 
+        /// <summary>
+        /// Navigate the dungeon with this algorithm
+        /// </summary>
         private AStar aStar;
 
+        /// <summary>
+        /// The number of turns the NPC is unable to get it's target and is
+        /// stuck in one place
+        /// </summary>
+        protected int IdleCounter = 0;
+
+        /// <summary>
+        /// When this value is exceed, and the NPC is wandering choose a new direction
+        /// </summary>
+        protected int IdleThreshHold = 3;
+
+        /// <summary>
+        /// How long the monser is to sleep for
+        /// </summary>
+        protected int SleepCounter = 0;
+
+        /// <summary>
+        /// Current behaviour state
+        /// </summary>
         public NPC_STATE State { get; set; }
 
         protected NPC monster;
-        public Script(NPC pMon)
+
+        public void setMonster(NPC pNPC)
         {
-            monster = pMon;
+            monster = pNPC;
+        }
+
+        public Script()
+        {
             aStar = new AStar(RosieGame.currentLevel.Map);
         }
 
@@ -74,32 +104,54 @@ namespace Rosie.Code.Actors
             return false;
         }
 
+        /// <summary>
+        /// Set a new TargetWayPoint based on the current target. Each target contains
+        /// a list of connected Waypoints, so randomly choose one.
+        /// </summary>
+        /// <param name="pWayPoint"></param>
         public void SetTargetWayPoint(WayPoint pWayPoint)
         {
             TargetWayPoint = pWayPoint.ConnectedPoints[rnd.Next(pWayPoint.ConnectedPoints.Count)];
             RosieGame.AddMessage("Monster Target Waypoint {0}", TargetWayPoint.ToString());
         }
 
+        /// <summary>
+        /// Simple wander - try to get to the current defined TargetWaypoint. If the target can't be reached 
+        /// </summary>
         public void Wander()
         {
 
             if ((monster.X == TargetWayPoint.X && monster.Y == TargetWayPoint.Y))
             {
                 SetTargetWayPoint(TargetWayPoint);
-
-
             }
 
             State = NPC_STATE.Exploring;
+
 
             Point p;
             if (aStar.Calculate(monster.X, monster.Y, TargetWayPoint.X, TargetWayPoint.Y, out p))
             {
                 monster.Move(p.X, p.Y);
+                IdleCounter = 0;
             }
+            else
+            {
+                if (IdleCounter++ > IdleThreshHold)
+                {
+                    IdleCounter = 0;
+                    SetTargetWayPoint(TargetWayPoint);
+                    RosieGame.AddMessage("Monster stuck choosing a new wander location");
+                }
 
+            }
+        }
+
+        protected void Sleep()
+        {
 
         }
+
 
         protected void Swap<T>(ref T lhs, ref T rhs) { T temp; temp = lhs; lhs = rhs; rhs = temp; }
 

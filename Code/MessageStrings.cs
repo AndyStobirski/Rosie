@@ -31,5 +31,11 @@
 
         public static readonly string Battle_Damage_Monster = "The {0} hits you for {1} damage, your armour absorbs {2}";
         public static readonly string Battle_Damage_Player = "You hit the {0} for {1} damage, its armour absorbs {2}";
+
+        public static readonly string Stairs_None = "I see no staircase";
+        public static readonly string Stairs_Up = "You ascend the staircase";
+        public static readonly string Stairs_Down = "You descend the staircase";
+        public static readonly string Stairs_CantLeave = "You can't leave yet";
+
     }
 }

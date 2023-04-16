@@ -20,6 +20,7 @@ At the present time, it's more of a collection of the concepts that make a rogue
 * Treasure placement and pickup
 * Addded input handling system
 * Added door open / close mechanics via the iOpenable interface
+* Added stairr cases / movement between levels
 
 ### To Do
 * Inventory Management: throw
@@ -27,6 +28,7 @@ At the present time, it's more of a collection of the concepts that make a rogue
 * Animations - projectiles
 * Food
 * Item effects
+* Clean up movement between 
 
 ### Long Term
  * Add articles in wiki - note that at the momenet as it's currently in so much flux that there's a chance I might chop up and burn something that has been meticulously documented.

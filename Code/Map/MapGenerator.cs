@@ -25,14 +25,33 @@ namespace Rosie.Map
         /// Build a series of rooms and corridoors and return the map data
         /// </summary>
         /// <returns>Instance of CurrentLevel class</returns>
-        public override Level Build()
+        public override Level Build(int pWidth, int pHeight)
         {
+
+            MapSize = new Size(pWidth, pHeight);
+
+            Level = new Level();
 
             WayPoints = new();
             Build_OneStartRoom();
             AddWalls();
             Level.Rooms = rctBuiltRooms;
             Level.WayPoints = WayPoints;
+
+
+            // 
+            //  Add Stair Cases
+            //
+            Point stair = GetRandomRoomPoint();
+            Level.Map[stair.X, stair.Y] = new Staircase(true); //up
+            Level.StairCase_Up = new Point(stair.X, stair.Y); //up
+
+            stair = GetRandomRoomPoint();
+            Level.Map[stair.X, stair.Y] = new Staircase(false); //up
+            Level.StairCase_Down = new Point(stair.X, stair.Y); //up
+
+
+
 
             return Level;
         }
@@ -120,33 +139,33 @@ namespace Rosie.Map
 
         //room properties
         [Category("Room"), Description("Minimum Size"), DisplayName("Minimum Size")]
-        public Size Room_Min { get; set; }
+        public Size Room_Min { get; set; } = new Size(4, 4);
         [Category("Room"), Description("Max Size"), DisplayName("Maximum Size")]
-        public Size Room_Max { get; set; }
+        public Size Room_Max { get; set; } = new Size(10, 10);
         [Category("Room"), Description("Total number"), DisplayName("Rooms to build")]
-        public int MaxRooms { get; set; }
+        public int MaxRooms { get; set; } = 2;
         [Category("Room"), Description("Minimum distance between rooms"), DisplayName("Distance from other rooms")]
-        public int RoomDistance { get; set; }
+        public int RoomDistance { get; set; } = 3;
         [Category("Room"), Description("Minimum distance of room from existing corridors"), DisplayName("Corridor Distance")]
-        public int CorridorDistance { get; set; }
+        public int CorridorDistance { get; set; } = 4;
 
         //corridor properties
         [Category("Corridor"), Description("Minimum corridor length"), DisplayName("Minimum length")]
-        public int Corridor_Min { get; set; }
+        public int Corridor_Min { get; set; } = 3;
         [Category("Corridor"), Description("Maximum corridor length"), DisplayName("Maximum length")]
-        public int Corridor_Max { get; set; }
-        [Category("Corridor"), Description("Maximum turns"), DisplayName("Maximum turns")]
-        public int Corridor_MaxTurns { get; set; }
+        public int Corridor_Max { get; set; } = 15;
+        [Category("Corridor"), Description("Maximum corridor length"), DisplayName("Maximum length")]
+        public int Corridor_MaxTurns { get; set; } = 5;
         [Category("Corridor"), Description("The distance a corridor has to be away from a closed cell for it to be built"), DisplayName("Corridor Spacing")]
-        public int CorridorSpace { get; set; }
+        public int CorridorSpace { get; set; } = 2;
 
 
         [Category("Probability"), Description("Probability of building a corridor from a room or corridor. Greater than value = room"), DisplayName("Select room")]
-        public int BuildProb { get; set; }
+        public int BuildProb { get; set; } = 30;
 
 
         [Category("Map"), DisplayName("Break Out"), Description("")]
-        public int BreakOut { get; set; }
+        public int BreakOut { get; set; } = 250;
 
         /// <summary>
         /// Add doors to map
@@ -181,24 +200,24 @@ namespace Rosie.Map
 
         public MapGenerator()
         {
-            Level = new Level();
+            //Level = new Level();
 
-            MapSize = new Size(150, 150);
-            Level.Map = new Tile[MapSize.Width, MapSize.Height];
-            Corridor_MaxTurns = 5;
-            Room_Min = new Size(3, 3);
-            Room_Max = new Size(10, 10);
-            Corridor_Min = 3;
-            Corridor_Max = 15;
-            MaxRooms = 25;
+            //MapSize = new Size(150, 150);
+            //Level.Map = new Tile[MapSize.Width, MapSize.Height];
+            //Corridor_MaxTurns = 5;
+            //Room_Min = new Size(3, 3);
+            //Room_Max = new Size(10, 10);
+            //Corridor_Min = 3;
+            //Corridor_Max = 15;
+            //MaxRooms = 25;
 
 
-            RoomDistance = 5;
-            CorridorDistance = 4;
-            CorridorSpace = 2;
+            //RoomDistance = 5;
+            //CorridorDistance = 4;
+            //CorridorSpace = 2;
 
-            BuildProb = 30;
-            BreakOut = 250;
+            //BuildProb = 30;
+            //BreakOut = 250;
         }
 
         /// <summary>
@@ -977,5 +996,29 @@ namespace Rosie.Map
         }
 
 
+        public Point GetRandomRoomPoint()
+        {
+            Point pLocation = new Point();
+
+            do
+            {
+                var rommIdx = _rnd.Next(0, Level.Rooms.Count);
+
+                var room = Level.Rooms[rommIdx];
+                pLocation = new Point(
+                    _rnd.Next(room.Left, room.Right)
+                    , _rnd.Next(room.Top, room.Bottom)
+                    );
+
+            } while (!(Level.Map[pLocation.X, pLocation.Y] is Floor) && !Level.Map[pLocation.X, pLocation.Y].Passable());
+
+            return pLocation;
+
+        }
+
+        public override Level Build()
+        {
+            throw new System.NotImplementedException();
+        }
     }
 }

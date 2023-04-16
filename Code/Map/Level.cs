@@ -34,7 +34,10 @@ namespace Rosie.Code.Map
 
         protected Random _rnd = new Random();
 
+        public Point StairCase_Up { get; set; }
+        public Point StairCase_Down { get; set; }
 
+        public Guid Guid { get; set; }
 
         public void Monster_ActorMoved(object sender, Actor.ActorCompeletedTurnEventArgs e)
         {
@@ -42,6 +45,10 @@ namespace Rosie.Code.Map
             Map[e.After.X, e.After.Y].Inhabitant = e.Inhabitant;
         }
 
+        public Level()
+        {
+            Guid = Guid.NewGuid();
+        }
 
         /// <summary>
         /// Write the current map to a text file as a 2d integer array
@@ -85,48 +92,96 @@ namespace Rosie.Code.Map
         /// <summary>
         /// Set up monsters on the 
         /// </summary>
-        public void InitActors(Player pPlayer, int pMaxMonsters)
+        public void InitLevel(Player pPlayer, int pMaxMonsters)
         {
 
             player = pPlayer;
-            _Scheduler.AddActor(pPlayer);
+
+            if (!_Scheduler.ContainsActor(pPlayer))
+            {
+                _Scheduler.AddActor(pPlayer);
+            }
 
             NPC m;
 
             Point location;
             WayPoint wp;
 
-
+            //
+            //  Set NPCs
+            //
             for (int ctr = 0; ctr < pMaxMonsters; ctr++)
             {
                 MapUtils.GetRandomRoomPoint(out location, out wp);
 
-                m = new NPC(location)
+                m = new NPC(location, new ScriptBasic())
                 {
-                    Gfx = (int)GFXValues.MONSTER_SKELETON
+                    Gfx = (int)GFXValues.MONSTER_ORC
                     ,
                     Speed = 10
                     ,
-                    VisionRange = 3
+                    VisionRange = 5
                     ,
-                    HitPointsMax = 5,
-
+                    HitPointsMax = 5
+                    ,
                     HitPointsCurrent = 5
                 };
 
-                m.script = new ScriptZombie(m);
+
                 m.script.SetTargetWayPoint(wp);
                 m.WeaponPrimary = new Spear();
                 m.ActorCompletedTurn += Monster_ActorMoved;
                 m.Died += Monster_Died;
 
+                Map[m.X, m.Y].Inhabitant = m;
+                Monsters.Add(m);
+                _Scheduler.AddActor(m);
+            }
 
-                //Console.WriteLine("Monster {0},{1}", m.RoamTarget.X, m.RoamTarget.Y);
+
+            for (int ctr = 0; ctr < pMaxMonsters; ctr++)
+            {
+                MapUtils.GetRandomRoomPoint(out location, out wp);
+
+                m = new NPC(location, new ScriptZombie())
+                {
+                    Gfx = (int)GFXValues.MONSTER_SKELETON
+                    ,
+                    Speed = 10
+                    ,
+                    VisionRange = 5
+                    ,
+                    HitPointsMax = 5
+                    ,
+                    HitPointsCurrent = 5
+                };
+
+
+                m.script.SetTargetWayPoint(wp);
+                m.WeaponPrimary = new Dagger();
+                m.ActorCompletedTurn += Monster_ActorMoved;
+                m.Died += Monster_Died;
 
                 Map[m.X, m.Y].Inhabitant = m;
                 Monsters.Add(m);
                 _Scheduler.AddActor(m);
             }
+
+
+
+            //
+            //  Randomly add treasure
+            //
+            for (int ctr = 0; ctr < 10; ctr++)
+            {
+                var p = MapUtils.GetRandomRoomPoint();
+                AddItem(new GoldCoins(_rnd.Next(1, 100)) { X = p.X, Y = p.Y });
+            }
+
+
+
+
+
         }
 
         /// <summary>
@@ -153,6 +208,7 @@ namespace Rosie.Code.Map
             Map[e.monster.X, e.monster.Y].Inhabitant = null;
 
         }
+
 
 
     }

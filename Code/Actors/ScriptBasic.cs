@@ -2,10 +2,9 @@
 
 namespace Rosie.Code.Actors
 {
-    public class ScriptZombie : Script
+    public class ScriptBasic : Script
     {
-
-        public ScriptZombie() : base()
+        public ScriptBasic() : base()
         {
 
         }
@@ -24,8 +23,10 @@ namespace Rosie.Code.Actors
                     DirectMoveTowardsPoint(player.X, player.Y);
                 }
             }
-
+            else
+            {
+                Wander();
+            }
         }
-
     }
 }

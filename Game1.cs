@@ -211,7 +211,7 @@ namespace Rosie
         protected void DrawPlayerStats()
         {
             Point drawOrigin = new Point(10, 50);
-            _spriteBatch.DrawString(_font, RosieGame.player.Properties() + "\r\nTNS: " + _Rosie.TurnCounter, new Vector2(drawOrigin.X, drawOrigin.Y), Color.White);
+            _spriteBatch.DrawString(_font, _Rosie.PlayerProperties() + "\r\nTNS: " + _Rosie.TurnCounter, new Vector2(drawOrigin.X, drawOrigin.Y), Color.White);
         }
 
 
@@ -387,15 +387,19 @@ namespace Rosie
                         {
                             DrawTile(tile.Inhabitant.Gfx, rect, Color.White);
 
-                            DrawHitpoints(
-                                rect
-                                , tile.Inhabitant.HitPointsCurrent
-                                , tile.Inhabitant.HitPointsMax
-                                );
-
                             if (tile.Inhabitant is NPC)
                             {
                                 DrawNPCState(rect, (tile.Inhabitant as NPC).script.State);
+
+                                if ((tile.Inhabitant as NPC).script.State == NPC_STATE.Combat)
+                                {
+                                    DrawHitpoints(
+                                      rect
+                                      , tile.Inhabitant.HitPointsCurrent
+                                      , tile.Inhabitant.HitPointsMax
+                                      );
+                                }
+
                             }
                         }
                     }
