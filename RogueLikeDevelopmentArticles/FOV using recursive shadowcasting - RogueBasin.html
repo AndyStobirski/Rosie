@@ -1,0 +1,625 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<!-- saved from url=(0135)https://web.archive.org/web/20100525121443/http://roguebasin.roguelikedevelopment.org/index.php?title=FOV_using_recursive_shadowcasting -->
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en" dir="ltr"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8"><script src="./FOV using recursive shadowcasting - RogueBasin_files/analytics.js.download" type="text/javascript"></script>
+<script type="text/javascript">window.addEventListener('DOMContentLoaded',function(){var v=archive_analytics.values;v.service='wb';v.server_name='wwwb-app201.us.archive.org';v.server_ms=1003;archive_analytics.send_pageview({});});</script>
+<script type="text/javascript" src="./FOV using recursive shadowcasting - RogueBasin_files/bundle-playback.js.download" charset="utf-8"></script>
+<script type="text/javascript" src="./FOV using recursive shadowcasting - RogueBasin_files/wombat.js.download" charset="utf-8"></script>
+<script type="text/javascript">
+  __wm.init("https://web.archive.org/web");
+  __wm.wombat("http://roguebasin.roguelikedevelopment.org:80/index.php?title=FOV_using_recursive_shadowcasting","20100525121443","https://web.archive.org/","web","/_static/",
+	      "1274789683");
+</script>
+<link rel="stylesheet" type="text/css" href="./FOV using recursive shadowcasting - RogueBasin_files/banner-styles.css">
+<link rel="stylesheet" type="text/css" href="./FOV using recursive shadowcasting - RogueBasin_files/iconochive.css">
+<!-- End Wayback Rewrite JS Include -->
+
+		
+		<meta http-equiv="Content-Style-Type" content="text/css">
+		<meta name="generator" content="MediaWiki 1.15.0">
+		<meta name="keywords" content="FOV using recursive shadowcasting,PythonShadowcastingImplementation,Ruby shadowcasting implementation">
+		<link rel="shortcut icon" href="https://web.archive.org/web/20100525121443im_/http://roguebasin.roguelikedevelopment.org/favicon.ico">
+		<link rel="search" type="application/opensearchdescription+xml" href="https://web.archive.org/web/20100525121443/http://roguebasin.roguelikedevelopment.org/opensearch_desc.php" title="RogueBasin (en)">
+		<link rel="alternate" type="application/rss+xml" title="RogueBasin RSS Feed" href="https://web.archive.org/web/20100525121443/http://roguebasin.roguelikedevelopment.org/index.php?title=Special:RecentChanges&amp;feed=rss">
+		<link rel="alternate" type="application/atom+xml" title="RogueBasin Atom Feed" href="https://web.archive.org/web/20100525121443/http://roguebasin.roguelikedevelopment.org/index.php?title=Special:RecentChanges&amp;feed=atom">
+		<title>FOV using recursive shadowcasting - RogueBasin</title>
+		<link rel="stylesheet" href="./FOV using recursive shadowcasting - RogueBasin_files/shared.css" type="text/css" media="screen">
+		<link rel="stylesheet" href="./FOV using recursive shadowcasting - RogueBasin_files/commonPrint.css" type="text/css" media="print">
+		<link rel="stylesheet" href="./FOV using recursive shadowcasting - RogueBasin_files/main.css" type="text/css" media="screen">
+		<!--[if lt IE 5.5000]><link rel="stylesheet" href="/skins/monobook/IE50Fixes.css?207" type="text/css" media="screen" /><![endif]-->
+		<!--[if IE 5.5000]><link rel="stylesheet" href="/skins/monobook/IE55Fixes.css?207" type="text/css" media="screen" /><![endif]-->
+		<!--[if IE 6]><link rel="stylesheet" href="/skins/monobook/IE60Fixes.css?207" type="text/css" media="screen" /><![endif]-->
+		<!--[if IE 7]><link rel="stylesheet" href="/skins/monobook/IE70Fixes.css?207" type="text/css" media="screen" /><![endif]-->
+		<link rel="stylesheet" href="./FOV using recursive shadowcasting - RogueBasin_files/index.php" type="text/css">
+		<link rel="stylesheet" href="./FOV using recursive shadowcasting - RogueBasin_files/index(1).php" type="text/css" media="print">
+		<link rel="stylesheet" href="./FOV using recursive shadowcasting - RogueBasin_files/index(2).php" type="text/css">
+		<link rel="stylesheet" href="./FOV using recursive shadowcasting - RogueBasin_files/index(3).php" type="text/css">
+		<!--[if lt IE 7]><script type="text/javascript" src="/skins/common/IEFixes.js?207"></script>
+		<meta http-equiv="imagetoolbar" content="no" /><![endif]-->
+
+		<script type="text/javascript">/*<![CDATA[*/
+		var skin = "monobook";
+		var stylepath = "/skins";
+		var wgArticlePath = "/index.php?title=$1";
+		var wgScriptPath = "";
+		var wgScript = "/index.php";
+		var wgVariantArticlePath = false;
+		var wgActionPaths = {};
+		var wgServer = "https://web.archive.org/web/20100525121443/http://roguebasin.roguelikedevelopment.org";
+		var wgCanonicalNamespace = "";
+		var wgCanonicalSpecialPageName = false;
+		var wgNamespaceNumber = 0;
+		var wgPageName = "FOV_using_recursive_shadowcasting";
+		var wgTitle = "FOV using recursive shadowcasting";
+		var wgAction = "view";
+		var wgArticleId = "1459";
+		var wgIsArticle = true;
+		var wgUserName = null;
+		var wgUserGroups = null;
+		var wgUserLanguage = "en";
+		var wgContentLanguage = "en";
+		var wgBreakFrames = false;
+		var wgCurRevisionId = 19952;
+		var wgVersion = "1.15.0";
+		var wgEnableAPI = true;
+		var wgEnableWriteAPI = true;
+		var wgSeparatorTransformTable = ["", ""];
+		var wgDigitTransformTable = ["", ""];
+		var wgRestrictionEdit = [];
+		var wgRestrictionMove = [];
+		/*]]>*/</script>
+
+		<script type="text/javascript" src="./FOV using recursive shadowcasting - RogueBasin_files/wikibits.js.download"><!-- wikibits js --></script><style type="text/css">@import "/web/20100525121443/http://roguebasin.roguelikedevelopment.org/skins/monobook/KHTMLFixes.css";</style>
+		<!-- Head Scripts -->
+		<script type="text/javascript" src="./FOV using recursive shadowcasting - RogueBasin_files/ajax.js.download"></script>
+		<script type="text/javascript" src="./FOV using recursive shadowcasting - RogueBasin_files/index(4).php"><!-- site js --></script>
+	</head>
+<body class="mediawiki ltr ns-0 ns-subject page-FOV_using_recursive_shadowcasting skin-monobook"><!-- BEGIN WAYBACK TOOLBAR INSERT -->
+<script>__wm.rw(0);</script>
+<div id="wm-ipp-base" lang="en" style="display: block; direction: ltr;"><template shadowrootmode="closed"><div id="wm-ipp" style="position:fixed;left:0;top:0;right:0;">
+<div id="donato" style="position:relative;width:100%;">
+  <div id="donato-base">
+    <iframe id="donato-if" src="https://archive.org/includes/donate.php?as_page=1&amp;platform=wb&amp;referer=https%3A//web.archive.org/web/20100525121443/http%3A//roguebasin.roguelikedevelopment.org/index.php%3Ftitle%3DFOV_using_recursive_shadowcasting" scrolling="no" frameborder="0" style="width:100%; height:100%">
+    </iframe>
+  </div>
+</div><div id="wm-ipp-inside">
+  <div id="wm-toolbar" style="position:relative;display:flex;flex-flow:row nowrap;justify-content:space-between;">
+    <div id="wm-logo" style="/*width:110px;*/padding-top:12px;">
+      <a href="https://web.archive.org/web/" title="Wayback Machine home page"><img src="https://web.archive.org/_static/images/toolbar/wayback-toolbar-logo-200.png" srcset="/_static/images/toolbar/wayback-toolbar-logo-100.png, /_static/images/toolbar/wayback-toolbar-logo-150.png 1.5x, /_static/images/toolbar/wayback-toolbar-logo-200.png 2x" alt="Wayback Machine" style="width:100px" border="0"></a>
+    </div>
+    <div class="c" style="display:flex;flex-flow:column nowrap;justify-content:space-between;flex:1;">
+      <form class="u" style="display:flex;flex-direction:row;flex-wrap:nowrap;" target="_top" method="get" action="https://web.archive.org/web/submit" name="wmtb" id="wmtb"><input type="text" name="url" id="wmtbURL" value="http://roguebasin.roguelikedevelopment.org/index.php?title=FOV_using_recursive_shadowcasting" onfocus="this.focus();this.select();" style="flex:1;" autocomplete="off"><input type="hidden" name="type" value="replay"><input type="hidden" name="date" value="20100525121443"><input type="submit" value="Go">
+      </form>
+      <div style="display:flex;flex-flow:row nowrap;align-items:flex-end;">
+                <div class="s" id="wm-nav-captures" style="flex:1;"><a class="t" href="https://web.archive.org/web/*/http://roguebasin.roguelikedevelopment.org/index.php?title=FOV_using_recursive_shadowcasting" title="See a list of every capture for this URL">49 captures</a><div class="r" title="Timespan for captures of this URL">22 May 2007 - 11 Mar 2021</div></div>
+        <div class="k">
+          <a href="https://web.archive.org/web/20100525121443/http://roguebasin.roguelikedevelopment.org/index.php?title=FOV_using_recursive_shadowcasting" id="wm-graph-anchor">
+            <div id="wm-ipp-sparkline" title="Explore captures for this URL" style="position: relative">
+              <canvas id="wm-sparkline-canvas" width="700" height="27" border="0"></canvas>
+            <div class="yt" style="display: none; width: 25px; height: 27px;"></div><div class="mt" style="display: none; width: 2px; height: 27px;"></div></div>
+          </a>
+        </div>
+      </div>
+    </div>
+    <div class="n">
+      <table>
+        <tbody>
+          <!-- NEXT/PREV MONTH NAV AND MONTH INDICATOR -->
+          <tr class="m">
+            <td class="b" nowrap="nowrap"><a href="https://web.archive.org/web/20080305124738/http://roguebasin.roguelikedevelopment.org:80/index.php?title=FOV_using_recursive_shadowcasting" title="05 Mar 2008"><strong>Mar</strong></a></td>
+            <td class="c" id="displayMonthEl" title="You are here: 12:14:43 May 25, 2010">MAY</td>
+            <td class="f" nowrap="nowrap"><a href="https://web.archive.org/web/20110510231619/http://roguebasin.roguelikedevelopment.org:80/index.php?title=FOV_using_recursive_shadowcasting" title="10 May 2011"><strong>May</strong></a></td>
+          </tr>
+          <!-- NEXT/PREV CAPTURE NAV AND DAY OF MONTH INDICATOR -->
+          <tr class="d">
+            <td class="b" nowrap="nowrap"><a href="https://web.archive.org/web/20080305124738/http://roguebasin.roguelikedevelopment.org:80/index.php?title=FOV_using_recursive_shadowcasting" title="12:47:38 Mar 05, 2008"><img src="https://web.archive.org/_static/images/toolbar/wm_tb_prv_on.png" alt="Previous capture" width="14" height="16" border="0"></a></td>
+            <td class="c" id="displayDayEl" style="width:34px;font-size:22px;white-space:nowrap;" title="You are here: 12:14:43 May 25, 2010">25</td>
+            <td class="f" nowrap="nowrap"><a href="https://web.archive.org/web/20110510231619/http://roguebasin.roguelikedevelopment.org:80/index.php?title=FOV_using_recursive_shadowcasting" title="23:16:19 May 10, 2011"><img src="https://web.archive.org/_static/images/toolbar/wm_tb_nxt_on.png" alt="Next capture" width="14" height="16" border="0"></a></td>
+          </tr>
+          <!-- NEXT/PREV YEAR NAV AND YEAR INDICATOR -->
+          <tr class="y">
+            <td class="b" nowrap="nowrap"><a href="https://web.archive.org/web/20080305124738/http://roguebasin.roguelikedevelopment.org:80/index.php?title=FOV_using_recursive_shadowcasting" title="05 Mar 2008"><strong>2008</strong></a></td>
+            <td class="c" id="displayYearEl" title="You are here: 12:14:43 May 25, 2010">2010</td>
+            <td class="f" nowrap="nowrap"><a href="https://web.archive.org/web/20120326053355/http://roguebasin.roguelikedevelopment.org:80/index.php?title=FOV_using_recursive_shadowcasting" title="26 Mar 2012"><strong>2012</strong></a></td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+    <div class="r" style="display:flex;flex-flow:column nowrap;align-items:flex-end;justify-content:space-between;">
+      <div id="wm-btns" style="text-align:right;height:23px;">
+                <span class="xxs">
+          <div id="wm-save-snapshot-success">success</div>
+          <div id="wm-save-snapshot-fail">fail</div>
+          <a id="wm-save-snapshot-open" href="https://web.archive.org/web/20100525121443/http://roguebasin.roguelikedevelopment.org/index.php?title=FOV_using_recursive_shadowcasting#" title="Share via My Web Archive" style="display: none;">
+            <span class="iconochive-web"></span>
+          </a>
+          <a href="https://archive.org/account/login.php" title="Sign In" id="wm-sign-in" style="display: inline-block;">
+            <span class="iconochive-person"></span>
+          </a>
+          <span id="wm-save-snapshot-in-progress" class="iconochive-web" style="display: none;"></span>
+        </span>
+                <a class="xxs" href="http://faq.web.archive.org/" title="Get some help using the Wayback Machine" style="top:-6px;"><span class="iconochive-question" style="color:rgb(87,186,244);font-size:160%;"></span></a>
+        <a id="wm-tb-close" href="https://web.archive.org/web/20100525121443/http://roguebasin.roguelikedevelopment.org/index.php?title=FOV_using_recursive_shadowcasting#close" style="top:-2px;" title="Close the toolbar"><span class="iconochive-remove-circle" style="color:#888888;font-size:240%;"></span></a>
+      </div>
+      <div id="wm-share" class="xxs">
+        <a href="https://web.archive.org/web/20100525121443/http://web.archive.org/screenshot/http://roguebasin.roguelikedevelopment.org/index.php?title=FOV_using_recursive_shadowcasting" id="wm-screenshot" title="screenshot" style="visibility: hidden;">
+          <span class="wm-icon-screen-shot"></span>
+        </a>
+        <a href="https://web.archive.org/web/20100525121443/http://roguebasin.roguelikedevelopment.org/index.php?title=FOV_using_recursive_shadowcasting#" id="wm-video" title="video">
+          <span class="iconochive-movies"></span>
+        </a>
+        <a id="wm-share-facebook" href="https://web.archive.org/web/20100525121443/http://roguebasin.roguelikedevelopment.org/index.php?title=FOV_using_recursive_shadowcasting#" data-url="https://web.archive.org/web/20100525121443/http://roguebasin.roguelikedevelopment.org:80/index.php?title=FOV_using_recursive_shadowcasting" title="Share on Facebook" style="margin-right:5px;" target="_blank"><span class="iconochive-facebook" style="color:#3b5998;font-size:160%;"></span></a>
+        <a id="wm-share-twitter" href="https://web.archive.org/web/20100525121443/http://roguebasin.roguelikedevelopment.org/index.php?title=FOV_using_recursive_shadowcasting#" data-url="https://web.archive.org/web/20100525121443/http://roguebasin.roguelikedevelopment.org:80/index.php?title=FOV_using_recursive_shadowcasting" title="Share on Twitter" style="margin-right:5px;" target="_blank"><span class="iconochive-twitter" style="color:#1dcaff;font-size:160%;"></span></a>
+      </div>
+      <div style="padding-right:2px;text-align:right;white-space:nowrap;">
+        <a id="wm-expand" class="wm-btn wm-closed" href="https://web.archive.org/web/20100525121443/http://roguebasin.roguelikedevelopment.org/index.php?title=FOV_using_recursive_shadowcasting#expand" onclick="__wm.ex(event);return false;"><span id="wm-expand-icon" class="iconochive-down-solid"></span> <span class="xxs" style="font-size:80%;">About this capture</span></a>
+      </div>
+    </div>
+  </div>
+    <div id="wm-capinfo" style="border-top:1px solid #777;display:none; overflow: hidden">
+        <div id="wm-capinfo-notice" source="api"></div>
+                <div id="wm-capinfo-collected-by">
+    <div style="background-color:#666;color:#fff;font-weight:bold;text-align:center">COLLECTED BY</div>
+    <div style="padding:3px;position:relative" id="wm-collected-by-content">
+            <div style="display:inline-block;vertical-align:top;width:50%;">
+			<span class="c-logo" style="background-image:url(https://archive.org/services/img/alexacrawls);"></span>
+		Organization: <a style="color:#33f;" href="https://archive.org/details/alexacrawls" target="_new"><span class="wm-title">Alexa Crawls</span></a>
+		<div style="max-height:75px;overflow:hidden;position:relative;">
+	  <div style="position:absolute;top:0;left:0;width:100%;height:75px;background:linear-gradient(to bottom,rgba(255,255,255,0) 0%,rgba(255,255,255,0) 90%,rgba(255,255,255,255) 100%);"></div>
+	  Starting in 1996, <a href="http://www.alexa.com/">Alexa Internet</a> has been donating their crawl data to the Internet Archive.  Flowing in every day, these data are added to the <a href="http://web.archive.org/">Wayback Machine</a> after an embargo period.
+	</div>
+	      </div>
+      <div style="display:inline-block;vertical-align:top;width:49%;">
+			<span class="c-logo" style="background-image:url(https://archive.org/services/img/alexa_web_2010)"></span>
+		<div>Collection: <a style="color:#33f;" href="https://archive.org/details/alexa_web_2010" target="_new"><span class="wm-title">alexa_web_2010</span></a></div>
+		<div style="max-height:75px;overflow:hidden;position:relative;">
+	  <div style="position:absolute;top:0;left:0;width:100%;height:75px;background:linear-gradient(to bottom,rgba(255,255,255,0) 0%,rgba(255,255,255,0) 90%,rgba(255,255,255,255) 100%);"></div>
+	  this data is currently not publicly accessible.
+	</div>
+	      </div>
+    </div>
+    </div>
+    <div id="wm-capinfo-timestamps">
+    <div style="background-color:#666;color:#fff;font-weight:bold;text-align:center" title="Timestamps for the elements of this page">TIMESTAMPS</div>
+    <div>
+      <div id="wm-capresources" style="margin:0 5px 5px 5px;max-height:250px;overflow-y:scroll !important"></div>
+      <div id="wm-capresources-loading" style="text-align:left;margin:0 20px 5px 5px;display:none"><img src="https://web.archive.org/_static/images/loading.gif" alt="loading"></div>
+    </div>
+    </div>
+  </div></div></div><link rel="stylesheet" type="text/css" href="./FOV using recursive shadowcasting - RogueBasin_files/banner-styles.css"><link rel="stylesheet" type="text/css" href="./FOV using recursive shadowcasting - RogueBasin_files/iconochive.css"><div class="wb-autocomplete-suggestions "></div></template>
+</div><div id="wm-ipp-print">The Wayback Machine - https://web.archive.org/web/20100525121443/http://roguebasin.roguelikedevelopment.org:80/index.php?title=FOV_using_recursive_shadowcasting</div>
+<script type="text/javascript">//<![CDATA[
+__wm.bt(700,27,25,2,"web","http://roguebasin.roguelikedevelopment.org/index.php?title=FOV_using_recursive_shadowcasting","20100525121443",1996,"/_static/",["/_static/css/banner-styles.css?v=S1zqJCYt","/_static/css/iconochive.css?v=qtvMKcIJ"], false);
+  __wm.rw(1);
+//]]></script>
+<!-- END WAYBACK TOOLBAR INSERT -->
+ 
+	<div id="globalWrapper">
+		<div id="column-content">
+	<div id="content">
+		<a name="top" id="top"></a>
+				<h1 id="firstHeading" class="firstHeading">FOV using recursive shadowcasting</h1>
+		<div id="bodyContent">
+			<h3 id="siteSub">From RogueBasin</h3>
+			<div id="contentSub"></div>
+									<div id="jump-to-nav">Jump to: <a href="https://web.archive.org/web/20100525121443/http://roguebasin.roguelikedevelopment.org/index.php?title=FOV_using_recursive_shadowcasting#column-one">navigation</a>, <a href="https://web.archive.org/web/20100525121443/http://roguebasin.roguelikedevelopment.org/index.php?title=FOV_using_recursive_shadowcasting#searchInput">search</a></div>			<!-- start content -->
+			<p>FOV using recursive shadowcasting - Björn Bergström [bjorn.bergstrom@roguelikedevelopment.org]
+</p>
+<table id="toc" class="toc" summary="Contents"><tbody><tr><td><div id="toctitle"><h2>Contents</h2> <span class="toctoggle">[<a id="togglelink" class="internal" href="javascript:toggleToc()">hide</a>]</span></div>
+<ul>
+<li class="toclevel-1"><a href="https://web.archive.org/web/20100525121443/http://roguebasin.roguelikedevelopment.org/index.php?title=FOV_using_recursive_shadowcasting#Introduction"><span class="tocnumber">1</span> <span class="toctext">Introduction</span></a></li>
+<li class="toclevel-1"><a href="https://web.archive.org/web/20100525121443/http://roguebasin.roguelikedevelopment.org/index.php?title=FOV_using_recursive_shadowcasting#Shadowcasting"><span class="tocnumber">2</span> <span class="toctext">Shadowcasting</span></a></li>
+<li class="toclevel-1"><a href="https://web.archive.org/web/20100525121443/http://roguebasin.roguelikedevelopment.org/index.php?title=FOV_using_recursive_shadowcasting#Definitions"><span class="tocnumber">3</span> <span class="toctext">Definitions</span></a></li>
+<li class="toclevel-1"><a href="https://web.archive.org/web/20100525121443/http://roguebasin.roguelikedevelopment.org/index.php?title=FOV_using_recursive_shadowcasting#Recursive_Shadowcasting"><span class="tocnumber">4</span> <span class="toctext">Recursive Shadowcasting</span></a></li>
+<li class="toclevel-1"><a href="https://web.archive.org/web/20100525121443/http://roguebasin.roguelikedevelopment.org/index.php?title=FOV_using_recursive_shadowcasting#Implementations"><span class="tocnumber">5</span> <span class="toctext">Implementations</span></a></li>
+</ul>
+</td></tr></tbody></table><script type="text/javascript"> if (window.showTocToggle) { var tocShowText = "show"; var tocHideText = "hide"; showTocToggle(); } </script>
+<a name="Introduction" id="Introduction"></a><h2> <span class="mw-headline">Introduction</span></h2>
+<p>A working field-of-view (or commonly known as line of sight) algorithm is one of
+the essential parts in any roguelike. A FOV algorithm is used to calculate which
+mapcells, within a given radius, that can be seen, or in the case of a
+lightsource, which mapcells that are lit.
+</p><p>The simplest approach is to trace lines from the center out to all of the
+mapcells at the edge of the radius and stopping when a mapcell is blocking line
+of sight. The problem with this approach is that many mapcells are visited
+several times, most often near the starting point and more seldom at the edges.
+There are a few things that can improve the performance of this simple approach.
+The most obvious is improvement can be made when a blocking mapcell is hit.
+Using a simple calculation all rays that cross the blocking mapcell can be
+skipped, hence improving performance. All of this is covered in detail in other
+LOS articles. "Line of  Sight" by Tobias Downer is a good starting point.
+</p><p>Even if the "rayskipping" described above is implemented many mapcells will be
+visited more than once, thus wasting CPU time. To overcome this a totally
+different approach must be used. This approach is called shadowcasting.
+</p><p><br>
+</p>
+<a name="Shadowcasting" id="Shadowcasting"></a><h2> <span class="mw-headline">Shadowcasting</span></h2>
+<p>Shadowcasting divides the FOV calculations into eight octants and visits the
+mapcells in a totally different way than normal raycasting, described above.
+Instead of tracing lines from the center out to the edges, shadowcasting visits
+mapcells row by row or column by column, starting with the nearest row or column
+and working it's way outward.
+</p>
+<pre>  ------&gt;  6 row 6 last
+   -----&gt;  5 .
+    ----&gt;  4 .
+     ---&gt;  3 .
+      --&gt;  2 row 2 second
+       -&gt;  1 row 1 is scanned first
+        @  @ this is the starting point 
+
+ Fig.2a Shadowcasting order of scanning
+</pre>
+<p>When a scan comes across a cell that blocks LOS it calculates which other cells
+in rows/columns farther away that isn't visible because of the blocker. Those
+cells are "in shadow", hence the term shadowcasting.
+</p>
+<pre>  -...---  - = visible cells
+   -..---  # = blocking cell
+    -#---  . = cells in blocker's shadow
+     ----
+      ---
+       --
+        @
+
+ Fig.2b Cells in shadow of blocker
+</pre>
+<p>Normal shadowcasting is described in detail in the article "Computing LOS for
+Large Areas" by Gordon Lipford. Gordon's algorithm uses a temporary array and
+is rather complex. Using recursion one can achieve a clean and pretty fast
+algorithm that only visits non blocking and blocking cells, leaving out the
+cells in shadow. The algorithm is especially fast in confined areas such as
+corridors and small rooms.
+</p>
+<a name="Definitions" id="Definitions"></a><h2> <span class="mw-headline">Definitions</span></h2>
+<p>In order to understand recursive shadowcasting one need to understand what the
+slope and inverse slope of a line means. The slope is calculated using this
+simple formula:
+</p>
+<pre>slope = (x1 - x2) / (y1 - y2)
+</pre>
+<p>If we draw a line between [6,6] and [5,3] the slope would be:
+</p>
+<pre>slope = (6 - 5) / (6 - 3) = 1 / 3 = 0.33333
+</pre>
+<p>If we were to walk along this line we would find that for each step that we
+decreased y, x would be decreased 0.3333.
+</p><p>The inverse slope is simply 1 / slope.
+</p><p><br>
+</p>
+<a name="Recursive_Shadowcasting" id="Recursive_Shadowcasting"></a><h2> <span class="mw-headline">Recursive Shadowcasting</span></h2>
+<p>Recursive shadowcasting divides the field of view into eight octants with shared
+edges. The field of view will look like this when the octants are marked:
+</p>
+<pre>             Shared
+             edge by
+  Shared     1 &amp; 2      Shared
+  edge by\      |      /edge by
+  1 &amp; 8   \     |     / 2 &amp; 3
+           \1111|2222/
+           8\111|222/3
+           88\11|22/33
+           888\1|2/333
+  Shared   8888\|/3333  Shared
+  edge by-------@-------edge by
+  7 &amp; 8    7777/|\4444  3 &amp; 4
+           777/6|5\444
+           77/66|55\44
+           7/666|555\4
+           /6666|5555\
+  Shared  /     |     \ Shared
+  edge by/      |      \edge by
+  6 &amp; 7      Shared     4 &amp; 5
+             edge by 
+             5 &amp; 6
+
+ Fig.4a Area of coverage by each octant
+</pre>
+<p>As with normal shadowcasting, this recursive shadowcasting algorithm scans an
+octant row by row or column by column, depending on the octant. In each octant
+the rows/columns closest to the starting point are scanned first.
+</p><p><br>
+In octant 1 and 6 the scans are performed row by row, going from the leftmost
+cell to the rightmost cell in each row.
+</p><p>In octant 2 and 5 the scans are performed row by row, going from the rightmost
+cell to the leftmost cell in each row.
+</p><p>In octant 3 and 8 the scans are performed column by column, going from the
+topmost cell to the bottom most cell in each column.
+</p><p>In octant 4 and 7 the scans are performed column by column, going from the
+bottom most cell to the topmost cell in each column.
+</p><p><br>
+When a blocking cell is found a new scan is recursivly started one row/column
+further away, covering the area up until the first cell in shadow of the
+blocker. The rest of the initial row/column is scanned and subsequent blocking
+cells directly adjacent to the initial blocker is skipped. If a new section of
+non-blocking cells, followed by a blocker, is found the procedure is repeated.
+</p><p>I will try to illustrate the procedure described above using some simple ascii
+drawings. The area that we wish to calculate a field of view for looks like
+this:
+</p>
+<pre> ................. 16  @ = starting cell
+  ......###....... 15  # = blocking cell
+   .....###....... 14  . = non-blocking cell
+    ....###..#..## 13 
+     ...##........ 12
+      ............ 11
+       ........... 10
+        .......... 9
+         ......... 8
+          ........ 7
+           ....... 6
+            ...... 5
+             ..... 4
+              .... 3
+               ... 2
+                .. 1
+                 @
+
+  Fig.4b Field of view
+</pre>
+<p>Rows 1 through 11 are all scanned without any problems from left to right. When
+the rightmost cell is reached a new scan is started one row further away, just
+as described before.
+</p><p>If we were to draw a line from the center of the starting cell to the center of
+the leftmost cell in any of these rows we would find that the slope is 1. We
+call this the scan's start slope. If we would do the same for the rightmost cell
+the slope would be 0. This slope is ofcourse called the end slope.
+</p><p>When we reach the 12th row things are becoming a bit more interesting. The
+recursion is started when we get to row 12 and hit the blocking cells.
+</p>
+<pre> ................. 16  # = blocking cell
+  ......###....... 15  . = non-blocking cell
+   .....###....... 14  
+    ....###..#..## 13 
+     ...x#........ 12  x = first blocking cell
+
+ Fig.4c The first blocking cell
+</pre>
+<p>When the first blocking cell is hit (x) a new scan is started on row 13. The
+start slope is ofcourse the same as for all of the previous rows (ie. 1), but
+the end slope is different. The end slope is calculated using a line from the
+starting point to a point that 'brushes' by to the left of the blocking cell. If
+we zoom in it looks something like this:
+</p>
+<pre> +---+xxxxx#####  x = first blocking cell
+ |   |xxxxx#####  a = point that 'brushes' by to
+ |   |xxxxx#####      the left of the blocking cell
+ |   |xxxxx#####
+ +---axxxxx#####
+ +---++---++---+
+ |   ||   ||   |
+ |   ||   ||   |
+ |   ||   ||   |
+ +---++---++---+
+
+ Fig.4d Zoom in on the first blocking cell
+</pre>
+<p>Thus, the end slope is obtained using a line from the center starting cell to
+the point marked 'a' in the figure. This gives an end slope of about 0.82.
+</p><p>Ok, so now we have two scans; the original that continues to scan row 12 until
+the rightmost cell is reached and a new scan that scans row 13 from the leftmost
+cell (start slope 1) to the cell at row 13 that intersects the line with a slope
+of 0.82 (end slope):
+</p>
+<pre> 2222............. 16  # = blocking cell
+  2222..###....... 15  . = non-blocking cell
+   222..###....... 14  
+    222.###..#..## 13  1 = original scan 
+     111##11111111 12  2 = new scan
+
+ Fig.4e Current scans
+</pre>
+<p>Ok, lets return to the original scan on row 12. The scan had just come across
+the first blocking cell and recursivly started a new scan one row further away
+with a new end slope. The original scan now checks the next cell and finds that
+this one is also a blocking cell. Since the previous cell was a blocking cell
+too, we have come across a section of blocker and just continue scanning until
+we reach a non blocking cell:
+</p>
+<pre> ................. 16  # = blocking cell
+  ......###....... 15  . = non-blocking cell
+   .....###....... 14  
+    ....###..#..## 13 
+     ...##o....... 12  o = first non-blocking cell after a section of blockers
+
+ Fig.4f First non-blocking cell after a blocker
+</pre>
+<p>When the first non-blocking cell is found after a section of blockers we need to
+calculate a new start slope for the scan. This is done using a line from the
+center of the starting cell to a point that 'brushes' by to the right of the
+blocking cell. If we zoom in it looks something like this:
+</p>
+<pre> ##########aoooo  o = first non-blocking cell
+ ##########o   o  a = point that 'brushes' by to the
+ ##########o   o      right of the blocking cell
+ ##########o   o
+ ##########ooooo
+ +---++---++---+
+ |   ||   ||   |
+ |   ||   ||   |
+ |   ||   ||   |
+ +---++---++---+
+
+ Fig.4g Zoom in on the first non-blocking cell
+</pre>
+<p>Thus, the new start slope of the original scan is obtained using a line from the
+center of the starting cell to the point marked 'a' in the figure. This gives a
+start slope of 0.6.
+</p><p>Ok, once a scan has reached it's last cell the scan is finished and a new scan
+is started one row further away if, and only if, the last cell was a
+non-blocking cell. In the case of our original scan the last cell was a
+non-blocking cell so a new scan is started one row further away with the new
+start slope of 0.6 (instead of the old 1).
+</p><p><br>
+When the original scan starts on row 13 a blocking cell is immediately found:
+</p>
+<pre> ................. 16  # = blocking cell
+  ......###....... 15  . = non-blocking cell
+   .....###....... 14  
+    ....##x..#..## 13  x = blocking cell in original scan
+
+ Fig.4h Starting with a blocking cell
+</pre>
+<p>When this happens we continue scanning until a non-blocking cell is found. In
+this case the next cell is a non-blocking cell and we calculate a new start
+slope in the same manner as on row 12 when we passed the section of blockers.
+After this is done we continue to scan from left to right until we reach the
+last cell or until we hit a blocking cell. In our example a blocking cell is
+found before we reach the last cell:
+</p>
+<pre> ................. 16  # = blocking cell
+  ......###....... 15  . = non-blocking cell
+   .....###....... 14  
+    ....##...x..## 13  x = blocking cell in original scan
+
+ Fig.4i Another blocking cell
+</pre>
+<p>A new scan is now recursively started in the same way as on row 12. The scan has
+the same start slope as the original scan (0.6) and an end slope of a line that
+'brushes' by to the left of the blocking cell (marked x in fig.4i). Now we have
+three active scans:
+</p>
+<pre> 2222......33..... 16
+  2222..##333..... 15
+   222..##333..... 14  
+    222.###11#11## 13  
+
+ Fig.4j Active scans
+</pre>
+<p>The same procedure is repeated once more when we move out of the blocking cell,
+find two new non-blocking cells and the run into yet another blocking cell:
+</p>
+<pre> 2222......33444.. 16
+  2222..##333.44.. 15
+   222..##333.44.. 14  
+    222.##111#11## 13  
+
+ Fig.4k Active scans
+</pre>
+<p>When the original scan ends at the rightmost cell in row 13 we end with a
+blocking instead of a non-blocking, as we did in row 12. Since the original scan
+ended with a blocking cell a new scan is NOT started one row further away. We
+now have scan 2, 3 and 4 to do the job of scanning the rest of the field of
+view. These scans follow the same procedures and rules as the original scan.
+</p><p>When the scans are done we get this field of view:
+</p>
+<pre> ....ssssss.....ss 16  @ = starting cell
+  ....ssss#..s..ss 15  # = blocking cell
+   ...ssss#..s..ss 14  . = non-blocking cell
+    ...ss##..#..## 13  s = shadowed cells
+     ...##........ 12
+      ............ 11
+       ........... 10
+        .......... 9
+         ......... 8
+          ........ 7
+           ....... 6
+            ...... 5
+             ..... 4
+              .... 3
+               ... 2
+                .. 1
+                 @
+</pre>
+<p>This procedure is repeated on the other octants, thus producing a complete
+field of view. An implementation along with source and DOS executable can
+be found here.
+</p><p>Copyright 2001 Björn Bergström
+bjorn.bergstrom@roguelikedevelopment.org
+</p>
+<a name="Implementations" id="Implementations"></a><h2> <span class="mw-headline">Implementations</span></h2>
+<p>An <a href="https://web.archive.org/web/20100525121443/http://roguebasin.roguelikedevelopment.org/index.php?title=PythonShadowcastingImplementation" title="PythonShadowcastingImplementation" class="mw-redirect">implementation</a> of this algorithm in Python.
+</p><p>Another <a href="https://web.archive.org/web/20100525121443/http://roguebasin.roguelikedevelopment.org/index.php?title=Ruby_shadowcasting_implementation" title="Ruby shadowcasting implementation">implementation</a> in Ruby.
+</p><p><a href="https://web.archive.org/web/20100525121443/http://nemonon.de/blog/?p=10" class="external text" title="http://nemonon.de/blog/?p=10" rel="nofollow">ActionScript 3 implementation</a>
+</p>
+<!-- 
+NewPP limit report
+Preprocessor node count: 48/1000000
+Post-expand include size: 0/2097152 bytes
+Template argument size: 0/2097152 bytes
+Expensive parser function count: 0/100
+-->
+
+<!-- Saved in parser cache with key rogueliked_db3:pcache:idhash:1459-0!1!0!!en!2!edit=0 and timestamp 20100524215156 -->
+<div class="printfooter">
+Retrieved from "<a href="https://web.archive.org/web/20100525121443/http://roguebasin.roguelikedevelopment.org/index.php?title=FOV_using_recursive_shadowcasting">http://roguebasin.roguelikedevelopment.org/index.php?title=FOV_using_recursive_shadowcasting</a>"</div>
+			<div id="catlinks" class="catlinks"><div id="mw-normal-catlinks"><a href="https://web.archive.org/web/20100525121443/http://roguebasin.roguelikedevelopment.org/index.php?title=Special:Categories" title="Special:Categories">Categories</a>: <span dir="ltr"><a href="https://web.archive.org/web/20100525121443/http://roguebasin.roguelikedevelopment.org/index.php?title=Category:LOS" title="Category:LOS">LOS</a></span> | <span dir="ltr"><a href="https://web.archive.org/web/20100525121443/http://roguebasin.roguelikedevelopment.org/index.php?title=Category:FOV" title="Category:FOV">FOV</a></span></div></div>			<!-- end content -->
+						<div class="visualClear"></div>
+		</div>
+	</div>
+		</div>
+		<div id="column-one">
+	<div id="p-cactions" class="portlet">
+		<h5>Views</h5>
+		<div class="pBody">
+			<ul>
+	
+				 <li id="ca-nstab-main" class="selected"><a href="https://web.archive.org/web/20100525121443/http://roguebasin.roguelikedevelopment.org/index.php?title=FOV_using_recursive_shadowcasting" title="View the content page [alt-c]" accesskey="c">Page</a></li>
+				 <li id="ca-talk" class="new"><a href="https://web.archive.org/web/20100525121443/http://roguebasin.roguelikedevelopment.org/index.php?title=Talk:FOV_using_recursive_shadowcasting&amp;action=edit&amp;redlink=1" title="Discussion about the content page [alt-t]" accesskey="t">Discussion</a></li>
+				 <li id="ca-viewsource"><a href="https://web.archive.org/web/20100525121443/http://roguebasin.roguelikedevelopment.org/index.php?title=FOV_using_recursive_shadowcasting&amp;action=edit" title="This page is protected.
+You can view its source [alt-e]" accesskey="e">View source</a></li>
+				 <li id="ca-history"><a href="https://web.archive.org/web/20100525121443/http://roguebasin.roguelikedevelopment.org/index.php?title=FOV_using_recursive_shadowcasting&amp;action=history" title="Past revisions of this page [alt-h]" accesskey="h">History</a></li>			</ul>
+		</div>
+	</div>
+	<div class="portlet" id="p-personal">
+		<h5>Personal tools</h5>
+		<div class="pBody">
+			<ul>
+				<li id="pt-login"><a href="https://web.archive.org/web/20100525121443/http://roguebasin.roguelikedevelopment.org/index.php?title=Special:UserLogin&amp;returnto=FOV_using_recursive_shadowcasting" title="You are encouraged to log in; however, it is not mandatory [alt-o]" accesskey="o">Log in / create account</a></li>
+			</ul>
+		</div>
+	</div>
+	<div class="portlet" id="p-logo">
+		<a style="background-image: url(/web/20100525121443im_/http://roguebasin.roguelikedevelopment.org/skins/roguebasin/RogueBasin_logo.png);" href="https://web.archive.org/web/20100525121443/http://roguebasin.roguelikedevelopment.org/index.php?title=Main_Page" title="Visit the main page [alt-z]" accesskey="z"></a>
+	</div>
+	<script type="text/javascript"> if (window.isMSIE55) fixalpha(); </script>
+	<div class="generated-sidebar portlet" id="p-navigation">
+		<h5>Navigation</h5>
+		<div class="pBody">
+			<ul>
+				<li id="n-mainpage"><a href="https://web.archive.org/web/20100525121443/http://roguebasin.roguelikedevelopment.org/index.php?title=Main_Page" title="Visit the main page">Main Page</a></li>
+				<li id="n-portal"><a href="https://web.archive.org/web/20100525121443/http://roguebasin.roguelikedevelopment.org/index.php?title=RogueBasin:Community_Portal" title="About the project, what you can do, where to find things">Community portal</a></li>
+				<li id="n-recentchanges"><a href="https://web.archive.org/web/20100525121443/http://roguebasin.roguelikedevelopment.org/index.php?title=Special:RecentChanges" title="The list of recent changes in the wiki [alt-r]" accesskey="r">Recent changes</a></li>
+				<li id="n-randompage"><a href="https://web.archive.org/web/20100525121443/http://roguebasin.roguelikedevelopment.org/index.php?title=Special:Random" title="Load a random page [alt-x]" accesskey="x">Random page</a></li>
+				<li id="n-help"><a href="https://web.archive.org/web/20100525121443/http://roguebasin.roguelikedevelopment.org/index.php?title=Help:Contents" title="The place to find out">Help</a></li>
+			</ul>
+		</div>
+	</div>
+	<div id="p-search" class="portlet">
+		<h5><label for="searchInput">Search</label></h5>
+		<div id="searchBody" class="pBody">
+			<form action="https://web.archive.org/web/20100525121443/http://roguebasin.roguelikedevelopment.org/index.php" id="searchform"><div>
+				<input type="hidden" name="title" value="Special:Search">
+				<input id="searchInput" name="search" type="text" title="Search RogueBasin [alt-f]" accesskey="f" value="">
+				<input type="submit" name="go" class="searchButton" id="searchGoButton" value="Go" title="Go to a page with this exact name if exists">&nbsp;
+				<input type="submit" name="fulltext" class="searchButton" id="mw-searchButton" value="Search" title="Search the pages for this text">
+			</div></form>
+		</div>
+	</div>
+	<div class="portlet" id="p-tb">
+		<h5>Toolbox</h5>
+		<div class="pBody">
+			<ul>
+				<li id="t-whatlinkshere"><a href="https://web.archive.org/web/20100525121443/http://roguebasin.roguelikedevelopment.org/index.php?title=Special:WhatLinksHere/FOV_using_recursive_shadowcasting" title="List of all wiki pages that link here [alt-j]" accesskey="j">What links here</a></li>
+				<li id="t-recentchangeslinked"><a href="https://web.archive.org/web/20100525121443/http://roguebasin.roguelikedevelopment.org/index.php?title=Special:RecentChangesLinked/FOV_using_recursive_shadowcasting" title="Recent changes in pages linked from this page [alt-k]" accesskey="k">Related changes</a></li>
+<li id="t-specialpages"><a href="https://web.archive.org/web/20100525121443/http://roguebasin.roguelikedevelopment.org/index.php?title=Special:SpecialPages" title="List of all special pages [alt-q]" accesskey="q">Special pages</a></li>
+				<li id="t-print"><a href="https://web.archive.org/web/20100525121443/http://roguebasin.roguelikedevelopment.org/index.php?title=FOV_using_recursive_shadowcasting&amp;printable=yes" rel="alternate" title="Printable version of this page [alt-p]" accesskey="p">Printable version</a></li>				<li id="t-permalink"><a href="https://web.archive.org/web/20100525121443/http://roguebasin.roguelikedevelopment.org/index.php?title=FOV_using_recursive_shadowcasting&amp;oldid=19952" title="Permanent link to this revision of the page">Permanent link</a></li>			</ul>
+		</div>
+	</div>
+		</div><!-- end of the left (by default at least) column -->
+			<div class="visualClear"></div>
+			<div id="footer">
+				<div id="f-poweredbyico"><a href="https://web.archive.org/web/20100525121443/http://www.mediawiki.org/"><img src="./FOV using recursive shadowcasting - RogueBasin_files/poweredby_mediawiki_88x31.png" alt="Powered by MediaWiki"></a></div>
+			<ul id="f-list">
+					<li id="lastmod"> This page was last modified on 8 January 2010, at 13:53.</li>
+					<li id="viewcount">This page has been accessed 6,855 times.</li>
+					<li id="privacy"><a href="https://web.archive.org/web/20100525121443/http://roguebasin.roguelikedevelopment.org/index.php?title=RogueBasin:Privacy_policy" title="RogueBasin:Privacy policy">Privacy policy</a></li>
+					<li id="about"><a href="https://web.archive.org/web/20100525121443/http://roguebasin.roguelikedevelopment.org/index.php?title=RogueBasin:About" title="RogueBasin:About">About RogueBasin</a></li>
+					<li id="disclaimer"><a href="https://web.archive.org/web/20100525121443/http://roguebasin.roguelikedevelopment.org/index.php?title=RogueBasin:General_disclaimer" title="RogueBasin:General disclaimer">Disclaimers</a></li>
+			</ul>
+		</div>
+</div>
+
+		<script type="text/javascript">if (window.runOnloadHook) runOnloadHook();</script>
+<!-- Served in 1.028 secs. -->
+
+</body></html>
