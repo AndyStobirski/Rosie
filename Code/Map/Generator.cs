@@ -2,7 +2,6 @@
 using Rosie.Code.Environment;
 using Rosie.Code.Map;
 using Rosie.Misc;
-using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 
@@ -30,7 +29,7 @@ namespace Rosie.Map
             , new Point(0,0)    //centre
         };
 
-        protected Random _rnd = new Random(12345);
+
         /// <summary>
         /// Contains the map
         /// </summary>

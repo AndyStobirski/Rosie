@@ -1,5 +1,5 @@
-﻿using Rosie.Entities;
-using Rosie.Enums;
+﻿using Rosie.Code.Misc;
+using Rosie.Entities;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -94,6 +94,10 @@ namespace Rosie.Code
 
             //Use stairs
             com = new Command(CommandType.StairsMove, true, keys.keyS);
+            commands.Add(com);
+
+            //Use stairs
+            com = new Command(CommandType.MiniMap, true, keys.keyM);
             commands.Add(com);
 
         }

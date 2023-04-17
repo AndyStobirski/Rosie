@@ -1,9 +1,7 @@
 ﻿using Microsoft.Xna.Framework;
-using Rosie.Code;
 using Rosie.Code.Environment;
 using Rosie.Code.Items;
 using Rosie.Code.Misc;
-using Rosie.Enums;
 using System;
 using System.Linq;
 
@@ -50,12 +48,12 @@ namespace Rosie
                     Item tItem = null;
                     if (MapUtils.ItemTake(player.X, player.Y, out tItem))
                     {
-                        RosieGame.AddMessage(Code.MessageStrings.Take_True, tItem.Name);
+                        RosieGame.AddMessage(MessageStrings.Take_True, tItem.Name);
                         player.TakeItem(tItem);
                     }
                     else
                     {
-                        RosieGame.AddMessage(Code.MessageStrings.Take_False);
+                        RosieGame.AddMessage(MessageStrings.Take_False);
                     }
                     break;
 
@@ -107,7 +105,10 @@ namespace Rosie
 
                 case CommandType.StairsMove:
                     UseStairs(player.X, player.Y);
+                    break;
 
+                case CommandType.MiniMap:
+                    ViewMode = GameViewMode.MiniMap;
                     break;
 
                 default:

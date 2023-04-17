@@ -1,4 +1,5 @@
 ﻿using Rosie.Code.Interfaces;
+using Rosie.Code.Misc;
 
 namespace Rosie.Code.Environment
 {

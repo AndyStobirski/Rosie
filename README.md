@@ -2,7 +2,7 @@
 # Rosie
 A [RogueLike](https://en.wikipedia.org/wiki/Roguelike) named after my dog, which consists of modified code from my RogueLike repository. This is a work in progress and will change  a lot over time. I have no plan or structure for this, I'm making it up as I go along and enjoying myself as I do it.
 
-It's  barely an alpha and has has the following features:
+It's barely an alpha and has has the following features:
 
 * Maze generation
 * Player Field of vision

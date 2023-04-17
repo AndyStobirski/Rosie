@@ -1,5 +1,4 @@
 ﻿using Microsoft.Xna.Framework;
-using Rosie.Code;
 using Rosie.Code.Items;
 using Rosie.Code.Misc;
 using Rosie.Misc;
@@ -33,9 +32,13 @@ namespace Rosie.Entities
         public int ArmorClass { get; set; }
         public Weapon WeaponPrimary { get; set; }
         public Armour ArmourEquiped { get; set; }
+
+        public string Class { get; set; }
         public string Name { get; set; }
         public int Gold { get; set; }
         public List<Item> Inventory { get; set; }
+
+        public string ID => Class + " " + Name;
 
         public Point Location => new Point(X, Y);
 
@@ -103,20 +106,18 @@ namespace Rosie.Entities
             int damage = (AttackerDamage - TargetResistsant > 0) ? AttackerDamage - TargetResistsant : 0;
 
             string msg;
-            string thing;
+
             if (this is Player)
             {
-                thing = pActor.Name;
                 msg = MessageStrings.Battle_Damage_Player;
             }
             else
             {
-                thing = Name;
                 msg = MessageStrings.Battle_Damage_Monster;
             }
 
 
-            RosieGame.AddMessage(msg, thing, damage.ToString(), TargetResistsant.ToString());
+            RosieGame.AddMessage(msg, ID, damage.ToString(), TargetResistsant.ToString());
 
             pActor.ModifyCurrentHitPoints(-damage);
         }

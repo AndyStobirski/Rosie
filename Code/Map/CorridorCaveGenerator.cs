@@ -1,6 +1,7 @@
 using Microsoft.Xna.Framework;
 using Rosie.Code.Environment;
 using Rosie.Code.Map;
+using Rosie.Code.Misc;
 using Rosie.Misc;
 using System;
 using System.Collections.Generic;
@@ -133,7 +134,7 @@ namespace Rosie.Map
             //the +5 offsets are to leave an empty border round the edge of the map
             for (int x = 0; x < MapSize.Width; x++)
                 for (int y = 0; y < MapSize.Height; y++)
-                    if (_rnd.Next(0, 100) < CloseCellProb)
+                    if (RandomWithSeed.Next(0, 100) < CloseCellProb)
                         Level.Map[x, y] = new Floor(FloorTile);
 
             Point cell;
@@ -141,7 +142,7 @@ namespace Rosie.Map
             //Pick cells at random
             for (int x = 0; x <= Iterations; x++)
             {
-                cell = new Point(_rnd.Next(0, MapSize.Width), _rnd.Next(0, MapSize.Height));
+                cell = new Point(RandomWithSeed.Next(0, MapSize.Width), RandomWithSeed.Next(0, MapSize.Height));
 
                 //if the randomly selected cell has more closed neighbours than the property Neighbours
                 //set it closed, else open it
@@ -206,7 +207,7 @@ namespace Rosie.Map
             {
 
                 //random point in cave
-                pCavePoint = pCave.ToList()[_rnd.Next(0, pCave.Count)];
+                pCavePoint = pCave.ToList()[RandomWithSeed.Next(0, pCave.Count)];
 
                 pDirection = Direction_Get(pDirection);
 
@@ -308,7 +309,7 @@ namespace Rosie.Map
             Corridors = new List<Point>(); //corridors built stored here
 
             //get started by randomly selecting a cave..
-            currentcave = Caves[_rnd.Next(0, Caves.Count)];
+            currentcave = Caves[RandomWithSeed.Next(0, Caves.Count)];
             ConnectedCaves.Add(currentcave);
             Caves.Remove(currentcave);
 
@@ -321,15 +322,15 @@ namespace Rosie.Map
                 //no corridors are present, sp build off a cave
                 if (Corridors.Count == 0)
                 {
-                    currentcave = ConnectedCaves[_rnd.Next(0, ConnectedCaves.Count)];
+                    currentcave = ConnectedCaves[RandomWithSeed.Next(0, ConnectedCaves.Count)];
                     Cave_GetEdge(currentcave, ref cor_point, ref cor_direction);
                 }
                 else
                     //corridors are presnt, so randomly chose whether a get a start
                     //point from a corridor or cave
-                    if (_rnd.Next(0, 100) > 50)
+                    if (RandomWithSeed.Next(0, 100) > 50)
                 {
-                    currentcave = ConnectedCaves[_rnd.Next(0, ConnectedCaves.Count)];
+                    currentcave = ConnectedCaves[RandomWithSeed.Next(0, ConnectedCaves.Count)];
                     Cave_GetEdge(currentcave, ref cor_point, ref cor_direction);
                 }
                 else
@@ -412,7 +413,7 @@ namespace Rosie.Map
             do
             {
                 //the modifiers below prevent the first of last point being chosen
-                pLocation = Corridors[_rnd.Next(1, Corridors.Count - 1)];
+                pLocation = Corridors[RandomWithSeed.Next(1, Corridors.Count - 1)];
 
                 //attempt to locate all the empy map points around the location
                 //using the directions to offset the randomly chosen point
@@ -424,7 +425,7 @@ namespace Rosie.Map
 
             } while (validdirections.Count == 0);
 
-            pDirection = validdirections[_rnd.Next(0, validdirections.Count)];
+            pDirection = validdirections[RandomWithSeed.Next(0, validdirections.Count)];
 
             pLocation.X += pDirection.X;
             pLocation.Y += pDirection.Y;
@@ -453,7 +454,7 @@ namespace Rosie.Map
             {
                 pTurns--;
 
-                corridorlength = _rnd.Next(Corridor_Min, Corridor_Max);
+                corridorlength = RandomWithSeed.Next(Corridor_Min, Corridor_Max);
                 //build corridor
                 while (corridorlength > 0)
                 {
@@ -548,7 +549,7 @@ namespace Rosie.Map
             Point newdir;
             do
             {
-                newdir = Directions[_rnd.Next(0, Directions.Count())
+                newdir = Directions[RandomWithSeed.Next(0, Directions.Count())
                     ];
 
             } while (newdir.X != -p.X & newdir.Y != -p.Y);
@@ -573,7 +574,7 @@ namespace Rosie.Map
             Point NewDir;
             do
             {
-                NewDir = Directions[_rnd.Next(0, Directions.Count())];
+                NewDir = Directions[RandomWithSeed.Next(0, Directions.Count())];
             } while (
                         Direction_Reverse(NewDir) == pDir
                          | Direction_Reverse(NewDir) == pDirExclude
@@ -631,9 +632,9 @@ namespace Rosie.Map
         public override Point GetStartLocation()
         {
 
-            int cv = _rnd.Next(0, Caves.Count);
+            int cv = RandomWithSeed.Next(0, Caves.Count);
             List<Point> cave = Caves[cv];
-            Point p = cave[_rnd.Next(0, cave.Count)];
+            Point p = cave[RandomWithSeed.Next(0, cave.Count)];
             Console.WriteLine("Cave {0}, Point {1}", cv, p);
 
 

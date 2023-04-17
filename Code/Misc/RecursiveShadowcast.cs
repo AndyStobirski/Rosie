@@ -1,6 +1,6 @@
 using Microsoft.Xna.Framework;
-using Rosie.Entities;
 using Rosie.Code.Environment;
+using Rosie.Entities;
 using System;
 
 namespace Rosie.Misc
@@ -8,53 +8,52 @@ namespace Rosie.Misc
 
     /// <summary>
     /// Implementation of "FOV using recursive shadowcasting - improved" as
-    /// described on http://roguebasin.roguelikedevelopment.org/index.php?title=FOV_using_recursive_shadowcasting_-_improved
+    /// described on https://web.archive.org/web/20090721163830/http://roguebasin.roguelikedevelopment.org/index.php?title=FOV_using_recursive_shadowcasting_-_improved
     /// 
-    /// The FOV code is contained in the region "FOV Algorithm".
+    /// It references https://web.archive.org/web/20090721163830/http://roguebasin.roguelikedevelopment.org/index.php?title=FOV_using_recursive_shadowcasting
+    /// 
+    /// The Recursive Shadowcasting code is contained in the region "Shadowcast Algorithm".
     /// The method GetVisibleCells() is called to calculate the cells
     /// visible to the player by examing each octant sequantially. 
     /// The generic list VisiblePoints contains the cells visible to the PlayerData.Location.
     /// 
-    /// GetVisibleCells() is called everytime the player moves, and the event playerMoved
-    /// is called when a successful move is made (the player moves into an empty cell)
+    /// GetVisibleCells() is called everytime the player moves and the property 
     /// 
-    /// Notes:
-    /// 
-    ///     1. The method
     /// 
     /// </summary>
-    public class FOVRecurse
+    public class RecursiveShadowcast
     {
-        public FOVRecurse(Actor pPlayer, Tile[,] pMap)
+        public RecursiveShadowcast(Actor pPlayer, Tile[,] pMap)
         {
-            _PlayerData = pPlayer;
+            _ShadowCaster = pPlayer;
             _Map = pMap;
         }
 
         /// <summary>
-        /// The player
+        /// The source of the shadow caster
         /// </summary>
-        private Actor _PlayerData { get; set; }
+        private Actor _ShadowCaster { get; set; }
 
         /// <summary>
-        /// Full Map
+        /// The map the shadowcaster is using
         /// </summary>
         private Tile[,] _Map { get; set; }
 
         /// <summary>
-        /// The octants which a player can see
+        /// The octants which the shadowcaster can see
         /// </summary>
         readonly int[] _VisibleOctants = { 1, 2, 3, 4, 5, 6, 7, 8 };
 
         /// <summary>
-        /// The rectangle which defines the game view
+        /// A square which defines the limits of the shadowcasting, a maximum area of effect
         /// </summary>
         private Rectangle _GameViewDefinition;
 
         /// <summary>
-        /// Contains the cells visible to the player in the game view
+        /// Contains the cells which are affected by the shadowcasting - zero indicates 
+        /// an area in shadow
         /// </summary>
-        public bool[,] GameViewVisibilityGrid { get; set; }
+        public double[,] GameViewVisibilityGrid { get; set; }
 
 
         #region map point code
@@ -89,7 +88,7 @@ namespace Rosie.Misc
 
         }
 
-        #region FOV algorithm
+        #region Shadowcast algorithm
 
         //  Octant data
         //
@@ -105,20 +104,31 @@ namespace Rosie.Misc
         /// Start here: go through all the octants which surround the player to
         /// determine which open cells are visible
         /// </summary>
-        public void GetVisibleCells(Rectangle pGameViewDefinition)
+        public void ScanArea(Rectangle pGameViewDefinition)
         {
             _GameViewDefinition = pGameViewDefinition;
 
             //reset the grid to false
-            GameViewVisibilityGrid = new bool[_GameViewDefinition.Width, _GameViewDefinition.Height];
+            GameViewVisibilityGrid = new double[_GameViewDefinition.Width, _GameViewDefinition.Height];
 
             //the player can see himself
-            GameViewVisibilityGrid[_PlayerData.X - _GameViewDefinition.X, _PlayerData.Y - _GameViewDefinition.Y] = true;
+            GameViewVisibilityGrid[_ShadowCaster.X - _GameViewDefinition.X, _ShadowCaster.Y - _GameViewDefinition.Y] = 1;
 
             foreach (int o in _VisibleOctants)
                 ScanOctant(1, o, 1.0, 0.0);
 
 
+
+            //string file = @"c:\temp\" + Guid.NewGuid().ToString() + ".json";
+
+
+            //for (int i = 0; i < GameViewVisibilityGrid.GetLength(1); i++)
+            //{
+            //    File.AppendAllText(file, String.Join("\t",
+            //        Enumerable.Range(0, GameViewVisibilityGrid.GetLength(0)).Select(j => GameViewVisibilityGrid[j, i].ToString())) + "\r\n"
+            //        );
+            //    File.AppendAllText(file, "\r\n");
+            //}
         }
 
         /// <summary>
@@ -129,7 +139,7 @@ namespace Rosie.Misc
         protected void SetGameViewVisibilityGrid(int pX, int pY)
         {
             if (_GameViewDefinition.Contains(pX, pY))
-                GameViewVisibilityGrid[pX - _GameViewDefinition.X, pY - _GameViewDefinition.Y] = true;
+                GameViewVisibilityGrid[pX - _GameViewDefinition.X, pY - _GameViewDefinition.Y] = 1;
         }
 
         /// <summary>
@@ -142,7 +152,7 @@ namespace Rosie.Misc
         protected void ScanOctant(int pDepth, int pOctant, double pStartSlope, double pEndSlope)
         {
 
-            int visrange2 = _PlayerData.VisionRange * _PlayerData.VisionRange;
+            int visrange2 = _ShadowCaster.VisionRange * _ShadowCaster.VisionRange;
             int x = 0;
             int y = 0;
 
@@ -150,15 +160,15 @@ namespace Rosie.Misc
             {
 
                 case 1: //nnw
-                    y = _PlayerData.Location.Y - pDepth;
+                    y = _ShadowCaster.Location.Y - pDepth;
                     if (y < 0) return;
 
-                    x = _PlayerData.Location.X - Convert.ToInt32((pStartSlope * Convert.ToDouble(pDepth)));
+                    x = _ShadowCaster.Location.X - Convert.ToInt32((pStartSlope * Convert.ToDouble(pDepth)));
                     if (x < 0) x = 0;
 
-                    while (GetSlope(x, y, _PlayerData.Location.X, _PlayerData.Location.Y, false) >= pEndSlope)
+                    while (GetSlope(x, y, _ShadowCaster.Location.X, _ShadowCaster.Location.Y, false) >= pEndSlope)
                     {
-                        if (GetVisDistance(x, y, _PlayerData.Location.X, _PlayerData.Location.Y) <= visrange2)
+                        if (GetVisDistance(x, y, _ShadowCaster.Location.X, _ShadowCaster.Location.Y) <= visrange2)
                         {
                             SetGameViewVisibilityGrid(x, y);
 
@@ -168,7 +178,7 @@ namespace Rosie.Misc
                                 {
                                     //prior cell within range AND open...
                                     //...incremenet the depth, adjust the endslope and recurse
-                                    ScanOctant(pDepth + 1, pOctant, pStartSlope, GetSlope(x - 0.5, y + 0.5, _PlayerData.Location.X, _PlayerData.Location.Y, false));
+                                    ScanOctant(pDepth + 1, pOctant, pStartSlope, GetSlope(x - 0.5, y + 0.5, _ShadowCaster.Location.X, _ShadowCaster.Location.Y, false));
                                 }
                             }
                             else
@@ -178,7 +188,7 @@ namespace Rosie.Misc
                                 {
                                     //prior cell within range AND open...
                                     //..adjust the startslope
-                                    pStartSlope = GetSlope(x - 0.5, y - 0.5, _PlayerData.Location.X, _PlayerData.Location.Y, false);
+                                    pStartSlope = GetSlope(x - 0.5, y - 0.5, _ShadowCaster.Location.X, _ShadowCaster.Location.Y, false);
                                 }
                             }
                         }
@@ -189,15 +199,15 @@ namespace Rosie.Misc
 
                 case 2: //nne
 
-                    y = _PlayerData.Location.Y - pDepth;
+                    y = _ShadowCaster.Location.Y - pDepth;
                     if (y < 0) return;
 
-                    x = _PlayerData.Location.X + Convert.ToInt32((pStartSlope * Convert.ToDouble(pDepth)));
+                    x = _ShadowCaster.Location.X + Convert.ToInt32((pStartSlope * Convert.ToDouble(pDepth)));
                     if (x >= _Map.GetLength(0)) x = _Map.GetLength(0) - 1;
 
-                    while (GetSlope(x, y, _PlayerData.Location.X, _PlayerData.Location.Y, false) <= pEndSlope)
+                    while (GetSlope(x, y, _ShadowCaster.Location.X, _ShadowCaster.Location.Y, false) <= pEndSlope)
                     {
-                        if (GetVisDistance(x, y, _PlayerData.Location.X, _PlayerData.Location.Y) <= visrange2)
+                        if (GetVisDistance(x, y, _ShadowCaster.Location.X, _ShadowCaster.Location.Y) <= visrange2)
                         {
                             SetGameViewVisibilityGrid(x, y);
 
@@ -205,14 +215,14 @@ namespace Rosie.Misc
                             {
                                 if (x + 1 < _Map.GetLength(0) && CellOpen(x + 1, y))
                                 {
-                                    ScanOctant(pDepth + 1, pOctant, pStartSlope, GetSlope(x + 0.5, y + 0.5, _PlayerData.Location.X, _PlayerData.Location.Y, false));
+                                    ScanOctant(pDepth + 1, pOctant, pStartSlope, GetSlope(x + 0.5, y + 0.5, _ShadowCaster.Location.X, _ShadowCaster.Location.Y, false));
                                 }
                             }
                             else
                             {
                                 if (x + 1 < _Map.GetLength(0) && !CellOpen(x + 1, y))
                                 {
-                                    pStartSlope = -GetSlope(x + 0.5, y - 0.5, _PlayerData.Location.X, _PlayerData.Location.Y, false);
+                                    pStartSlope = -GetSlope(x + 0.5, y - 0.5, _ShadowCaster.Location.X, _ShadowCaster.Location.Y, false);
                                 }
                             }
                         }
@@ -223,16 +233,16 @@ namespace Rosie.Misc
 
                 case 3:
 
-                    x = _PlayerData.Location.X + pDepth;
+                    x = _ShadowCaster.Location.X + pDepth;
                     if (x >= _Map.GetLength(0)) return;
 
-                    y = _PlayerData.Location.Y - Convert.ToInt32((pStartSlope * Convert.ToDouble(pDepth)));
+                    y = _ShadowCaster.Location.Y - Convert.ToInt32((pStartSlope * Convert.ToDouble(pDepth)));
                     if (y < 0) y = 0;
 
-                    while (GetSlope(x, y, _PlayerData.Location.X, _PlayerData.Location.Y, true) <= pEndSlope)
+                    while (GetSlope(x, y, _ShadowCaster.Location.X, _ShadowCaster.Location.Y, true) <= pEndSlope)
                     {
 
-                        if (GetVisDistance(x, y, _PlayerData.Location.X, _PlayerData.Location.Y) <= visrange2)
+                        if (GetVisDistance(x, y, _ShadowCaster.Location.X, _ShadowCaster.Location.Y) <= visrange2)
                         {
                             SetGameViewVisibilityGrid(x, y);
 
@@ -240,17 +250,17 @@ namespace Rosie.Misc
                             {
                                 if (y - 1 >= 0 && CellOpen(x, y - 1))
                                 {
-                                    ScanOctant(pDepth + 1, pOctant, pStartSlope, GetSlope(x - 0.5, y - 0.5, _PlayerData.Location.X, _PlayerData.Location.Y, true));
+                                    ScanOctant(pDepth + 1, pOctant, pStartSlope, GetSlope(x - 0.5, y - 0.5, _ShadowCaster.Location.X, _ShadowCaster.Location.Y, true));
                                 }
                             }
                             else
                             {
                                 if (y - 1 >= 0 && !CellOpen(x, y - 1))
-                                    pStartSlope = -GetSlope(x + 0.5, y - 0.5, _PlayerData.Location.X, _PlayerData.Location.Y, true);
+                                    pStartSlope = -GetSlope(x + 0.5, y - 0.5, _ShadowCaster.Location.X, _ShadowCaster.Location.Y, true);
 
                                 if (_GameViewDefinition.Contains(x, y))
                                 {
-                                    GameViewVisibilityGrid[x - _GameViewDefinition.X, y - _GameViewDefinition.Y] = true;
+                                    GameViewVisibilityGrid[x - _GameViewDefinition.X, y - _GameViewDefinition.Y] = 1;
                                 }
                             }
                         }
@@ -261,16 +271,16 @@ namespace Rosie.Misc
 
                 case 4:
 
-                    x = _PlayerData.Location.X + pDepth;
+                    x = _ShadowCaster.Location.X + pDepth;
                     if (x >= _Map.GetLength(0)) return;
 
-                    y = _PlayerData.Location.Y + Convert.ToInt32((pStartSlope * Convert.ToDouble(pDepth)));
+                    y = _ShadowCaster.Location.Y + Convert.ToInt32((pStartSlope * Convert.ToDouble(pDepth)));
                     if (y >= _Map.GetLength(1)) y = _Map.GetLength(1) - 1;
 
-                    while (GetSlope(x, y, _PlayerData.Location.X, _PlayerData.Location.Y, true) >= pEndSlope)
+                    while (GetSlope(x, y, _ShadowCaster.Location.X, _ShadowCaster.Location.Y, true) >= pEndSlope)
                     {
 
-                        if (GetVisDistance(x, y, _PlayerData.Location.X, _PlayerData.Location.Y) <= visrange2)
+                        if (GetVisDistance(x, y, _ShadowCaster.Location.X, _ShadowCaster.Location.Y) <= visrange2)
                         {
 
                             SetGameViewVisibilityGrid(x, y);
@@ -279,14 +289,14 @@ namespace Rosie.Misc
                             {
                                 if (y + 1 < _Map.GetLength(1) && CellOpen(x, y + 1))
                                 {
-                                    ScanOctant(pDepth + 1, pOctant, pStartSlope, GetSlope(x - 0.5, y + 0.5, _PlayerData.Location.X, _PlayerData.Location.Y, true));
+                                    ScanOctant(pDepth + 1, pOctant, pStartSlope, GetSlope(x - 0.5, y + 0.5, _ShadowCaster.Location.X, _ShadowCaster.Location.Y, true));
                                 }
                             }
                             else
                             {
                                 if (y + 1 < _Map.GetLength(1) && !CellOpen(x, y + 1))
                                 {
-                                    pStartSlope = GetSlope(x + 0.5, y + 0.5, _PlayerData.Location.X, _PlayerData.Location.Y, true);
+                                    pStartSlope = GetSlope(x + 0.5, y + 0.5, _ShadowCaster.Location.X, _ShadowCaster.Location.Y, true);
                                 }
                             }
                         }
@@ -297,15 +307,15 @@ namespace Rosie.Misc
 
                 case 5:
 
-                    y = _PlayerData.Location.Y + pDepth;
+                    y = _ShadowCaster.Location.Y + pDepth;
                     if (y >= _Map.GetLength(1)) return;
 
-                    x = _PlayerData.Location.X + Convert.ToInt32((pStartSlope * Convert.ToDouble(pDepth)));
+                    x = _ShadowCaster.Location.X + Convert.ToInt32((pStartSlope * Convert.ToDouble(pDepth)));
                     if (x >= _Map.GetLength(0)) x = _Map.GetLength(0) - 1;
 
-                    while (GetSlope(x, y, _PlayerData.Location.X, _PlayerData.Location.Y, false) >= pEndSlope)
+                    while (GetSlope(x, y, _ShadowCaster.Location.X, _ShadowCaster.Location.Y, false) >= pEndSlope)
                     {
-                        if (GetVisDistance(x, y, _PlayerData.Location.X, _PlayerData.Location.Y) <= visrange2)
+                        if (GetVisDistance(x, y, _ShadowCaster.Location.X, _ShadowCaster.Location.Y) <= visrange2)
                         {
                             SetGameViewVisibilityGrid(x, y);
 
@@ -313,14 +323,14 @@ namespace Rosie.Misc
                             {
                                 if (x + 1 < _Map.GetLength(1) && CellOpen(x + 1, y))
                                 {
-                                    ScanOctant(pDepth + 1, pOctant, pStartSlope, GetSlope(x + 0.5, y - 0.5, _PlayerData.Location.X, _PlayerData.Location.Y, false));
+                                    ScanOctant(pDepth + 1, pOctant, pStartSlope, GetSlope(x + 0.5, y - 0.5, _ShadowCaster.Location.X, _ShadowCaster.Location.Y, false));
                                 }
                             }
                             else
                             {
                                 if (x + 1 < _Map.GetLength(1) && !CellOpen(x + 1, y))
                                 {
-                                    pStartSlope = GetSlope(x + 0.5, y + 0.5, _PlayerData.Location.X, _PlayerData.Location.Y, false);
+                                    pStartSlope = GetSlope(x + 0.5, y + 0.5, _ShadowCaster.Location.X, _ShadowCaster.Location.Y, false);
                                 }
                             }
                         }
@@ -331,28 +341,28 @@ namespace Rosie.Misc
 
                 case 6:
 
-                    y = _PlayerData.Location.Y + pDepth;
+                    y = _ShadowCaster.Location.Y + pDepth;
                     if (y >= _Map.GetLength(1)) return;
 
-                    x = _PlayerData.Location.X - Convert.ToInt32((pStartSlope * Convert.ToDouble(pDepth)));
+                    x = _ShadowCaster.Location.X - Convert.ToInt32((pStartSlope * Convert.ToDouble(pDepth)));
                     if (x < 0) x = 0;
 
-                    while (GetSlope(x, y, _PlayerData.Location.X, _PlayerData.Location.Y, false) <= pEndSlope)
+                    while (GetSlope(x, y, _ShadowCaster.Location.X, _ShadowCaster.Location.Y, false) <= pEndSlope)
                     {
-                        if (GetVisDistance(x, y, _PlayerData.Location.X, _PlayerData.Location.Y) <= visrange2)
+                        if (GetVisDistance(x, y, _ShadowCaster.Location.X, _ShadowCaster.Location.Y) <= visrange2)
                         {
                             SetGameViewVisibilityGrid(x, y);
 
                             if (!CellOpen(x, y))
                             {
                                 if (x - 1 >= 0 && CellOpen(x - 1, y))
-                                    ScanOctant(pDepth + 1, pOctant, pStartSlope, GetSlope(x - 0.5, y - 0.5, _PlayerData.Location.X, _PlayerData.Location.Y, false));
+                                    ScanOctant(pDepth + 1, pOctant, pStartSlope, GetSlope(x - 0.5, y - 0.5, _ShadowCaster.Location.X, _ShadowCaster.Location.Y, false));
                             }
                             else
                             {
                                 if (x - 1 >= 0 && !CellOpen(x - 1, y))
                                 {
-                                    pStartSlope = -GetSlope(x - 0.5, y + 0.5, _PlayerData.Location.X, _PlayerData.Location.Y, false);
+                                    pStartSlope = -GetSlope(x - 0.5, y + 0.5, _ShadowCaster.Location.X, _ShadowCaster.Location.Y, false);
                                 }
                             }
                         }
@@ -363,29 +373,29 @@ namespace Rosie.Misc
 
                 case 7:
 
-                    x = _PlayerData.Location.X - pDepth;
+                    x = _ShadowCaster.Location.X - pDepth;
                     if (x < 0) return;
 
-                    y = _PlayerData.Location.Y + Convert.ToInt32((pStartSlope * Convert.ToDouble(pDepth)));
+                    y = _ShadowCaster.Location.Y + Convert.ToInt32((pStartSlope * Convert.ToDouble(pDepth)));
                     if (y >= _Map.GetLength(1)) y = _Map.GetLength(1) - 1;
 
-                    while (GetSlope(x, y, _PlayerData.Location.X, _PlayerData.Location.Y, true) <= pEndSlope)
+                    while (GetSlope(x, y, _ShadowCaster.Location.X, _ShadowCaster.Location.Y, true) <= pEndSlope)
                     {
 
-                        if (GetVisDistance(x, y, _PlayerData.Location.X, _PlayerData.Location.Y) <= visrange2)
+                        if (GetVisDistance(x, y, _ShadowCaster.Location.X, _ShadowCaster.Location.Y) <= visrange2)
                         {
                             SetGameViewVisibilityGrid(x, y);
 
                             if (!CellOpen(x, y))
                             {
                                 if (y + 1 < _Map.GetLength(1) && CellOpen(x, y + 1))
-                                    ScanOctant(pDepth + 1, pOctant, pStartSlope, GetSlope(x + 0.5, y + 0.5, _PlayerData.Location.X, _PlayerData.Location.Y, true));
+                                    ScanOctant(pDepth + 1, pOctant, pStartSlope, GetSlope(x + 0.5, y + 0.5, _ShadowCaster.Location.X, _ShadowCaster.Location.Y, true));
                             }
                             else
                             {
                                 if (y + 1 < _Map.GetLength(1) && !CellOpen(x, y + 1))
                                 {
-                                    pStartSlope = -GetSlope(x - 0.5, y + 0.5, _PlayerData.Location.X, _PlayerData.Location.Y, true);
+                                    pStartSlope = -GetSlope(x - 0.5, y + 0.5, _ShadowCaster.Location.X, _ShadowCaster.Location.Y, true);
                                 }
                             }
                         }
@@ -396,16 +406,16 @@ namespace Rosie.Misc
 
                 case 8: //wnw
 
-                    x = _PlayerData.Location.X - pDepth;
+                    x = _ShadowCaster.Location.X - pDepth;
                     if (x < 0) return;
 
-                    y = _PlayerData.Location.Y - Convert.ToInt32((pStartSlope * Convert.ToDouble(pDepth)));
+                    y = _ShadowCaster.Location.Y - Convert.ToInt32((pStartSlope * Convert.ToDouble(pDepth)));
                     if (y < 0) y = 0;
 
-                    while (GetSlope(x, y, _PlayerData.Location.X, _PlayerData.Location.Y, true) >= pEndSlope)
+                    while (GetSlope(x, y, _ShadowCaster.Location.X, _ShadowCaster.Location.Y, true) >= pEndSlope)
                     {
 
-                        if (GetVisDistance(x, y, _PlayerData.Location.X, _PlayerData.Location.Y) <= visrange2)
+                        if (GetVisDistance(x, y, _ShadowCaster.Location.X, _ShadowCaster.Location.Y) <= visrange2)
                         {
                             SetGameViewVisibilityGrid(x, y);
 
@@ -413,7 +423,7 @@ namespace Rosie.Misc
                             {
                                 if (y - 1 >= 0 && CellOpen(x, y - 1))
                                 {
-                                    ScanOctant(pDepth + 1, pOctant, pStartSlope, GetSlope(x + 0.5, y - 0.5, _PlayerData.Location.X, _PlayerData.Location.Y, true));
+                                    ScanOctant(pDepth + 1, pOctant, pStartSlope, GetSlope(x + 0.5, y - 0.5, _ShadowCaster.Location.X, _ShadowCaster.Location.Y, true));
                                 }
 
                             }
@@ -421,7 +431,7 @@ namespace Rosie.Misc
                             {
                                 if (y - 1 >= 0 && !CellOpen(x, y - 1))
                                 {
-                                    pStartSlope = GetSlope(x - 0.5, y - 0.5, _PlayerData.Location.X, _PlayerData.Location.Y, true);
+                                    pStartSlope = GetSlope(x - 0.5, y - 0.5, _ShadowCaster.Location.X, _ShadowCaster.Location.Y, true);
                                 }
                             }
                         }
@@ -442,7 +452,7 @@ namespace Rosie.Misc
             else if (y >= _Map.GetLength(1))
                 y = _Map.GetLength(1) - 1;
 
-            if (pDepth < _PlayerData.VisionRange & CellOpen(x, y))
+            if (pDepth < _ShadowCaster.VisionRange & CellOpen(x, y))
                 ScanOctant(pDepth + 1, pOctant, pStartSlope, pEndSlope);
 
         }

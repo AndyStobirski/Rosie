@@ -2,8 +2,8 @@
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 using Rosie.Code;
+using Rosie.Code.Misc;
 using Rosie.Entities;
-using Rosie.Enums;
 using Rosie.Misc;
 using System;
 using System.Diagnostics;
@@ -60,6 +60,8 @@ namespace Rosie
             _InputHandler = new InputHandler();
             _InputHandler.GameCommandIssued += _InputHandler_GameCommandIssued;
 
+            RandomWithSeed.SetSeed("ifov-wfum-ougt");
+
             base.Initialize();
         }
 
@@ -94,11 +96,11 @@ namespace Rosie
 
             //Check if mouse inside the camera area
             //and set the position based on tile size
-            if (_Rosie.CameraBorder.Contains(mouseState.X, mouseState.Y))
+            if (Camera.CameraBorder.Contains(mouseState.X, mouseState.Y))
             {
                 RosieGame.SelectedTile = new Point(
-                    ((mouseState.X - _Rosie.GameCameraOffset.X) / _Rosie.TileSize.Width) + _Rosie.GameCameraDefinition.X,
-                    ((mouseState.Y - _Rosie.GameCameraOffset.Y) / _Rosie.TileSize.Height) + _Rosie.GameCameraDefinition.Y
+                    (mouseState.X - Camera.GameCameraOffset.X) / Camera.TileSize.Width + Camera.GameCameraDefinition.X,
+                    (mouseState.Y - Camera.GameCameraOffset.Y) / Camera.TileSize.Height + Camera.GameCameraDefinition.Y
                     );
 
             }
@@ -113,7 +115,7 @@ namespace Rosie
                 _Rosie.MouseClick(mouseState.X, mouseState.Y);
             }
 
-            if (_Rosie.GameState == Enums.GameStates.PlayerTurn)
+            if (_Rosie.GameState == GameStates.PlayerTurn)
             {
 
                 //
@@ -125,7 +127,7 @@ namespace Rosie
                                     select key)
                 {
 
-                    Debug.WriteLine(String.Format("{0} - {1}", key, (int)key));
+                    Debug.WriteLine(string.Format("{0} - {1}", key, (int)key));
 
 
                     _InputHandler.ProcessCommand((int)key);
@@ -135,7 +137,7 @@ namespace Rosie
                 }
 
             }
-            else if (_Rosie.GameState == Enums.GameStates.EnemyTurn)
+            else if (_Rosie.GameState == GameStates.EnemyTurn)
                 _Rosie.Tick();
 
 
@@ -170,7 +172,7 @@ namespace Rosie
 
             switch (RosieGame.ViewMode)
             {
-                case Enums.GameViewMode.Game:
+                case GameViewMode.Game:
                     /*
                         var deltaTime = (float)gameTime.ElapsedGameTime.TotalSeconds;
                         _frameCounter.Update(deltaTime);
@@ -188,11 +190,11 @@ namespace Rosie
                     DrawPlayerStats();
                     break;
 
-                case Enums.GameViewMode.MiniMap:
+                case GameViewMode.MiniMap:
                     DrawMiniMap();
                     break;
 
-                case Enums.GameViewMode.IO:
+                case GameViewMode.IO:
                     DrawInventory();
                     break;
 
@@ -229,7 +231,7 @@ namespace Rosie
         {
 
             Size _tilesSize = new Size(_tiles.Width / 32, _tiles.Height / 32);
-            int y = (pIndex / _tilesSize.Width);
+            int y = pIndex / _tilesSize.Width;
             int x = pIndex - y * _tilesSize.Width;
 
             return new Rectangle(x * 32, y * 32, 32, 32);
@@ -244,15 +246,15 @@ namespace Rosie
         {
             int size = 4;
 
-            for (int x = 0; x < _Rosie.MapSize.Width; x++)
-                for (int y = 0; y < _Rosie.MapSize.Height; y++)
+            for (int x = 0; x < Camera.MapSize.Width; x++)
+                for (int y = 0; y < Camera.MapSize.Height; y++)
                     if (_Rosie.Map[x, y] != null)
                     {
                         DrawTile(
                              1378
                              , new Rectangle(
-                                                 x * size + _Rosie.GameCameraOffset.X
-                                                 , y * size + _Rosie.GameCameraOffset.Y
+                                                 x * size + Camera.GameCameraOffset.X
+                                                 , y * size + Camera.GameCameraOffset.Y
                                                  , size
                                                  , size
                                               )
@@ -264,8 +266,8 @@ namespace Rosie
                         DrawTile(
                             1649
                             , new Rectangle(
-                                                x * size + _Rosie.GameCameraOffset.X
-                                                , y * size + _Rosie.GameCameraOffset.Y
+                                                x * size + Camera.GameCameraOffset.X
+                                                , y * size + Camera.GameCameraOffset.Y
                                                 , size
                                                 , size
                                              )
@@ -274,8 +276,8 @@ namespace Rosie
                     }
 
             DrawTile(RosieGame.player.Gfx, new Rectangle(
-                                            RosieGame.player.X * size + _Rosie.GameCameraOffset.X
-                                            , RosieGame.player.Y * size + _Rosie.GameCameraOffset.Y
+                                            RosieGame.player.X * size + Camera.GameCameraOffset.X
+                                            , RosieGame.player.Y * size + Camera.GameCameraOffset.Y
                                             , size
                                             , size
                                          )
@@ -294,34 +296,34 @@ namespace Rosie
 
             //top line
             _spriteBatch.Draw(pixel
-                , new Rectangle(_Rosie.CameraBorder.X
-                    , _Rosie.CameraBorder.Y
-                    , _Rosie.CameraBorder.Width
+                , new Rectangle(Camera.CameraBorder.X
+                    , Camera.CameraBorder.Y
+                    , Camera.CameraBorder.Width
                     , 1)
                 , col);
 
             //bottom line
             _spriteBatch.Draw(pixel
-                , new Rectangle(_Rosie.CameraBorder.X
-                    , _Rosie.CameraBorder.Y + _Rosie.CameraBorder.Height
-                    , _Rosie.CameraBorder.Width
+                , new Rectangle(Camera.CameraBorder.X
+                    , Camera.CameraBorder.Y + Camera.CameraBorder.Height
+                    , Camera.CameraBorder.Width
                     , 1)
                 , col);
 
             //left line
             _spriteBatch.Draw(pixel
-                , new Rectangle(_Rosie.CameraBorder.X
-                    , _Rosie.CameraBorder.Y
+                , new Rectangle(Camera.CameraBorder.X
+                    , Camera.CameraBorder.Y
                     , 1
-                    , _Rosie.CameraBorder.Height)
+                    , Camera.CameraBorder.Height)
                 , col);
 
             //right line
             _spriteBatch.Draw(pixel
-                , new Rectangle(_Rosie.CameraBorder.Width + _Rosie.CameraBorder.X
-                    , _Rosie.GameCameraOffset.Y
+                , new Rectangle(Camera.CameraBorder.Width + Camera.CameraBorder.X
+                    , Camera.GameCameraOffset.Y
                     , 1
-                    , _Rosie.CameraBorder.Height)
+                    , Camera.CameraBorder.Height)
                 , col);
 
 
@@ -329,7 +331,7 @@ namespace Rosie
             //
             //
             //
-            _spriteBatch.DrawString(_font, string.Format("Mouse: {0},{1}", RosieGame.SelectedTile.X, RosieGame.SelectedTile.Y), new Vector2(_Rosie.CameraBorder.X, _Rosie.CameraBorder.Y), Color.White);
+            _spriteBatch.DrawString(_font, string.Format("Mouse: {0},{1}", RosieGame.SelectedTile.X, RosieGame.SelectedTile.Y), new Vector2(Camera.CameraBorder.X, Camera.CameraBorder.Y), Color.White);
 
         }
 
@@ -341,22 +343,22 @@ namespace Rosie
 
             bool visible;
 
-            for (int x = _Rosie.GameCameraDefinition.Left; x < _Rosie.GameCameraDefinition.Right; x++)
+            for (int x = Camera.GameCameraDefinition.Left; x < Camera.GameCameraDefinition.Right; x++)
             {
-                for (int y = _Rosie.GameCameraDefinition.Top; y < _Rosie.GameCameraDefinition.Bottom; y++)
+                for (int y = Camera.GameCameraDefinition.Top; y < Camera.GameCameraDefinition.Bottom; y++)
                 {
                     //  lookup whether the player can see the tile
-                    visible = _Rosie._fov.GameViewVisibilityGrid[x - _Rosie.GameCameraDefinition.Left, y - _Rosie.GameCameraDefinition.Top];
+                    visible = _Rosie._fov.GameViewVisibilityGrid[x - Camera.GameCameraDefinition.Left, y - Camera.GameCameraDefinition.Top] > 0;
 
                     //the tile being examined
                     var tile = _Rosie.Map[x, y];
 
                     //the rectangle to draw into
                     var rect = new Rectangle(
-                         (x - _Rosie.GameCameraDefinition.Left) * _Rosie.TileSize.Width + _Rosie.GameCameraOffset.X
-                         , (y - _Rosie.GameCameraDefinition.Top) * _Rosie.TileSize.Height + _Rosie.GameCameraOffset.Y
-                         , _Rosie.TileSize.Width
-                         , _Rosie.TileSize.Height);
+                         (x - Camera.GameCameraDefinition.Left) * Camera.TileSize.Width + Camera.GameCameraOffset.X
+                         , (y - Camera.GameCameraDefinition.Top) * Camera.TileSize.Height + Camera.GameCameraOffset.Y
+                         , Camera.TileSize.Width
+                         , Camera.TileSize.Height);
 
 
                     if (tile?.Viewed == 0 && visible)
@@ -383,7 +385,7 @@ namespace Rosie
                         }
 
                         // Draw Monster / Player
-                        if ((tile.Inhabitant is Player) || (visible && tile.Inhabitant is NPC))
+                        if (tile.Inhabitant is Player || visible && tile.Inhabitant is NPC)
                         {
                             DrawTile(tile.Inhabitant.Gfx, rect, Color.White);
 
@@ -410,17 +412,17 @@ namespace Rosie
                 //but in order to draw it on the camera view we need to translate it
 
                 Point p = new Point(RosieGame.SelectedTile.X, RosieGame.SelectedTile.Y);
-                p.X -= _Rosie.GameCameraDefinition.X;
-                p.Y -= _Rosie.GameCameraDefinition.Y;
+                p.X -= Camera.GameCameraDefinition.X;
+                p.Y -= Camera.GameCameraDefinition.Y;
 
                 //draw mouse reticule
                 DrawTile(
                     (int)GFXValues.MOUSE_RETICULE
                         , new Rectangle(
-                            _Rosie.GameCameraOffset.X + (p.X * _Rosie.TileSize.Width)
-                            , _Rosie.GameCameraOffset.Y + (p.Y * _Rosie.TileSize.Height)
-                            , _Rosie.TileSize.Width
-                            , _Rosie.TileSize.Height
+                            Camera.GameCameraOffset.X + p.X * Camera.TileSize.Width
+                            , Camera.GameCameraOffset.Y + p.Y * Camera.TileSize.Height
+                            , Camera.TileSize.Width
+                            , Camera.TileSize.Height
                          )
                 , Color.White
                 );
@@ -451,10 +453,10 @@ namespace Rosie
 
             if (pCurrent >= 0)
             {
-                int current = (int)(((pCurrent * 1.0) / pMax) * _Rosie.TileSize.Width);
+                int current = (int)(pCurrent * 1.0 / pMax * Camera.TileSize.Width);
 
                 //max hit points
-                _spriteBatch.Draw(pixel, new Rectangle(pTargetRect.X, pTargetRect.Y - barHeight, _Rosie.TileSize.Width, barHeight), Color.Red);
+                _spriteBatch.Draw(pixel, new Rectangle(pTargetRect.X, pTargetRect.Y - barHeight, Camera.TileSize.Width, barHeight), Color.Red);
 
                 //current hitpoints
                 _spriteBatch.Draw(pixel, new Rectangle(pTargetRect.X, pTargetRect.Y - barHeight, current, barHeight), Color.Green);
@@ -477,7 +479,7 @@ namespace Rosie
 
         protected void DrawGameMessages()
         {
-            int drawMessageStart = _Rosie.GameCameraOffset.Y + _Rosie.GameCameraSize.Y * _Rosie.TileSize.Height;
+            int drawMessageStart = Camera.GameCameraOffset.Y + Camera.GameCameraSize.Y * Camera.TileSize.Height;
             int ctr = 0;
             foreach (string message in RosieGame.Messages.Take(15))
             {

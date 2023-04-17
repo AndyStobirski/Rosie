@@ -2,7 +2,6 @@
 using Rosie.Code.Environment;
 using Rosie.Code.Misc;
 using Rosie.Entities;
-using Rosie.Enums;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -15,7 +14,7 @@ namespace Rosie.Code.Actors
     /// </summary>
     public abstract class Script
     {
-        private static Random rnd = new Random();
+
 
         protected static Roll d20 = new Roll(20, 0);
 
@@ -124,7 +123,7 @@ namespace Rosie.Code.Actors
         /// <param name="pWayPoint"></param>
         public void SetTargetWayPoint(WayPoint pWayPoint)
         {
-            TargetWayPoint = pWayPoint.ConnectedPoints[rnd.Next(pWayPoint.ConnectedPoints.Count)];
+            TargetWayPoint = pWayPoint.ConnectedPoints[RandomWithSeed.Next(pWayPoint.ConnectedPoints.Count)];
             RosieGame.AddMessage("Monster Target Waypoint {0}", TargetWayPoint.ToString());
         }
 

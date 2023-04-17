@@ -1,6 +1,7 @@
 using Microsoft.Xna.Framework;
 using Rosie.Code.Environment;
 using Rosie.Code.Map;
+using Rosie.Code.Misc;
 using Rosie.Misc;
 using System;
 
@@ -27,7 +28,7 @@ namespace Rosie.Map
             {
                 for (int y = 0; y < Level.Map.GetLength(1); y++)
                 {
-                    if (_rnd.Next(0, 100) < CloseCellProb)
+                    if (RandomWithSeed.Next(0, 100) < CloseCellProb)
                     {
                         Level.Map[x, y] = new Floor();
                     }
@@ -37,8 +38,8 @@ namespace Rosie.Map
             //pick some cells at random
             for (int x = 0; x <= Iterations; x++)
             {
-                int rX = _rnd.Next(0, Level.Map.GetLength(0));
-                int rY = _rnd.Next(0, Level.Map.GetLength(1));
+                int rX = RandomWithSeed.Next(0, Level.Map.GetLength(0));
+                int rY = RandomWithSeed.Next(0, Level.Map.GetLength(1));
 
                 if (ProbExceeded == true)
                 {
@@ -138,8 +139,8 @@ namespace Rosie.Map
 
             do
             {
-                x = _rnd.Next(0, MapSize.Width);
-                y = _rnd.Next(0, MapSize.Height);
+                x = RandomWithSeed.Next(0, MapSize.Width);
+                y = RandomWithSeed.Next(0, MapSize.Height);
 
             } while (Level.Map[x, y] == null);
 

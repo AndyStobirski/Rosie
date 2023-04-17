@@ -1,4 +1,4 @@
-﻿namespace Rosie.Enums
+﻿namespace Rosie.Code.Misc
 {
     public enum GameViewMode
     {
@@ -88,7 +88,7 @@
 
     public enum CommandType
     {
-        Move, Take, Drop, Equip, Open, Close, StairsMove
+        Move, Take, Drop, Equip, Open, Close, StairsMove, MiniMap
     }
 
     public enum NPC_STATE

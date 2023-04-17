@@ -1,9 +1,9 @@
 ﻿using Microsoft.Xna.Framework;
+using Rosie.Code;
 using Rosie.Code.Environment;
 using Rosie.Code.Map;
 using Rosie.Code.Misc;
 using Rosie.Entities;
-using Rosie.Enums;
 using Rosie.Map;
 using Rosie.Misc;
 using System;
@@ -47,42 +47,6 @@ namespace Rosie
         public static List<string> Messages { get => messages; set => messages = value; }
         private static List<string> messages = new List<string>();
 
-        #region Map Draw Properties
-        /// <summary>
-        /// The offset to start drawing the game view based on the top left
-        /// hand of the ganme 
-        /// </summary>
-        public Point GameCameraOffset { get; set; } = new Point(320, 32);
-
-        /// <summary>
-        /// The size of the tiles to draw
-        /// </summary>
-        public Size TileSize { get; } = new Size(32, 32);
-
-        /// <summary>
-        /// The rectangle which defines the GameView on the map, recalculate every time the player moves
-        /// </summary>
-        private Rectangle _GameCameraDefinition;
-        public Rectangle GameCameraDefinition => _GameCameraDefinition;
-
-        /// <summary>
-        /// The size of the gameview, which a portion of the map centered
-        /// arround the player
-        /// </summary>
-        public Point GameCameraSize { get; set; } = new Point(25, 25);
-
-
-        /// <summary>
-        /// Size of the GameMap in tiles
-        /// </summary>
-        public Size MapSize => Map == null ? null : new Size(Map.GetLength(0), Map.GetLength(1));
-
-        /// <summary>
-        /// Defines the rectangle which contains the camera view
-        /// </summary>
-        public Rectangle CameraBorder => new Rectangle(GameCameraOffset.X, GameCameraOffset.Y, GameCameraSize.X * TileSize.Width, GameCameraSize.Y * TileSize.Height);
-
-        #endregion
 
         /// <summary>
         /// Game turns
@@ -93,14 +57,14 @@ namespace Rosie
         /// <summary>
         /// Player vision is calculated here
         /// </summary>
-        public FOVRecurse _fov;
+        public RecursiveShadowcast _fov;
 
         /// <summary>
         /// Calculate the field of vision, the visible cells that the player can see
         /// </summary>
         private void CalculateFieldOfVision()
         {
-            _fov.GetVisibleCells(_GameCameraDefinition);
+            _fov.ScanArea(Camera.GameCameraDefinition);
         }
 
 
@@ -154,40 +118,6 @@ namespace Rosie
             Messages.Insert(0, string.Format(pMessageBody, pArgs));
         }
 
-        /// <summary>
-        /// Calculate the GameView, a rectangle which defines the drawn part of the map
-        /// based on the location of the player
-        /// </summary>
-        public void CalculateGameCameraDefinition()
-        {
-
-            // GameView
-            _GameCameraDefinition.X = player.X - GameCameraSize.X / 2;
-            _GameCameraDefinition.Y = player.Y - GameCameraSize.Y / 2;
-
-            if (_GameCameraDefinition.X < 0)
-                _GameCameraDefinition.X = 0;
-            else if (_GameCameraDefinition.X + GameCameraSize.X > MapSize.Width)
-                _GameCameraDefinition.X -= (_GameCameraDefinition.X + GameCameraSize.X - MapSize.Width);
-
-            if (_GameCameraDefinition.Y < 0)
-                _GameCameraDefinition.Y = 0;
-            else if (_GameCameraDefinition.Y + GameCameraSize.Y > MapSize.Height)
-                _GameCameraDefinition.Y -= (_GameCameraDefinition.Y + GameCameraSize.Y - MapSize.Height);
-
-            _GameCameraDefinition.Width = GameCameraSize.X;
-            if (_GameCameraDefinition.Right > MapSize.Width)
-                _GameCameraDefinition.Width -= (_GameCameraDefinition.Right - MapSize.Width);
-
-            _GameCameraDefinition.Height = GameCameraSize.Y;
-            if (_GameCameraDefinition.Bottom > MapSize.Height)
-                _GameCameraDefinition.Height -= (_GameCameraDefinition.Bottom - MapSize.Height);
-
-
-            //Calculate visible cells
-            _fov.GetVisibleCells(_GameCameraDefinition);
-        }
-
 
         public GameStates GameState { get; set; }
 
@@ -220,7 +150,7 @@ namespace Rosie
                 if ((currentLevelIndex + pLevelIndex) >= 0)
                 {
 
-                    RosieGame.AddMessage(Code.MessageStrings.Stairs_Up);
+                    RosieGame.AddMessage(MessageStrings.Stairs_Up);
 
                     currentLevel = levels[currentLevelIndex + pLevelIndex];
 
@@ -230,7 +160,7 @@ namespace Rosie
                 }
                 else
                 {
-                    RosieGame.AddMessage(Code.MessageStrings.Stairs_CantLeave);
+                    RosieGame.AddMessage(MessageStrings.Stairs_CantLeave);
                 }
             }
             else if (pLevelIndex == 1)
@@ -267,9 +197,11 @@ namespace Rosie
             player.X = pX;
             player.Y = pY;
             currentLevel.Map[pX, pY].Inhabitant = player;
-            _fov = new FOVRecurse(player, Map);
-            CalculateGameCameraDefinition();
+            _fov = new RecursiveShadowcast(player, Map);
             MapUtils.MakeMapVisible();
+            Camera.CalculateGameCameraDefinition();
+            CalculateFieldOfVision();
+
         }
 
 
@@ -299,7 +231,7 @@ namespace Rosie
             player = new Player();
             player.ActorCompletedTurn += Player_ActorMoved;
 
-            GameState = Enums.GameStates.PlayerTurn;
+            GameState = GameStates.PlayerTurn;
 
             GetLevel(0);
 
@@ -362,8 +294,9 @@ namespace Rosie
             Map[e.After.X, e.After.Y].Inhabitant = e.Inhabitant;
 
             GameState = GameStates.EnemyTurn;
-            CalculateGameCameraDefinition();
+            Camera.CalculateGameCameraDefinition();
             CalculateFieldOfVision();
+
 
         }
 

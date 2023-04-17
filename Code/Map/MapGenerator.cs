@@ -269,8 +269,8 @@ namespace Rosie.Map
                 if (Corridor_GetStart(out Location, out Direction))
                 {
 
-                    CorBuildOutcome = Corridor_Make(ref Location, ref Direction, _rnd.Next(1, Corridor_MaxTurns)
-                        , _rnd.Next(0, 100) > 50 ? true : false);
+                    CorBuildOutcome = Corridor_Make(ref Location, ref Direction, RandomWithSeed.Next(1, Corridor_MaxTurns)
+                        , RandomWithSeed.Next(0, 100) > 50 ? true : false);
 
                     switch (CorBuildOutcome)
                     {
@@ -357,8 +357,8 @@ namespace Rosie.Map
                 if (Corridor_GetStart(out Location, out Direction))
                 {
 
-                    CorBuildOutcome = Corridor_Make(ref Location, ref Direction, _rnd.Next(1, Corridor_MaxTurns)
-                        , _rnd.Next(0, 100) > 50 ? true : false);
+                    CorBuildOutcome = Corridor_Make(ref Location, ref Direction, RandomWithSeed.Next(1, Corridor_MaxTurns)
+                        , RandomWithSeed.Next(0, 100) > 50 ? true : false);
 
                     switch (CorBuildOutcome)
                     {
@@ -400,9 +400,9 @@ namespace Rosie.Map
         {
             rctCurrentRoom = new Rectangle()
             {
-                Width = _rnd.Next(Room_Min.Width, Room_Max.Width)
+                Width = RandomWithSeed.Next(Room_Min.Width, Room_Max.Width)
                 ,
-                Height = _rnd.Next(Room_Min.Height, Room_Max.Height)
+                Height = RandomWithSeed.Next(Room_Min.Height, Room_Max.Height)
             };
             rctCurrentRoom.X = MapSize.Width / 2;
             rctCurrentRoom.Y = MapSize.Height / 2;
@@ -440,21 +440,21 @@ namespace Rosie.Map
                     //room at the top of the map
                     rctCurrentRoom = new Rectangle()
                     {
-                        Width = _rnd.Next(Room_Min.Width, Room_Max.Width)
+                        Width = RandomWithSeed.Next(Room_Min.Width, Room_Max.Width)
                                 ,
-                        Height = _rnd.Next(Room_Min.Height, Room_Max.Height)
+                        Height = RandomWithSeed.Next(Room_Min.Height, Room_Max.Height)
                     };
-                    rctCurrentRoom.X = _rnd.Next(0, MapSize.Width - rctCurrentRoom.Width);
+                    rctCurrentRoom.X = RandomWithSeed.Next(0, MapSize.Width - rctCurrentRoom.Width);
                     rctCurrentRoom.Y = 1;
                     Room_Build();
 
                     //at the bottom of the map
                     rctCurrentRoom = new Rectangle
                     {
-                        Width = _rnd.Next(Room_Min.Width, Room_Max.Width),
-                        Height = _rnd.Next(Room_Min.Height, Room_Max.Height)
+                        Width = RandomWithSeed.Next(Room_Min.Width, Room_Max.Width),
+                        Height = RandomWithSeed.Next(Room_Min.Height, Room_Max.Height)
                     };
-                    rctCurrentRoom.X = _rnd.Next(0, MapSize.Width - rctCurrentRoom.Width);
+                    rctCurrentRoom.X = RandomWithSeed.Next(0, MapSize.Width - rctCurrentRoom.Width);
                     rctCurrentRoom.Y = MapSize.Height - rctCurrentRoom.Height - 1;
                     Room_Build();
 
@@ -465,19 +465,19 @@ namespace Rosie.Map
                     //west side of room
                     rctCurrentRoom = new Rectangle
                     {
-                        Width = _rnd.Next(Room_Min.Width, Room_Max.Width),
-                        Height = _rnd.Next(Room_Min.Height, Room_Max.Height)
+                        Width = RandomWithSeed.Next(Room_Min.Width, Room_Max.Width),
+                        Height = RandomWithSeed.Next(Room_Min.Height, Room_Max.Height)
                     };
-                    rctCurrentRoom.Y = _rnd.Next(0, MapSize.Height - rctCurrentRoom.Height);
+                    rctCurrentRoom.Y = RandomWithSeed.Next(0, MapSize.Height - rctCurrentRoom.Height);
                     rctCurrentRoom.X = 1;
                     Room_Build();
 
                     rctCurrentRoom = new Rectangle
                     {
-                        Width = _rnd.Next(Room_Min.Width, Room_Max.Width),
-                        Height = _rnd.Next(Room_Min.Height, Room_Max.Height)
+                        Width = RandomWithSeed.Next(Room_Min.Width, Room_Max.Width),
+                        Height = RandomWithSeed.Next(Room_Min.Height, Room_Max.Height)
                     };
-                    rctCurrentRoom.Y = _rnd.Next(0, MapSize.Height - rctCurrentRoom.Height);
+                    rctCurrentRoom.Y = RandomWithSeed.Next(0, MapSize.Height - rctCurrentRoom.Height);
                     rctCurrentRoom.X = MapSize.Width - rctCurrentRoom.Width - 2;
                     Room_Build();
 
@@ -511,9 +511,9 @@ namespace Rosie.Map
         {
             rctCurrentRoom = new Rectangle()
             {
-                Width = _rnd.Next(Room_Min.Width, Room_Max.Width)
+                Width = RandomWithSeed.Next(Room_Min.Width, Room_Max.Width)
                     ,
-                Height = _rnd.Next(Room_Min.Height, Room_Max.Height)
+                Height = RandomWithSeed.Next(Room_Min.Height, Room_Max.Height)
             };
 
             //startbuilding room from this point
@@ -521,7 +521,7 @@ namespace Rosie.Map
 
             if (pDirection.X == 0) //north/south direction
             {
-                rctCurrentRoom.X = _rnd.Next(lc.X - rctCurrentRoom.Width + 1, lc.X);
+                rctCurrentRoom.X = RandomWithSeed.Next(lc.X - rctCurrentRoom.Width + 1, lc.X);
 
                 if (pDirection.Y == 1)
                     rctCurrentRoom.Y = lc.Y + 1;//south
@@ -532,7 +532,7 @@ namespace Rosie.Map
             }
             else if (pDirection.Y == 0)//east / west direction
             {
-                rctCurrentRoom.Y = _rnd.Next(lc.Y - rctCurrentRoom.Height + 1, lc.Y);
+                rctCurrentRoom.Y = RandomWithSeed.Next(lc.Y - rctCurrentRoom.Height + 1, lc.Y);
 
                 if (pDirection.X == -1)//west
                     rctCurrentRoom.X = lc.X - rctCurrentRoom.Width;
@@ -554,16 +554,16 @@ namespace Rosie.Map
         private Rectangle Room_GetEdge(out Point pLocation, out Point pDirection)
         {
 
-            Rectangle pRoomBuiltOff = rctBuiltRooms[_rnd.Next(0, rctBuiltRooms.Count())];
+            Rectangle pRoomBuiltOff = rctBuiltRooms[RandomWithSeed.Next(0, rctBuiltRooms.Count())];
 
             //pick a random point within a room
             //the +1 / -1 on the values are to stop a corner from being chosen
-            pLocation = new Point(_rnd.Next(pRoomBuiltOff.Left + 1, pRoomBuiltOff.Right - 1)
-                                  , _rnd.Next(pRoomBuiltOff.Top + 1, pRoomBuiltOff.Bottom - 1));
+            pLocation = new Point(RandomWithSeed.Next(pRoomBuiltOff.Left + 1, pRoomBuiltOff.Right - 1)
+                                  , RandomWithSeed.Next(pRoomBuiltOff.Top + 1, pRoomBuiltOff.Bottom - 1));
 
 
             //get a random direction
-            pDirection = Directions[_rnd.Next(0, Directions.GetLength(0))];
+            pDirection = Directions[RandomWithSeed.Next(0, Directions.GetLength(0))];
 
             do
             {
@@ -596,7 +596,7 @@ namespace Rosie.Map
             do
             {
                 //the modifiers below prevent the first of last point being chosen
-                pLocation = lBuilltCorridors[_rnd.Next(1, lBuilltCorridors.Count - 1)];
+                pLocation = lBuilltCorridors[RandomWithSeed.Next(1, lBuilltCorridors.Count - 1)];
 
                 //attempt to locate all the empy map points around the location
                 //using the directions to offset the randomly chosen point
@@ -608,7 +608,7 @@ namespace Rosie.Map
 
             } while (validdirections.Count == 0);
 
-            pDirection = validdirections[_rnd.Next(0, validdirections.Count)]; ;
+            pDirection = validdirections[RandomWithSeed.Next(0, validdirections.Count)]; ;
 
             pLocation.X += pDirection.X;
             pLocation.Y += pDirection.Y;
@@ -637,7 +637,7 @@ namespace Rosie.Map
                     if (ctr == 0 || ctr == lCurrentCorridor.Count - 1)
                     {
                         var d = new Door();
-                        d.IsOpen = _rnd.Next(2) == 1;
+                        d.IsOpen = RandomWithSeed.Next(2) == 1;
 
                         Point_Set(p.X, p.Y, d);
                     }
@@ -674,7 +674,7 @@ namespace Rosie.Map
 
             if (lBuilltCorridors.Count > 0)
             {
-                if (_rnd.Next(0, 100) >= BuildProb)
+                if (RandomWithSeed.Next(0, 100) >= BuildProb)
                 {
                     rctCorridorStartRoom = Room_GetEdge(out pLocation, out pDirection);
                     corridorStartPoint = CorridorContactPoint.room;
@@ -723,7 +723,7 @@ namespace Rosie.Map
             {
                 pTurns--;
 
-                corridorlength = _rnd.Next(Corridor_Min, Corridor_Max);
+                corridorlength = RandomWithSeed.Next(Corridor_Min, Corridor_Max);
                 //build corridor
                 while (corridorlength > 0)
                 {
@@ -842,7 +842,7 @@ namespace Rosie.Map
             Point NewDir;
             do
             {
-                NewDir = Directions[_rnd.Next(0, Directions.GetLength(0))];
+                NewDir = Directions[RandomWithSeed.Next(0, Directions.GetLength(0))];
             } while (Direction_Reverse(NewDir) == pDir);
 
             return NewDir;
@@ -865,7 +865,7 @@ namespace Rosie.Map
             Point NewDir;
             do
             {
-                NewDir = Directions[_rnd.Next(0, Directions.GetLength(0))];
+                NewDir = Directions[RandomWithSeed.Next(0, Directions.GetLength(0))];
             } while (
                         Direction_Reverse(NewDir) == pDir
                          | Direction_Reverse(NewDir) == pDirExclude
@@ -982,9 +982,9 @@ namespace Rosie.Map
 
         public override Point GetStartLocation()
         {
-            Rectangle r = rctBuiltRooms[_rnd.Next(0, rctBuiltRooms.Count())];
+            Rectangle r = rctBuiltRooms[RandomWithSeed.Next(0, rctBuiltRooms.Count())];
 
-            return new Point(_rnd.Next(r.Left, r.Right), _rnd.Next(r.Top, r.Bottom));
+            return new Point(RandomWithSeed.Next(r.Left, r.Right), RandomWithSeed.Next(r.Top, r.Bottom));
         }
 
 

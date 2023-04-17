@@ -1,6 +1,6 @@
-﻿using Rosie.Code;
-using Rosie.Code.Items;
+﻿using Rosie.Code.Items;
 using Rosie.Code.Items.Weapons;
+using Rosie.Code.Misc;
 using System;
 using System.Collections.Generic;
 

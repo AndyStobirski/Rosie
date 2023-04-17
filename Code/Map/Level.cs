@@ -32,7 +32,7 @@ namespace Rosie.Code.Map
 
         public List<WayPoint> WayPoints { get; set; }
 
-        protected Random _rnd = new Random();
+
 
         public Point StairCase_Up { get; set; }
         public Point StairCase_Down { get; set; }
@@ -125,6 +125,10 @@ namespace Rosie.Code.Map
                     HitPointsMax = 5
                     ,
                     HitPointsCurrent = 5
+                    ,
+                    Class = "Orc"
+                    ,
+                    Name = GibberishGenerator.GenerateName(true)
                 };
 
 
@@ -155,6 +159,10 @@ namespace Rosie.Code.Map
                     HitPointsMax = 5
                     ,
                     HitPointsCurrent = 5
+                    ,
+                    Class = "Skeleton"
+                    ,
+                    Name = GibberishGenerator.GenerateName(true)
                 };
 
 
@@ -176,7 +184,7 @@ namespace Rosie.Code.Map
             for (int ctr = 0; ctr < 10; ctr++)
             {
                 var p = GetRandomEmptyRoomPoint();
-                AddItem(new GoldCoins(_rnd.Next(1, 100)) { X = p.X, Y = p.Y });
+                AddItem(new GoldCoins(RandomWithSeed.Next(1, 100)) { X = p.X, Y = p.Y });
             }
         }
 
@@ -197,7 +205,7 @@ namespace Rosie.Code.Map
         /// <param name="e"></param>
         private void Monster_Died(object sender, NPC.MonsterDiedEventArgs e)
         {
-            RosieGame.AddMessage(MessageStrings.Monster_Die, e.monster.Name);
+            RosieGame.AddMessage(MessageStrings.Monster_Die, e.monster.ID);
             player.ExperiencePoints += e.monster.ExperienceValue;
             Monsters.Remove(e.monster);
             _Scheduler.RemoveActor(e.monster);
@@ -211,12 +219,12 @@ namespace Rosie.Code.Map
 
             do
             {
-                var rommIdx = _rnd.Next(Rooms.Count);
+                var rommIdx = RandomWithSeed.Next(Rooms.Count);
 
                 var room = Rooms[rommIdx];
                 pLocation = new Point(
-                    _rnd.Next(room.Left, room.Right)
-                    , _rnd.Next(room.Top, room.Bottom)
+                    RandomWithSeed.Next(room.Left, room.Right)
+                    , RandomWithSeed.Next(room.Top, room.Bottom)
                     );
 
                 if (Map[pLocation.X, pLocation.Y] is Floor)

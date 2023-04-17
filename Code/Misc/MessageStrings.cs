@@ -1,4 +1,4 @@
-﻿namespace Rosie.Code
+﻿namespace Rosie.Code.Misc
 {
     public static class MessageStrings
     {

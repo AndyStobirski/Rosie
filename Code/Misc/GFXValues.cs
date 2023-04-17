@@ -1,4 +1,4 @@
-﻿namespace Rosie.Code
+﻿namespace Rosie.Code.Misc
 {
     /// <summary>
     /// Indexes of sprites on the sprite sheet used by the game
@@ -13,12 +13,17 @@
         DUNGEON_FLOOR = 1378,
         DUNGEON_WALL = 1357,
 
-        PLAYER_WIZARD = 583,
+        PLAYER_WIZARD = 349,
 
         MONSTER_SKELETON = 332,
         MONSTER_ORC = 285,
         MONSTER_ORCWARRIOR = 286,
         MONSTER_ORCKNIGHT = 287,
+        MONSTER_GIANTFROG = 127,
+        MONSTER_GIANTSPIDER = 310,
+        MONSTER_FLYINGSKULL = 330,
+        MONSTER_FIREANT = 335,
+
 
         WEAPON_DAGGER = 722,
         WEAPON_SPEAR = 1091,

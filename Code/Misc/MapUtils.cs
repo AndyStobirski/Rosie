@@ -15,7 +15,6 @@ namespace Rosie.Code.Misc
     /// </summary>
     public static class MapUtils
     {
-        private static Random rnd = new Random();
         private static Level currentLevel => RosieGame.currentLevel;
         private static Tile[,] Map => RosieGame.currentLevel.Map;
 
@@ -67,8 +66,8 @@ namespace Rosie.Code.Misc
 
             do
             {
-                x = rnd.Next(0, Map.GetLength(0));
-                y = rnd.Next(0, Map.GetLength(1));
+                x = RandomWithSeed.Next(0, Map.GetLength(0));
+                y = RandomWithSeed.Next(0, Map.GetLength(1));
 
             } while (Map[x, y] == null || !Map[x, y].Passable());
 
@@ -137,13 +136,13 @@ namespace Rosie.Code.Misc
 
             do
             {
-                var rommIdx = rnd.Next(0, currentLevel.Rooms.Count);
+                var rommIdx = RandomWithSeed.Next(0, currentLevel.Rooms.Count);
 
                 var room = currentLevel.Rooms[rommIdx];
                 pWayPoint = currentLevel.WayPoints[rommIdx];
                 pLocation = new Point(
-                    rnd.Next(room.Left, room.Right)
-                    , rnd.Next(room.Top, room.Bottom)
+                    RandomWithSeed.Next(room.Left, room.Right)
+                    , RandomWithSeed.Next(room.Top, room.Bottom)
                     );
 
             } while (!(Map[pLocation.X, pLocation.Y] is Floor) && !Map[pLocation.X, pLocation.Y].Passable());

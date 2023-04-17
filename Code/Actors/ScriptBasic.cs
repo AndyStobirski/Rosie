@@ -1,4 +1,4 @@
-﻿using Rosie.Enums;
+﻿using Rosie.Code.Misc;
 using Rosie.Misc;
 
 namespace Rosie.Code.Actors

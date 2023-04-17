@@ -1,6 +1,7 @@
 ﻿using Microsoft.Xna.Framework;
 using Rosie.Code.Environment;
 using Rosie.Code.Map;
+using Rosie.Code.Misc;
 
 namespace Rosie.Map
 {
@@ -23,8 +24,8 @@ namespace Rosie.Map
             int x, y;
             do
             {
-                x = _rnd.Next(0, Level.Map.GetLength(0));
-                y = _rnd.Next(0, Level.Map.GetLength(1));
+                x = RandomWithSeed.Next(0, Level.Map.GetLength(0));
+                y = RandomWithSeed.Next(0, Level.Map.GetLength(1));
             } while (Level.Map[x, y] == null);
             return new Point(x, y);
         }
@@ -195,7 +196,7 @@ namespace Rosie.Map
 
         Tile RandomPercent(int percent)
         {
-            if (percent >= _rnd.Next(1, 101))
+            if (percent >= RandomWithSeed.Next(1, 101))
             {
                 return new Floor();
             }

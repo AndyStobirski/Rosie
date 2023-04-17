@@ -1,4 +1,6 @@
-﻿namespace Rosie.Code.Environment
+﻿using Rosie.Code.Misc;
+
+namespace Rosie.Code.Environment
 {
     public class Floor : Tile
     {
