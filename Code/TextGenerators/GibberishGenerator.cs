@@ -1,4 +1,6 @@
-﻿namespace Rosie.Code.Misc
+﻿using Rosie.Code.Misc;
+
+namespace Rosie.Code.TextGenerators
 {
 
     class GibberishGenerator

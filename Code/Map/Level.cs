@@ -5,6 +5,7 @@ using Rosie.Code.Items;
 using Rosie.Code.Items.Weapons;
 using Rosie.Code.Misc;
 using Rosie.Code.sensedata;
+using Rosie.Code.TextGenerators;
 using Rosie.Entities;
 using Rosie.Misc;
 using System;
