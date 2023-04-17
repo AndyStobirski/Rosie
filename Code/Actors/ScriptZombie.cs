@@ -2,6 +2,10 @@
 
 namespace Rosie.Code.Actors
 {
+    /// <summary>
+    /// The most simple script, attempt to move towards and attack the player
+    /// if they can be seen
+    /// </summary>
     public class ScriptZombie : Script
     {
 

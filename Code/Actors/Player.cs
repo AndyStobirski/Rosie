@@ -29,6 +29,9 @@ namespace Rosie.Entities
             var l = new LeatherArmour();
             Inventory.Add(l);
             EquipArmour(l);
+
+            BaseScent = 10;
+
         }
 
 

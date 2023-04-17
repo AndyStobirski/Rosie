@@ -3,6 +3,7 @@ using Rosie.Code;
 using Rosie.Code.Environment;
 using Rosie.Code.Map;
 using Rosie.Code.Misc;
+using Rosie.Code.sensedata;
 using Rosie.Entities;
 using Rosie.Map;
 using Rosie.Misc;
@@ -64,7 +65,7 @@ namespace Rosie
         /// </summary>
         private void CalculateFieldOfVision()
         {
-            _fov.ScanArea(Camera.GameCameraDefinition);
+            _fov.CastLight(Camera.GameCameraDefinition);
         }
 
 
@@ -74,7 +75,7 @@ namespace Rosie
 
         #endregion
 
-        public Tile[,] Map => currentLevel?.Map;
+        public Tile[,] Map => currentLevel.Map;
 
 
         List<Level> levels = new List<Level>();
@@ -139,7 +140,7 @@ namespace Rosie
             {
                 currentLevel = CreateNewLevel();
                 levels.Add(currentLevel);
-                currentLevel.InitLevel(player, 5);
+                currentLevel.InitLevel(player, 10);
                 player.X = currentLevel.StairCase_Up.X;
                 player.Y = currentLevel.StairCase_Up.Y;
 
@@ -213,7 +214,7 @@ namespace Rosie
             // TODO Need to refine the code that follows
 
             mapGenerator = new MapGenerator();
-            mapGenerator.MaxRooms = 5;
+            mapGenerator.MaxRooms = 15;
             //{
             //    Room_Min = new Size(4, 4),
             //    Room_Max = new Size(10, 10),
@@ -274,6 +275,63 @@ namespace Rosie
             {
                 TurnCounter++;
                 GameState = GameStates.PlayerTurn;
+
+                //
+                //  SCENT DATA
+                //
+                Scent s = currentLevel.SenseData.FirstOrDefault(s => s.X == player.X && s.Y == player.Y) as Scent;
+
+                if (s == null)
+                {
+                    //add it
+                    s = new Scent(player.BaseScent, 1, player.X, player.Y);
+                    Map[player.X, player.Y].SenseData.Add(s);
+                    currentLevel.SenseData.Add(s);
+                }
+                else
+                {
+                    // top it up
+                    s.ScentValue = player.BaseScent;
+                }
+
+
+                // examine each cell
+                for (int ctr = currentLevel.SenseData.Count - 1; ctr >= 0; ctr--)
+                {
+                    var sc = currentLevel.SenseData[ctr] as Scent;
+
+                    if (sc.Degrade())
+                    {
+                        Map[sc.X, sc.Y].SenseData.Remove(sc);
+                        currentLevel.SenseData.Remove(sc);
+                    }
+                    else
+                    {
+                        foreach (Scent n in sc.Propogate())//calling this degrades the scent
+                        {
+                            if (!currentLevel.SenseData.Any(s => s.X == n.X && s.Y == n.Y))
+                            {
+                                //the propogated scent item is not on the map
+                                Map[n.X, n.Y].SenseData.Add(n);
+                                currentLevel.SenseData.Add(n);
+
+                            }
+                            else
+                            {
+                                //the cell examined has scent data
+                                var es = Map[n.X, n.Y].SenseData.First() as Scent;
+                                if (es.ScentValue < n.ScentValue)
+                                {
+                                    es.ScentValue = n.ScentValue;
+                                }
+                            }
+                        }
+                    }
+                }
+
+                //
+                //  /SCENT DATA
+                //
             }
 
             foreach (Actor a in _ActorsToMove.Where(ac => ac is NPC))
@@ -297,32 +355,11 @@ namespace Rosie
             Camera.CalculateGameCameraDefinition();
             CalculateFieldOfVision();
 
-
         }
 
 
         #region mouse / key handling
-        private readonly keys[] DirectionKeys = new keys[]
-            {
-                keys.keypad1, keys.keypad2, keys.keypad3
-                , keys.keypad4, keys.keypad5, keys.keypad6
-                , keys.keypad7, keys.keypad8, keys.keypad9
-            };
 
-
-        readonly Point[] Directions =
-            {
-                  new Point(-1, 1),  new Point(0, 1),   new Point(1, 1)
-                , new Point(-1, 0),  new Point(0, 0),   new Point(1, 0)
-                , new Point(-1, -1), new Point(0, -1),  new Point(1,-1)
-            };
-
-
-        private Point GetVectorFromDirection(int pKey)
-        {
-            var idx = DirectionKeys.ToList().FindIndex(k => (int)k == pKey);
-            return Directions[idx];
-        }
 
         /// <summary>
         /// A click has occured on the game window

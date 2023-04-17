@@ -1,7 +1,9 @@
 ﻿using Microsoft.Xna.Framework;
 using Rosie.Code.Environment;
 using Rosie.Code.Misc;
+using Rosie.Code.sensedata;
 using Rosie.Entities;
+using Rosie.Misc;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -40,15 +42,7 @@ namespace Rosie.Code.Actors
         /// </summary>
         protected int IdleThreshHold = 3;
 
-        /// <summary>
-        /// How long the monser is to sleep for
-        /// </summary>
-        protected int SleepCounter = 0;
 
-        /// <summary>
-        /// Probability will sleep
-        /// </summary>
-        protected int SleepProb = 10;
 
         /// <summary>
         /// How long does it sleep foor
@@ -104,6 +98,9 @@ namespace Rosie.Code.Actors
         /// <returns></returns>
         protected bool CanSeePlayer()
         {
+            if (!monster.CanSee)
+                return false;
+
             if (MapUtils.CellDistance(player.X, player.Y, monster.X, monster.Y) <= monster.VisionRange)
             {
                 List<Point> bres = null;
@@ -132,6 +129,8 @@ namespace Rosie.Code.Actors
         /// </summary>
         public void Wander()
         {
+            if (!monster.CanMove)
+                return;
 
             if ((monster.X == TargetWayPoint.X && monster.Y == TargetWayPoint.Y))
             {
@@ -159,6 +158,8 @@ namespace Rosie.Code.Actors
 
         protected void SetSleep()
         {
+            if (!monster.CanSleep)
+                return;
 
             SleepCount = 25;
             State = NPC_STATE.Sleeping;
@@ -167,6 +168,13 @@ namespace Rosie.Code.Actors
 
         protected void Sleep()
         {
+            if (ScentDetect() && Roller.Roll(d20) > monster.ScentWakeUp)
+            {
+                RosieGame.AddMessage("Monster smelt player and woke up");
+                State = NPC_STATE.Alert;
+                return;
+            }
+
             SleepCount--;
 
             if (SleepCount <= 0)
@@ -175,6 +183,57 @@ namespace Rosie.Code.Actors
                 RosieGame.AddMessage("Monster woke up");
             }
         }
+
+        /// <summary>
+        /// Can the monster smell the player
+        /// </summary>
+        /// <returns></returns>
+        protected bool ScentDetect()
+        {
+
+            if (!monster.CanSmell)
+                return false;
+
+            var scent = map[monster.X, monster.Y].SenseData.Any();
+
+            return scent;
+        }
+
+
+
+        /// <summary>
+        /// Can detect scent move towards it
+        /// </summary>
+        protected void ScentTrack()
+        {
+            if (State != NPC_STATE.TrackScent)
+            {
+                RosieGame.AddMessage("Monster scented player");
+                State = NPC_STATE.TrackScent;
+            }
+
+            var scent = map[monster.X, monster.Y].SenseData.First() as Scent;
+
+            //get cell with next highest value
+            var surrounding = MapUtils.GetSurroundingPoints(monster.X, monster.Y)
+                                .Where(p => MapUtils.IsCellValid(p.X, p.Y))
+                                .Select(p => map[p.X, p.Y])
+                                .Where(m => m.SenseData.Any())
+                                .FirstOrDefault(m => ((m.SenseData.First()) as Scent).ScentValue == (scent.ScentValue + 1));
+
+
+            if (surrounding == null)
+            {
+                RosieGame.AddMessage("Monster lost scent of player");
+            }
+            else
+            {
+                RosieGame.AddMessage("Monster following scent");
+                var t = surrounding.SenseData.First();
+                monster.Move(t.X, t.Y);
+            }
+        }
+
 
 
         protected void Swap<T>(ref T lhs, ref T rhs) { T temp; temp = lhs; lhs = rhs; rhs = temp; }
@@ -231,6 +290,7 @@ namespace Rosie.Code.Actors
 
             return Map[pX, pY] != null && Map[pX, pY].SeeThrough();
         }
+
 
 
     }

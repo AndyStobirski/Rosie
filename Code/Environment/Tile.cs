@@ -1,4 +1,5 @@
 ﻿using Rosie.Code.Items;
+using Rosie.Code.sensedata;
 using Rosie.Entities;
 using System.Collections.Generic;
 
@@ -31,6 +32,8 @@ namespace Rosie.Code.Environment
         public Actor Inhabitant { get; set; }
 
         public List<Item> Items = new List<Item>();
+
+        public List<SenseDatum> SenseData = new List<SenseDatum>();
 
         /// <summary>
         /// The index of the item on the tile sheet

@@ -19,6 +19,7 @@ It's barely an alpha and has has the following features:
 * Added stair cases / movement between levels
 
 ## To Do
+* Document NPC AI system in Wiki
 * Inventory Management: throw
 * Add items: potions, scrolls, rings
 * Animations - projectiles

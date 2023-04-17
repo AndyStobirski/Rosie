@@ -153,5 +153,21 @@ namespace Rosie
             }
         }
 
+        private readonly keys[] DirectionKeys = new keys[]
+    {
+                keys.keypad1, keys.keypad2, keys.keypad3
+                , keys.keypad4, keys.keypad5, keys.keypad6
+                , keys.keypad7, keys.keypad8, keys.keypad9
+    };
+
+
+
+
+        private Point GetVectorFromDirection(int pKey)
+        {
+            var idx = DirectionKeys.ToList().FindIndex(k => (int)k == pKey);
+            return Library.Directions[idx];
+        }
+
     }
 }

@@ -42,6 +42,11 @@ namespace Rosie.Entities
 
         public Point Location => new Point(X, Y);
 
+        /// <summary>
+        /// The current level of scent an actor has, used in the generation
+        /// of SenseData
+        /// </summary>
+        public int BaseScent { get; set; }
 
         #region Abstract methods
 
@@ -110,6 +115,8 @@ namespace Rosie.Entities
             if (this is Player)
             {
                 msg = MessageStrings.Battle_Damage_Player;
+                (pActor as NPC).script.State = NPC_STATE.Alert;
+
             }
             else
             {

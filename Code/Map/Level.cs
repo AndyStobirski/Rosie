@@ -4,6 +4,7 @@ using Rosie.Code.Environment;
 using Rosie.Code.Items;
 using Rosie.Code.Items.Weapons;
 using Rosie.Code.Misc;
+using Rosie.Code.sensedata;
 using Rosie.Entities;
 using Rosie.Misc;
 using System;
@@ -24,15 +25,30 @@ namespace Rosie.Code.Map
         /// </summary>
         public List<NPC> Monsters = new List<NPC>();
 
+        /// <summary>
+        /// Player
+        /// </summary>
         public Player player { get; set; }
 
+        /// <summary>
+        /// The Level map
+        /// </summary>
         public Tile[,] Map { get; set; }
 
+        /// <summary>
+        /// Rectangles represent map rooms
+        /// </summary>
         public List<Rectangle> Rooms { get; set; }
 
+        /// <summary>
+        /// A point in the centre of a room, used for NPC navigation
+        /// </summary>
         public List<WayPoint> WayPoints { get; set; }
 
-
+        /// <summary>
+        /// Player / NPC generated sensedata stored here
+        /// </summary>
+        public List<SenseDatum> SenseData { get; set; }
 
         public Point StairCase_Up { get; set; }
         public Point StairCase_Down { get; set; }
@@ -48,6 +64,7 @@ namespace Rosie.Code.Map
         public Level()
         {
             Guid = Guid.NewGuid();
+            SenseData = new List<SenseDatum>();
         }
 
         /// <summary>
@@ -114,7 +131,7 @@ namespace Rosie.Code.Map
             {
                 MapUtils.GetRandomRoomPoint(out location, out wp);
 
-                m = new NPC(location, new ScriptBasic())
+                m = new NPC(location, new ScriptBasic1())
                 {
                     Gfx = (int)GFXValues.MONSTER_ORC
                     ,
@@ -128,11 +145,11 @@ namespace Rosie.Code.Map
                     ,
                     Class = "Orc"
                     ,
-                    Name = GibberishGenerator.GenerateName(true)
+                    Name = GibberishGenerator.GenerateName()
                 };
 
 
-                m.Name = GibberishGenerator.GenerateName(true);
+                m.Name = GibberishGenerator.GenerateName();
                 m.script.SetTargetWayPoint(wp);
                 m.WeaponPrimary = new Spear();
                 m.ActorCompletedTurn += Monster_ActorMoved;
@@ -144,6 +161,7 @@ namespace Rosie.Code.Map
             }
 
 
+            /*
             for (int ctr = 0; ctr < pMaxMonsters; ctr++)
             {
                 MapUtils.GetRandomRoomPoint(out location, out wp);
@@ -175,6 +193,7 @@ namespace Rosie.Code.Map
                 Monsters.Add(m);
                 _Scheduler.AddActor(m);
             }
+            */
 
 
 

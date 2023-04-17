@@ -10,41 +10,44 @@
 
         private static string[] vowelPairs = { "ai", "au", "ea", "ee", "ei", "eu", "ia", "ie", "io", "iu", "oa", "oe", "oi", "ou", "ua", "ue", "ui", "uo" };
 
-        public static string GenerateName(bool capitalizeFirstLetter)
+        public static string GenerateName()
         {
-            string name = "";
+            return Generate(true, 1, 1);
+        }
 
-            // Random number of syllables between 2 and 3
-            int syllableCount = RandomWithSeed.Next(2, 4);
-
-            for (int j = 0; j < syllableCount; j++)
+        public static string Generate(bool capitalizeFirstLetter, int pMinLength, int pMaxLength)
+        {
+            string sentence = "";
+            int wordCount = RandomWithSeed.Next(pMinLength, pMaxLength);
+            for (int i = 0; i < wordCount; i++)
             {
-                // Randomly choose syllable type
-                int syllableType = RandomWithSeed.Next(3);
-
-                if (syllableType == 0)
+                int syllableCount = RandomWithSeed.Next(1, 4); // Random number of syllables between 1 and 3
+                for (int j = 0; j < syllableCount; j++)
                 {
-                    // Non-vowel syllable
-                    name += nonVowelSyllables[RandomWithSeed.Next(nonVowelSyllables.Length)];
+                    if (j % 2 == 0)
+                    {
+                        sentence += nonVowelSyllables[RandomWithSeed.Next(nonVowelSyllables.Length)];
+                    }
+                    else
+                    {
+                        if (RandomWithSeed.Next(2) == 0)
+                        {
+                            sentence += vowelPairs[RandomWithSeed.Next(vowelPairs.Length)];
+                        }
+                        else
+                        {
+                            sentence += syllables[RandomWithSeed.Next(syllables.Length)];
+                        }
+                    }
                 }
-                else if (syllableType == 1)
-                {
-                    // Single vowel syllable
-                    name += syllables[RandomWithSeed.Next(syllables.Length)];
-                }
-                else
-                {
-                    // Vowel pair syllable
-                    name += vowelPairs[RandomWithSeed.Next(vowelPairs.Length)];
-                }
+                sentence += " ";
             }
-
+            sentence = sentence.TrimEnd();
             if (capitalizeFirstLetter)
             {
-                name = char.ToUpper(name[0]) + name.Substring(1);
+                sentence = char.ToUpper(sentence[0]) + sentence.Substring(1);
             }
-
-            return name;
+            return sentence;
         }
     }
 

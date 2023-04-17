@@ -34,7 +34,7 @@ namespace Rosie.Map
 
             WayPoints = new();
             Build_OneStartRoom();
-            AddWalls();
+            //AddWalls();
             Level.Rooms = rctBuiltRooms;
             Level.WayPoints = WayPoints;
 

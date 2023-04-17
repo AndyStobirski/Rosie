@@ -3,6 +3,7 @@ using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 using Rosie.Code;
 using Rosie.Code.Misc;
+using Rosie.Code.sensedata;
 using Rosie.Entities;
 using Rosie.Misc;
 using System;
@@ -173,12 +174,12 @@ namespace Rosie
             switch (RosieGame.ViewMode)
             {
                 case GameViewMode.Game:
-                    /*
-                        var deltaTime = (float)gameTime.ElapsedGameTime.TotalSeconds;
-                        _frameCounter.Update(deltaTime);
-                        var fps = string.Format("FPS: {0}", _frameCounter.AverageFramesPerSecond);
-                       _spriteBatch.DrawString(_font, fps, new Vector2(1, 1), Color.White);
-                    */
+
+                    var deltaTime = (float)gameTime.ElapsedGameTime.TotalSeconds;
+                    _frameCounter.Update(deltaTime);
+                    var fps = string.Format("FPS: {0}", _frameCounter.AverageFramesPerSecond);
+                    _spriteBatch.DrawString(_font, fps, new Vector2(1, 1), Color.White);
+
 
                     _spriteBatch.DrawString(_font, string.Format("CAPS: {0}, NUM: {1}, SHIFT: {2}", _Rosie.CapsLock, _Rosie.NumLock, _Rosie.ShiftDown), new Vector2(_graphics.PreferredBackBufferWidth - 300, 1), Color.White);
 
@@ -348,7 +349,7 @@ namespace Rosie
                 for (int y = Camera.GameCameraDefinition.Top; y < Camera.GameCameraDefinition.Bottom; y++)
                 {
                     //  lookup whether the player can see the tile
-                    visible = _Rosie._fov.GameViewVisibilityGrid[x - Camera.GameCameraDefinition.Left, y - Camera.GameCameraDefinition.Top] > 0;
+                    visible = _Rosie._fov.LightGrid[x - Camera.GameCameraDefinition.Left, y - Camera.GameCameraDefinition.Top] > 0;
 
                     //the tile being examined
                     var tile = _Rosie.Map[x, y];
@@ -403,6 +404,14 @@ namespace Rosie
                                 }
 
                             }
+                        }
+
+                        //draw sense data
+                        if (tile.SenseData.Any())
+                        {
+                            var s = tile.SenseData.First() as Scent;
+
+                            _spriteBatch.DrawString(_font, s.ScentValue.ToString(), new Vector2(rect.X, rect.Y), Color.White);
                         }
                     }
                 }
@@ -467,7 +476,28 @@ namespace Rosie
 
         protected void DrawNPCState(Rectangle pTargetRect, NPC_STATE State)
         {
-            var gfx = (int)State + 1645;
+            int gfx = 0;
+            switch (State)
+            {
+                case NPC_STATE.Alert:
+                    gfx = (int)GFXValues.MONSTER_STATE_ALERT;
+                    break;
+                case NPC_STATE.Combat:
+                    gfx = (int)GFXValues.MONSTER_STATE_COMBAT;
+                    break;
+                case NPC_STATE.Exploring:
+                    gfx = (int)GFXValues.MONSTER_STATE_EXPLORING;
+                    break;
+                case NPC_STATE.Sleeping:
+                    gfx = (int)GFXValues.MONSTER_STATE_SLEEP;
+                    break;
+                case NPC_STATE.Idle:
+                    gfx = (int)GFXValues.MONSTER_STATE_IDLE;
+                    break;
+                case NPC_STATE.TrackScent:
+                    gfx = (int)GFXValues.MONSTER_STATE_TRACK_SCENT;
+                    break;
+            }
 
             pTargetRect.Y -= 8;
 
