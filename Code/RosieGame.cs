@@ -65,7 +65,11 @@ namespace Rosie
         /// </summary>
         private void CalculateFieldOfVision()
         {
-            _fov.CastLight(Camera.GameCameraDefinition);
+
+            //_fov.CalculateDistanceMap(7, player.X, player.Y, player.VisionRange + 5);
+            //_fov.OutputMask();
+
+            _fov.CastLight(Camera.GameCameraDefinition, player.X, player.Y, player.VisionRange);
         }
 
 
@@ -198,7 +202,7 @@ namespace Rosie
             player.X = pX;
             player.Y = pY;
             currentLevel.Map[pX, pY].Inhabitant = player;
-            _fov = new RecursiveShadowcast(player, Map);
+            _fov = new RecursiveShadowcast(Map);
             MapUtils.MakeMapVisible();
             Camera.CalculateGameCameraDefinition();
             CalculateFieldOfVision();
@@ -214,7 +218,7 @@ namespace Rosie
             // TODO Need to refine the code that follows
 
             mapGenerator = new MapGenerator();
-            mapGenerator.MaxRooms = 15;
+            mapGenerator.MaxRooms = 4;
             //{
             //    Room_Min = new Size(4, 4),
             //    Room_Max = new Size(10, 10),
@@ -276,67 +280,73 @@ namespace Rosie
                 TurnCounter++;
                 GameState = GameStates.PlayerTurn;
 
-                //
-                //  SCENT DATA
-                //
-                Scent s = currentLevel.SenseData.FirstOrDefault(s => s.X == player.X && s.Y == player.Y) as Scent;
-
-                if (s == null)
-                {
-                    //add it
-                    s = new Scent(player.BaseScent, 1, player.X, player.Y);
-                    Map[player.X, player.Y].SenseData.Add(s);
-                    currentLevel.SenseData.Add(s);
-                }
-                else
-                {
-                    // top it up
-                    s.ScentValue = player.BaseScent;
-                }
-
-
-                // examine each cell
-                for (int ctr = currentLevel.SenseData.Count - 1; ctr >= 0; ctr--)
-                {
-                    var sc = currentLevel.SenseData[ctr] as Scent;
-
-                    if (sc.Degrade())
-                    {
-                        Map[sc.X, sc.Y].SenseData.Remove(sc);
-                        currentLevel.SenseData.Remove(sc);
-                    }
-                    else
-                    {
-                        foreach (Scent n in sc.Propogate())//calling this degrades the scent
-                        {
-                            if (!currentLevel.SenseData.Any(s => s.X == n.X && s.Y == n.Y))
-                            {
-                                //the propogated scent item is not on the map
-                                Map[n.X, n.Y].SenseData.Add(n);
-                                currentLevel.SenseData.Add(n);
-
-                            }
-                            else
-                            {
-                                //the cell examined has scent data
-                                var es = Map[n.X, n.Y].SenseData.First() as Scent;
-                                if (es.ScentValue < n.ScentValue)
-                                {
-                                    es.ScentValue = n.ScentValue;
-                                }
-                            }
-                        }
-                    }
-                }
-
-                //
-                //  /SCENT DATA
-                //
+                ScentPropogration();
             }
 
             foreach (Actor a in _ActorsToMove.Where(ac => ac is NPC))
             {
                 ((NPC)a).Act();
+            }
+        }
+
+        /// <summary>
+        /// Calculate the propogation of player scent across the map
+        /// </summary>
+        private void ScentPropogration()
+        {
+            Scent s = currentLevel.SenseData.FirstOrDefault(s => s.X == player.X && s.Y == player.Y) as Scent;
+
+            if (s == null)
+            {
+                //add it
+                s = new Scent(player.BaseScent, 1, player.X, player.Y);
+                Map[player.X, player.Y].SenseData.Add(s);
+                currentLevel.SenseData.Add(s);
+            }
+            else
+            {
+                // top it up
+                s.ScentValue = player.BaseScent;
+            }
+
+
+            // Examine the current contents of the sensedata 
+            for (int ctr = currentLevel.SenseData.Count - 1; ctr >= 0; ctr--)
+            {
+                var sc = currentLevel.SenseData[ctr] as Scent;
+
+
+
+
+                Debug.WriteLine(sc.ScentValue);
+
+                if (sc.Degrade())
+                {
+                    Map[sc.X, sc.Y].SenseData.Remove(sc);
+                    currentLevel.SenseData.Remove(sc);
+                }
+                else
+                {
+                    foreach (Scent n in sc.Propogate())
+                    {
+                        if (!currentLevel.SenseData.Any(s => s.X == n.X && s.Y == n.Y))
+                        {
+                            //the propogated scent item is not on the map
+                            Map[n.X, n.Y].SenseData.Add(n);
+                            currentLevel.SenseData.Add(n);
+
+                        }
+                        else
+                        {
+                            //the cell examined has scent data
+                            var es = Map[n.X, n.Y].SenseData.First() as Scent;
+                            if (es.ScentValue < n.ScentValue)
+                            {
+                                es.ScentValue = n.ScentValue;
+                            }
+                        }
+                    }
+                }
             }
         }
 

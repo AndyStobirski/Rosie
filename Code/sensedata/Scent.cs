@@ -8,11 +8,6 @@ namespace Rosie.Code.sensedata
 
         public int DegradeVal { get; set; }
         public int ScentValue { get; set; }
-        public Scent(int pDuration, int pDegrade)
-        {
-            ScentValue = pDuration;
-            DegradeVal = pDegrade;
-        }
 
         public Scent(int pScentValue, int pDegrade, int pX, int pY)
         {
@@ -28,28 +23,20 @@ namespace Rosie.Code.sensedata
         /// <returns></returns>
         public Scent[] Propogate()
         {
-            if ((ScentValue - DegradeVal) > 0)
-            {
-
-                return Library.Directions1
-                    .Select(p => new Scent(ScentValue, DegradeVal, p.X + this.X, p.Y + this.Y))
-                    .Where(p => MapUtils.IsCellValid(p.X, p.Y))
-                    .ToArray();
-            }
-            else
-            {
-                return new Scent[] { };
-            }
+            return Library.Directions2
+                .Select(p => new Scent(ScentValue, DegradeVal, p.X + this.X, p.Y + this.Y))
+                .Where(p => MapUtils.IsCellValid(p.X, p.Y))
+                .ToArray();
         }
 
         /// <summary>
-        /// Degrade the scent, returning if it's still existing
+        /// Degrade the scent, returning if it still exist
         /// </summary>
         /// <returns></returns>
         public bool Degrade()
         {
             ScentValue -= DegradeVal;
-            return ScentValue < 0;
+            return ScentValue < 1;
         }
 
 

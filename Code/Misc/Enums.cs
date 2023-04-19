@@ -97,5 +97,56 @@
 
     }
 
+    public enum NPC_Type
+    {
+        Alive
+            , Undead
+    }
+
+    public enum NPC_SubType
+    {
+        Skeleton
+        , Orc
+        , Amphibian
+        , Insect
+    }
+
+    public enum WEAPON_TYPE
+    {
+        Sword, Dagger, Hammer, Mace, PoleArm
+    }
+
+    public enum WEAPON_SUBTYPE
+    {
+        Sword_Small
+            , Sword
+            , Sword_Bastard
+            , Dagger
+            , Dagger_MainGauche
+            , Hammer
+            , Hammer_WarHammer
+            , Mace
+            , Mace_WoodenClub
+            , PoleArm_Spear
+            , PoleArm_Pike
+    }
+
+    public enum Armour_Type
+    {
+        Cloth,
+        Leather,
+        Ring,
+        Chain,
+        Plate
+    }
+
+    public enum Armour_SubType
+    {
+        Cloth
+            , Leather
+            , Ring
+            , Chain
+            , Plate
+    }
 
 }

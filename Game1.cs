@@ -164,13 +164,6 @@ namespace Rosie
             _spriteBatch.Begin();
 
 
-            #region Draw debug code
-
-
-
-            #endregion
-
-
             switch (RosieGame.ViewMode)
             {
                 case GameViewMode.Game:
@@ -230,11 +223,9 @@ namespace Rosie
         /// <returns></returns>
         private Rectangle IndexToRectangle(int pIndex)
         {
-
             Size _tilesSize = new Size(_tiles.Width / 32, _tiles.Height / 32);
             int y = pIndex / _tilesSize.Width;
             int x = pIndex - y * _tilesSize.Width;
-
             return new Rectangle(x * 32, y * 32, 32, 32);
         }
 

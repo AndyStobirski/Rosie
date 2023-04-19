@@ -1,8 +1,6 @@
 ﻿using Microsoft.Xna.Framework;
-using Rosie.Code.Actors;
 using Rosie.Code.Environment;
 using Rosie.Code.Items;
-using Rosie.Code.Items.Weapons;
 using Rosie.Code.Misc;
 using Rosie.Code.sensedata;
 using Rosie.Code.TextGenerators;
@@ -132,27 +130,13 @@ namespace Rosie.Code.Map
             {
                 MapUtils.GetRandomRoomPoint(out location, out wp);
 
-                m = new NPC(location, new ScriptBasic1())
-                {
-                    Gfx = (int)GFXValues.MONSTER_ORC
-                    ,
-                    Speed = 10
-                    ,
-                    VisionRange = 5
-                    ,
-                    HitPointsMax = 5
-                    ,
-                    HitPointsCurrent = 5
-                    ,
-                    Class = "Orc"
-                    ,
-                    Name = GibberishGenerator.GenerateName()
-                };
+                m = EntityData.RandomNPC();
+                m.PlaceNPC(location.X, location.Y, wp);
 
 
                 m.Name = GibberishGenerator.GenerateName();
                 m.script.SetTargetWayPoint(wp);
-                m.WeaponPrimary = new Spear();
+                m.WeaponPrimary = EntityData.RandomWeapon();
                 m.ActorCompletedTurn += Monster_ActorMoved;
                 m.Died += Monster_Died;
 
@@ -160,41 +144,6 @@ namespace Rosie.Code.Map
                 Monsters.Add(m);
                 _Scheduler.AddActor(m);
             }
-
-
-            /*
-            for (int ctr = 0; ctr < pMaxMonsters; ctr++)
-            {
-                MapUtils.GetRandomRoomPoint(out location, out wp);
-
-                m = new NPC(location, new ScriptZombie())
-                {
-                    Gfx = (int)GFXValues.MONSTER_SKELETON
-                    ,
-                    Speed = 10
-                    ,
-                    VisionRange = 5
-                    ,
-                    HitPointsMax = 5
-                    ,
-                    HitPointsCurrent = 5
-                    ,
-                    Class = "Skeleton"
-                    ,
-                    Name = GibberishGenerator.GenerateName(true)
-                };
-
-
-                m.script.SetTargetWayPoint(wp);
-                m.WeaponPrimary = new Dagger();
-                m.ActorCompletedTurn += Monster_ActorMoved;
-                m.Died += Monster_Died;
-
-                Map[m.X, m.Y].Inhabitant = m;
-                Monsters.Add(m);
-                _Scheduler.AddActor(m);
-            }
-            */
 
 
 
@@ -206,6 +155,27 @@ namespace Rosie.Code.Map
                 var p = GetRandomEmptyRoomPoint();
                 AddItem(new GoldCoins(RandomWithSeed.Next(1, 100)) { X = p.X, Y = p.Y });
             }
+
+            //
+            //  Randomly add items
+            //
+            foreach (var w in EntityData.Weapons)
+            {
+                var w1 = EntityData.RandomWeapon();
+                var p = GetRandomEmptyRoomPoint();
+                w1.SetLocation(p.X, p.Y);
+                AddItem(w1);
+            }
+
+            foreach (var a in EntityData.Armours)
+            {
+                var b = EntityData.RandomArmour();
+
+                var p = GetRandomEmptyRoomPoint();
+                b.SetLocation(p.X, p.Y);
+                AddItem(b);
+            }
+
         }
 
         /// <summary>

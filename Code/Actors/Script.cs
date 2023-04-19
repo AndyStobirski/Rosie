@@ -18,7 +18,7 @@ namespace Rosie.Code.Actors
     {
 
 
-        protected static Roll d20 = new Roll(20, 0);
+        protected static NDM d20 = new NDM(20, 0);
 
 
         /// <summary>

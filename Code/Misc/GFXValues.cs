@@ -13,7 +13,7 @@
         DUNGEON_FLOOR = 1378,
         DUNGEON_WALL = 1357,
 
-        PLAYER_WIZARD = 349,
+        PLAYER_WIZARD = 350,
 
         MONSTER_SKELETON = 332,
         MONSTER_ORC = 285,

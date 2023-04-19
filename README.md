@@ -5,18 +5,19 @@ A [RogueLike](https://en.wikipedia.org/wiki/Roguelike) named after my dog, which
 It's barely an alpha and has has the following features:
 
 * Maze generation
-* Player Field of vision
-* Monster AI (rudimentary: move towards player on sight, attack, wandering between rooms)
+* Player Field of vision via recursive shadowcasting
+* Monster AI (rudimentary: move towards player on sight, attack, wandering between rooms, following player scent)
 * Combat system
 * Messages
 * Minimap
-* Weapons (Rudimentary)
+* Weapons 
 * Take, drop, equip items 
-* Armour effects to combat system
+* Armour effects on combat system
 * Treasure placement and pickup
 * Addded input handling system
 * Added door open / close mechanics via the iOpenable interface
 * Added stair cases / movement between levels
+* Parameterised the Weapon, Armour and NPC data
 
 ## To Do
 * Document NPC AI system in Wiki

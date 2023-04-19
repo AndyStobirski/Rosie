@@ -1,4 +1,5 @@
 ﻿using Microsoft.Xna.Framework;
+using Rosie.Code;
 using Rosie.Code.Items;
 using Rosie.Code.Misc;
 using Rosie.Misc;
@@ -14,9 +15,9 @@ namespace Rosie.Entities
     ///     1. The method Attack is where Combat messages are outputted to the console
     /// 
     /// </summary>
-    public abstract class Actor
+    public abstract class Actor : Location
     {
-        static Roll d20 = new Roll(20, 0);
+        static NDM d20 = new NDM(20, 0);
 
         /// <summary>
         /// The lower the number the faster the character, e.g. a character with twice the speed of another will
@@ -24,8 +25,6 @@ namespace Rosie.Entities
         /// </summary>
         public int Speed { get; set; }
         public int Gfx { get; set; }
-        public int X { get; set; }
-        public int Y { get; set; }
         public int VisionRange { get; set; }
         public int HitPointsMax { get; set; }
         public int HitPointsCurrent { get; set; }

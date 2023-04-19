@@ -1,24 +1,26 @@
-﻿using Rosie.Code.Misc;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿
+using Rosie.Code.GameData;
+using Rosie.Code.Misc;
 
 namespace Rosie.Code.Items
 {
     public class Armour : Item
     {
-        public Roll Defence { get; protected set; }
 
-        public Armour()
+
+        public Armour(ArmourDatum datum)
         {
+            Defence = new NDM(datum.Number, datum.Dice, datum.Modifier);
+            Name = datum.Name;
+            Gfx = datum.GFX;
+            Type = datum.Type;
+            SubType = datum.SubType;
 
         }
 
-        public Armour(int pGfx) : base(pGfx)
-        {
-            pGfx = (int)GFXValues.ARMOUR_LEATHER;
-        }
+        public NDM Defence { get; private set; }
+
+        public Armour_Type Type { get; private set; }
+        public Armour_SubType SubType { get; private set; }
     }
 }

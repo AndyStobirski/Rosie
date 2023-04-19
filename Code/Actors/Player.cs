@@ -1,5 +1,6 @@
-﻿using Rosie.Code.Items;
-using Rosie.Code.Items.Weapons;
+﻿using Rosie.Code;
+using Rosie.Code.Items;
+
 using Rosie.Code.Misc;
 using System;
 using System.Collections.Generic;
@@ -23,14 +24,14 @@ namespace Rosie.Entities
             VisionRange = 8;
             HitPointsCurrent = 100;
             HitPointsMax = 100;
-            var d = new Dagger();
+            var d = EntityData.RandomWeapon();
             Inventory.Add(d);
             EquipWeapon(d);
-            var l = new LeatherArmour();
+            var l = EntityData.RandomArmour();
             Inventory.Add(l);
             EquipArmour(l);
 
-            BaseScent = 10;
+            BaseScent = 5;
 
         }
 

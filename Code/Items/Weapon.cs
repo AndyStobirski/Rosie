@@ -1,24 +1,28 @@
-﻿using Rosie.Code.Misc;
-using System;
-using System.Collections.Generic;
-using System.Text;
+﻿using Rosie.Code.GameData;
+using Rosie.Code.Misc;
 
 namespace Rosie.Code.Items
 {
     public class Weapon : Item
     {
-        public Roll Damage { get; set; }
 
-        public int Range { get; set; }
-
-        public Weapon()
+        public Weapon(WeaponDatum datum)
         {
+            Name = datum.Name;
+            Range = datum.Range;
+            Gfx = datum.GFX;
+            Damage = new NDM(datum.Number, datum.Dice, datum.Modifier);
+            type = datum.type;
+            subType = datum.subType;
 
         }
 
-        public Weapon(int pGfx) : base(pGfx)
-        {
+        public WEAPON_TYPE type { get; private set; }
+        public WEAPON_SUBTYPE subType { get; private set; }
 
-        }
+
+        public int Range { get; private set; }
+
+        public NDM Damage { get; private set; }
     }
 }
