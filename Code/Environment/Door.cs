@@ -26,7 +26,10 @@ namespace Rosie.Code.Environment
             }
         }
 
-
+        public override string Description()
+        {
+            return MessageStrings.See_YouSee + " an " + (IsOpen ? "open" : "closed") + " door";
+        }
 
         public override bool SeeThrough()
         {

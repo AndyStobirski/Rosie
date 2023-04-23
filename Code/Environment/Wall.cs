@@ -1,7 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-using Rosie.Code.Misc;
+﻿using Rosie.Code.Misc;
 
 namespace Rosie.Code.Environment
 {
@@ -22,6 +19,11 @@ namespace Rosie.Code.Environment
         public override bool SeeThrough()
         {
             return false;
+        }
+
+        public override string Description()
+        {
+            return MessageStrings.See_YouSee + " a wall";
         }
     }
 }

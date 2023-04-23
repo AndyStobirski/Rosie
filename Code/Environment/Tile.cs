@@ -17,6 +17,8 @@ namespace Rosie.Code.Environment
 
         }
 
+        public abstract string Description();
+
         /// <summary>
         /// Does the tile allow an actor to move over it?
         /// </summary>
@@ -53,6 +55,7 @@ namespace Rosie.Code.Environment
         {
             return $"{0},{1}:{Inhabitant == null}";
         }
+
 
     }
 }

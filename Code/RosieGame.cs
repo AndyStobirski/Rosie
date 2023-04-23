@@ -38,9 +38,9 @@ namespace Rosie
         #endregion
 
         /// <summary>
-        /// Tile selected by mouse click
-        /// </summary>
-        public static Point SelectedTile { get; set; }
+        /// Tile the mouse is over in the map
+        public static Point MouseOverTile { get; set; }
+
 
         /// <summary>
         /// Game messages are stored here. Why static? Easy for other things to access this.
@@ -54,6 +54,7 @@ namespace Rosie
         /// </summary>
         public int TurnCounter { get; set; }
 
+        public bool DislayOdourCloud { get; set; } = false;
 
         /// <summary>
         /// Player vision is calculated here
@@ -129,7 +130,7 @@ namespace Rosie
 
         public Level CreateNewLevel()
         {
-            var level = mapGenerator.Build(100, 100);
+            var level = mapGenerator.Build(50, 50);
             return level;
         }
 
@@ -144,7 +145,7 @@ namespace Rosie
             {
                 currentLevel = CreateNewLevel();
                 levels.Add(currentLevel);
-                currentLevel.InitLevel(player, 10);
+                currentLevel.InitLevel(player, 50);
                 player.X = currentLevel.StairCase_Up.X;
                 player.Y = currentLevel.StairCase_Up.Y;
 
@@ -193,7 +194,7 @@ namespace Rosie
         }
 
         /// <summary>
-        /// 
+        /// The player has entered the current level
         /// </summary>
         /// <param name="pX"></param>
         /// <param name="pY"></param>
@@ -207,6 +208,8 @@ namespace Rosie
             Camera.CalculateGameCameraDefinition();
             CalculateFieldOfVision();
 
+
+
         }
 
 
@@ -218,7 +221,13 @@ namespace Rosie
             // TODO Need to refine the code that follows
 
             mapGenerator = new MapGenerator();
-            mapGenerator.MaxRooms = 4;
+            mapGenerator.Corridor_Max = 5;
+            mapGenerator.Corridor_Min = 3;
+            mapGenerator.Corridor_MaxTurns = 1;
+            mapGenerator.MaxRooms = 10;
+
+
+
             //{
             //    Room_Min = new Size(4, 4),
             //    Room_Max = new Size(10, 10),
@@ -294,6 +303,7 @@ namespace Rosie
         /// </summary>
         private void ScentPropogration()
         {
+
             Scent s = currentLevel.SenseData.FirstOrDefault(s => s.X == player.X && s.Y == player.Y) as Scent;
 
             if (s == null)
@@ -309,16 +319,11 @@ namespace Rosie
                 s.ScentValue = player.BaseScent;
             }
 
-
             // Examine the current contents of the sensedata 
+            currentLevel.SenseData = currentLevel.SenseData.OrderByDescending(n => (n as Scent).ScentValue).ToList();
             for (int ctr = currentLevel.SenseData.Count - 1; ctr >= 0; ctr--)
             {
                 var sc = currentLevel.SenseData[ctr] as Scent;
-
-
-
-
-                Debug.WriteLine(sc.ScentValue);
 
                 if (sc.Degrade())
                 {
@@ -327,7 +332,7 @@ namespace Rosie
                 }
                 else
                 {
-                    foreach (Scent n in sc.Propogate())
+                    foreach (Scent n in sc.Propogate().OrderByDescending(n => n.ScentValue))
                     {
                         if (!currentLevel.SenseData.Any(s => s.X == n.X && s.Y == n.Y))
                         {

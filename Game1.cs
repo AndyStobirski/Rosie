@@ -7,7 +7,6 @@ using Rosie.Code.sensedata;
 using Rosie.Entities;
 using Rosie.Misc;
 using System;
-using System.Diagnostics;
 using System.Linq;
 
 namespace Rosie
@@ -32,7 +31,10 @@ namespace Rosie
         MouseState newMouseState;
         MouseState oldMouseState;
 
-
+        /// <summary>
+        /// The map cell the mouse pointer is over
+        /// </summary>
+        Point _MouseOverMapCell;
 
         public Game1()
         {
@@ -95,16 +97,7 @@ namespace Rosie
             var mouseState = Mouse.GetState();
 
 
-            //Check if mouse inside the camera area
-            //and set the position based on tile size
-            if (Camera.CameraBorder.Contains(mouseState.X, mouseState.Y))
-            {
-                RosieGame.SelectedTile = new Point(
-                    (mouseState.X - Camera.GameCameraOffset.X) / Camera.TileSize.Width + Camera.GameCameraDefinition.X,
-                    (mouseState.Y - Camera.GameCameraOffset.Y) / Camera.TileSize.Height + Camera.GameCameraDefinition.Y
-                    );
 
-            }
 
             _Rosie.ShiftDown = newKeyboardState.IsKeyDown(Keys.LeftShift) || newKeyboardState.IsKeyDown(Keys.RightShift);
             _Rosie.NumLock = newKeyboardState.NumLock;
@@ -116,8 +109,38 @@ namespace Rosie
                 _Rosie.MouseClick(mouseState.X, mouseState.Y);
             }
 
+
+            //Check if mouse inside the camera area
+            //and set the position based on tile size
+            if (Camera.CameraBorder.Contains(mouseState.X, mouseState.Y))
+            {
+                _MouseOverMapCell = new Point(
+                    (mouseState.X - Camera.GameCameraOffset.X) / Camera.TileSize.Width + Camera.GameCameraDefinition.X,
+                    (mouseState.Y - Camera.GameCameraOffset.Y) / Camera.TileSize.Height + Camera.GameCameraDefinition.Y
+                    );
+
+            }
+            else
+            {
+                _MouseOverMapCell = new Point(-1, -1);
+            }
+
+
+
+
+
             if (_Rosie.GameState == GameStates.PlayerTurn)
             {
+
+
+                //
+                //  Detect mouse click in game view
+                //
+                if (ClickInGameView(mouseState.X, mouseState.Y, out Point pClick))
+                {
+                    _InputHandler.MapCellClicked(_MouseOverMapCell.X, _MouseOverMapCell.Y);
+                }
+
 
                 //
                 //  Detect keyup
@@ -127,15 +150,14 @@ namespace Rosie
                                     where newKeyboardState.IsKeyUp(key)
                                     select key)
                 {
-
-                    Debug.WriteLine(string.Format("{0} - {1}", key, (int)key));
-
-
-                    _InputHandler.ProcessCommand((int)key);
-
-                    // _Rosie.KeyPress((int)key);
-
+                    _InputHandler.GetUserKeyPress((int)key);
                 }
+
+                if (newMouseState.LeftButton == ButtonState.Released && oldMouseState.LeftButton == ButtonState.Pressed)
+                {
+                    _Rosie.MouseClick(mouseState.X, mouseState.Y);
+                }
+
 
             }
             else if (_Rosie.GameState == GameStates.EnemyTurn)
@@ -167,7 +189,6 @@ namespace Rosie
             switch (RosieGame.ViewMode)
             {
                 case GameViewMode.Game:
-
                     var deltaTime = (float)gameTime.ElapsedGameTime.TotalSeconds;
                     _frameCounter.Update(deltaTime);
                     var fps = string.Format("FPS: {0}", _frameCounter.AverageFramesPerSecond);
@@ -176,20 +197,17 @@ namespace Rosie
 
                     _spriteBatch.DrawString(_font, string.Format("CAPS: {0}, NUM: {1}, SHIFT: {2}", _Rosie.CapsLock, _Rosie.NumLock, _Rosie.ShiftDown), new Vector2(_graphics.PreferredBackBufferWidth - 300, 1), Color.White);
 
-
-
                     DrawGame();
-                    DrawMapFrame();
-                    DrawGameMessages();
-                    DrawPlayerStats();
                     break;
 
                 case GameViewMode.MiniMap:
                     DrawMiniMap();
                     break;
 
-                case GameViewMode.IO:
-                    DrawInventory();
+                case GameViewMode.InputHandlerMode:
+
+                    DrawGame();
+                    DrawInputHandler();
                     break;
 
             }
@@ -211,7 +229,26 @@ namespace Rosie
         }
 
 
+        /// <summary>
+        /// Check if a mouse click in the game camera has taken place
+        /// </summary>
+        /// <param name="pX"></param>
+        /// <param name="pY"></param>
+        /// <param name="pClick"></param>
+        /// <returns></returns>
+        private bool ClickInGameView(int pX, int pY, out Point pClick)
+        {
+            pClick = Point.Zero;
 
+            //Check if mouse inside the camera area
+            //and set the position based on tile size
+            if (newMouseState.LeftButton == ButtonState.Released && oldMouseState.LeftButton == ButtonState.Pressed && _MouseOverMapCell.X != -1 && _MouseOverMapCell.Y != -1)
+            {
+                return true;
+            }
+            else
+                return false;
+        }
 
         #region Map Drawing Code
 
@@ -321,16 +358,25 @@ namespace Rosie
 
 
             //
+            //  Draw mouse coordinates
             //
-            //
-            _spriteBatch.DrawString(_font, string.Format("Mouse: {0},{1}", RosieGame.SelectedTile.X, RosieGame.SelectedTile.Y), new Vector2(Camera.CameraBorder.X, Camera.CameraBorder.Y), Color.White);
+            _spriteBatch.DrawString(_font, string.Format("Mouse: {0},{1}", RosieGame.MouseOverTile.X, RosieGame.MouseOverTile.Y), new Vector2(Camera.CameraBorder.X, Camera.CameraBorder.Y), Color.White);
 
         }
 
         #endregion
 
         #region GameDrawing Code
+
         private void DrawGame()
+        {
+            DrawCameraView();
+            DrawMapFrame();
+            DrawGameMessages();
+            DrawPlayerStats();
+        }
+
+        private void DrawCameraView()
         {
 
             bool visible;
@@ -398,7 +444,7 @@ namespace Rosie
                         }
 
                         //draw sense data
-                        if (tile.SenseData.Any())
+                        if (_Rosie.DislayOdourCloud && tile.SenseData.Any())
                         {
                             var s = tile.SenseData.First() as Scent;
 
@@ -411,7 +457,7 @@ namespace Rosie
                 //RosieGame.SelectedTile is the currently selected tile
                 //but in order to draw it on the camera view we need to translate it
 
-                Point p = new Point(RosieGame.SelectedTile.X, RosieGame.SelectedTile.Y);
+                Point p = new Point(RosieGame.MouseOverTile.X, RosieGame.MouseOverTile.Y);
                 p.X -= Camera.GameCameraDefinition.X;
                 p.Y -= Camera.GameCameraDefinition.Y;
 
@@ -465,6 +511,11 @@ namespace Rosie
             }
         }
 
+        /// <summary>
+        /// Draw an icon and healthbar over the head of the NPC 
+        /// </summary>
+        /// <param name="pTargetRect"></param>
+        /// <param name="State"></param>
         protected void DrawNPCState(Rectangle pTargetRect, NPC_STATE State)
         {
             int gfx = 0;
@@ -511,12 +562,44 @@ namespace Rosie
         #region Draw Inventory
 
 
-        protected void DrawInventory()
+
+        /// <summary>
+        /// Darw the messages from the input handler, a block at the top of the screen
+        /// which is the height of the displayed text, with two white lines underneath it
+        /// </summary>
+        protected void DrawInputHandler()
         {
             Point drawOrigin = new Point(10, 10);
 
+            //get dimensions of the text to be drawn
+            Vector2 textSize = _font.MeasureString(_InputHandler.DisplayMessage);
 
+            //draw black background
+            _spriteBatch.Draw(pixel, new Rectangle(0, 0, _graphics.PreferredBackBufferWidth, (int)textSize.Y + drawOrigin.Y * 2), Color.Black);
+
+            // draw the text
             _spriteBatch.DrawString(_font, _InputHandler.DisplayMessage, new Vector2(drawOrigin.X, drawOrigin.Y), Color.White);
+
+
+            Color col = Color.White;
+
+            //top line
+            _spriteBatch.Draw(pixel
+                , new Rectangle(0
+                    , (int)textSize.Y + drawOrigin.Y * 2
+                    , _graphics.PreferredBackBufferWidth
+                    , 1)
+                , col);
+
+            //bottom line
+            _spriteBatch.Draw(pixel
+                , new Rectangle(0
+                    , (int)textSize.Y + drawOrigin.Y * 2 - 2
+                    , _graphics.PreferredBackBufferWidth
+                    , 1)
+                , col);
+
+
         }
 
         #endregion

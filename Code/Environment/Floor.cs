@@ -28,5 +28,11 @@ namespace Rosie.Code.Environment
                 return true;
             return false;
         }
+
+
+        public override string Description()
+        {
+            return MessageStrings.See_YouSee + " dungeon floor";
+        }
     }
 }

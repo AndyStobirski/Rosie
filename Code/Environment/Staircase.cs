@@ -23,5 +23,10 @@ namespace Rosie.Code.Environment
         {
             return true;
         }
+
+        public override string Description()
+        {
+            return MessageStrings.See_YouSee + " a staircase going " + (IsUp ? "up" : "down");
+        }
     }
 }

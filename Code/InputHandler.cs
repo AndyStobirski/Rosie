@@ -22,7 +22,7 @@ namespace Rosie.Code
 
         enum InputState
         {
-            Waiting, Handling
+            WaitingForStartKey, AwaitingKeyPress, AwaitingMouseClick
         }
 
 
@@ -53,10 +53,10 @@ namespace Rosie.Code
         /// </summary>
         public InputHandler()
         {
-            State = InputState.Waiting;
+            State = InputState.WaitingForStartKey;
 
-            //
-            var com = new Command(CommandType.Move, false,
+            //move
+            var com = new Command(CommandType.Move,
                  keys.keypad1, keys.keypad2, keys.keypad3
                 , keys.keypad4, keys.keypad5, keys.keypad6
                 , keys.keypad7, keys.keypad8, keys.keypad9
@@ -64,93 +64,131 @@ namespace Rosie.Code
             commands.Add(com);
 
             //take
-            com = new Command(CommandType.Take, false, keys.keyT);
+            com = new Command(CommandType.Take, keys.keyT);
             commands.Add(com);
 
             //inventory
-            com = new Command(CommandType.Drop, true, keys.keyI);
-            com.AddStep(new Step() { dataType = DisplayInformation.Inventory });
+            com = new Command(CommandType.Drop, keys.keyI);
+            com.AddStep(new Step() { InfoToDisplay = DisplayInformation.Inventory });
             commands.Add(com);
 
             //drop
-            com = new Command(CommandType.Drop, true, keys.keyD);
-            com.AddStep(new Step() { dataType = DisplayInformation.Drop });
+            com = new Command(CommandType.Drop, keys.keyD);
+            com.AddStep(new Step() { InfoToDisplay = DisplayInformation.Drop });
             commands.Add(com);
 
             //equip
-            com = new Command(CommandType.Equip, true, keys.keyE);
-            com.AddStep(new Step() { dataType = DisplayInformation.Equip });
+            com = new Command(CommandType.Equip, keys.keyE);
+            com.AddStep(new Step() { InfoToDisplay = DisplayInformation.Equip });
             commands.Add(com);
 
             //open
-            com = new Command(CommandType.Open, true, keys.keyO);
-            com.AddStep(new Step() { dataType = DisplayInformation.ChooseDirection });
+            com = new Command(CommandType.Open, keys.keyO);
+            com.AddStep(new Step() { InfoToDisplay = DisplayInformation.ChooseDirection });
             commands.Add(com);
 
             //close
-            com = new Command(CommandType.Close, true, keys.keyC);
-            com.AddStep(new Step() { dataType = DisplayInformation.ChooseDirection });
+            com = new Command(CommandType.Close, keys.keyC);
+            com.AddStep(new Step() { InfoToDisplay = DisplayInformation.ChooseDirection });
             commands.Add(com);
 
             //Use stairs
-            com = new Command(CommandType.StairsMove, true, keys.keyS);
+            com = new Command(CommandType.StairsMove, keys.keyS);
             commands.Add(com);
 
-            //Use stairs
-            com = new Command(CommandType.MiniMap, true, keys.keyM);
+            //Minimap
+            com = new Command(CommandType.MiniMap, keys.keyM);
             commands.Add(com);
 
+            //Look
+            com = new Command(CommandType.Look, keys.keyL);
+            com.AddStep(new Step() { InfoToDisplay = DisplayInformation.SelectCell, Input = InputType.MouseClick });
+            commands.Add(com);
+
+
+        }
+
+        public void MapCellClicked(int pX, int pY)
+        {
+            if (State == InputState.AwaitingMouseClick)
+            {
+
+                CurrentData.Add(pX);
+                CurrentData.Add(pY);
+
+                GetNextStep();
+            }
         }
 
         /// <summary>
         /// Check if provided key press if known the input manager
         /// </summary>
         /// <param name="pKey"></param>
-        public void ProcessCommand(int pKey)
+        public void GetUserKeyPress(int pKey)
         {
-
             if (pKey == (int)keys.escape)
             {
                 RosieGame.ViewMode = GameViewMode.Game;
-                State = InputState.Waiting;
+                State = InputState.WaitingForStartKey;
             }
 
-            if (State == InputState.Waiting)
+
+            if (State == InputState.AwaitingMouseClick)
+                return;
+
+
+            if (State == InputState.WaitingForStartKey)
             {
                 if ((CurrentCommand = commands.FirstOrDefault(c => c.Trigger.Any(k => (int)k == pKey))) == null)
                     return;
 
                 CurrentCommand.ResetEnumerator();
 
-                if (CurrentCommand.UseIO)
-                {
-                    RosieGame.ViewMode = GameViewMode.IO;
-                }
 
-                // we have a trigger
+                RosieGame.ViewMode = GameViewMode.InputHandlerMode;
 
+                // We have a trigger, so initiate the current data array
                 CurrentData = new List<int> { pKey };
-
-                State = InputState.Handling;
-
             }
-            else if (State == InputState.Handling)
+            else if (State == InputState.AwaitingKeyPress)
             {
                 CurrentData.Add(pKey);
             }
 
+            GetNextStep();
+
+        }
+
+
+        /// <summary>
+        /// Get the next step of the current command
+        /// </summary>
+        private void GetNextStep()
+        {
             if (CurrentCommand.GetNextStep() == false)
             {
                 //reached the end of the enumerator
                 //so raise an event
-                State = InputState.Waiting;
+                State = InputState.WaitingForStartKey;
                 RosieGame.ViewMode = GameViewMode.Game;
                 GameCommandIssued?.Invoke(this, new GameCommandEventArgs(CurrentCommand.commandType, CurrentData.ToArray()));
 
             }
             else
             {
-                SetOutputMessage(CurrentCommand.CurrentStep.dataType);
+                switch (CurrentCommand.CurrentStep.Input)
+                {
+                    case InputType.MouseClick:
+                        State = InputState.AwaitingMouseClick;
+                        break;
+
+                    case InputType.KeyPress:
+                        State = InputState.AwaitingKeyPress;
+                        break;
+
+                }
+
+                SetOutputMessage(CurrentCommand.CurrentStep.InfoToDisplay);
             }
         }
 
@@ -162,8 +200,11 @@ namespace Rosie.Code
         {
             OutputMessage = new();
 
-            switch (CurrentCommand.CurrentStep.dataType)
+            switch (CurrentCommand.CurrentStep.InfoToDisplay)
             {
+                case DisplayInformation.None:
+                    break;
+
                 case DisplayInformation.Inventory:
                     OutputMessage.Add(MessageStrings.Inventory_Carrying);
                     OutputMessage.Add("");
@@ -192,6 +233,12 @@ namespace Rosie.Code
                     OutputMessage.Add(MessageStrings.Direction_Chose);
                     break;
 
+
+
+                case DisplayInformation.SelectCell:
+                    OutputMessage.Add(MessageStrings.Select_Cell);
+                    break;
+
                 default:
                     throw new NotImplementedException("SetOutputMessage: " + pDisplay.ToString());
 
@@ -213,14 +260,15 @@ namespace Rosie.Code
     }
 
     /// <summary>
-    /// Defines a keypress or presses which define a game command
+    /// Defines a keypress or which initiates a game command
+    /// The command can consist of multiple steps which gather more
+    /// information
     /// </summary>
     public class Command
     {
-        public Command(CommandType pCommandType, bool pUseIO, params keys[] pKeys)
+        public Command(CommandType pCommandType, params keys[] pKeys)
         {
             commandType = pCommandType;
-            UseIO = pUseIO;
             Trigger = pKeys;
         }
 
@@ -255,7 +303,6 @@ namespace Rosie.Code
 
         public Step CurrentStep => (Step)StepsEnum.Current;
 
-        public Boolean UseIO { get; private set; }
 
         /// <summary>
         /// Reset the Enumerator
@@ -279,15 +326,21 @@ namespace Rosie.Code
 
 
     /// <summary>
-    /// A screen which displays additional information to prompt to the player for another keypress
+    /// A screen which displays additional information to prompt to the player for more input
     /// </summary>
     public class Step
     {
         /// <summary>
         /// The data for the step to display
         /// </summary>
-        public DisplayInformation dataType { get; set; }
+        public DisplayInformation InfoToDisplay { get; set; } = DisplayInformation.None;
+
+        public InputType Input { get; set; } = InputType.KeyPress;
     }
 
+    public enum InputType
+    {
+        KeyPress, MouseClick
+    }
 
 }

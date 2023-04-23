@@ -2,6 +2,7 @@
 using Rosie.Code.Environment;
 using Rosie.Code.Items;
 using Rosie.Code.Misc;
+using Rosie.Entities;
 using System;
 using System.Linq;
 
@@ -59,7 +60,12 @@ namespace Rosie
 
                 case CommandType.Drop:
 
-                    //
+                    if (Map[player.X, player.Y] is not Tile)
+                    {
+                        AddMessage(MessageStrings.Drop_No, null);
+                        return;
+                    }
+
                     int dropItem = (int)data.Last();
 
                     var item = player.Inventory[dropItem - (int)keys.keyA];
@@ -109,6 +115,10 @@ namespace Rosie
 
                 case CommandType.MiniMap:
                     ViewMode = GameViewMode.MiniMap;
+                    break;
+
+                case CommandType.Look:
+                    Look(data[1], data[2]);
                     break;
 
                 default:
@@ -161,13 +171,41 @@ namespace Rosie
     };
 
 
-
-
         private Point GetVectorFromDirection(int pKey)
         {
             var idx = DirectionKeys.ToList().FindIndex(k => (int)k == pKey);
             return Library.Directions[idx];
         }
+
+        private void Look(int pX, int pY)
+        {
+            var thing = Map[pX, pY];
+
+            RosieGame.AddMessage(thing.Description());
+
+            if (thing is Tile)
+            {
+                var t = thing as Tile;
+
+                if (t.Inhabitant != null)
+                {
+                    RosieGame.AddMessage(MessageStrings.See_YouSee + (t.Inhabitant as NPC).Description());
+                }
+
+                if (t.Items.Any())
+                {
+                    RosieGame.AddMessage(MessageStrings.See_YouSee);
+
+                    foreach (var item in t.Items)
+                    {
+                        RosieGame.AddMessage(item.Description());
+                    }
+                }
+            }
+
+
+        }
+
 
     }
 }

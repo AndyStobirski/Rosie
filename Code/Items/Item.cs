@@ -1,4 +1,5 @@
-﻿using System.Drawing;
+﻿using System;
+using System.Drawing;
 
 namespace Rosie.Code.Items
 {
@@ -7,11 +8,18 @@ namespace Rosie.Code.Items
         public string Name { get; set; }
         public int Gfx { get; set; }
 
+        public Boolean Identified { get; set; }
+
 
         public Point Location => new Point(X, Y);
 
         public Item()
         {
+        }
+
+        public string Description()
+        {
+            return Name;
         }
 
         public void SetLocation(int pX, int pY)

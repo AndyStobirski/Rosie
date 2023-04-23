@@ -18,6 +18,7 @@ It's barely an alpha and has has the following features:
 * Added door open / close mechanics via the iOpenable interface
 * Added stair cases / movement between levels
 * Parameterised the Weapon, Armour and NPC data
+* Added click event into InputHandler
 
 ## To Do
 * Document NPC AI system in Wiki
@@ -26,7 +27,7 @@ It's barely an alpha and has has the following features:
 * Animations - projectiles
 * Food
 * Item effects
-* Clean up movement between levl code
+* Clean up movement between level code
 * Add code to increase complexity of levels, variation of monster types related to depth
 
 ## Long Term

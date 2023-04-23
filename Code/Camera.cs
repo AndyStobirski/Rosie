@@ -46,7 +46,7 @@ namespace Rosie.Code
         public static Size MapSize => Map == null ? null : new Size(Map.GetLength(0), Map.GetLength(1));
 
         /// <summary>
-        /// Defines the rectangle which contains the camera view
+        /// Defines the rectangle which contains the camera view over the map
         /// </summary>
         public static Rectangle CameraBorder => new Rectangle(GameCameraOffset.X, GameCameraOffset.Y, GameCameraSize.X * TileSize.Width, GameCameraSize.Y * TileSize.Height);
 
@@ -78,14 +78,6 @@ namespace Rosie.Code
             _GameCameraDefinition.Height = GameCameraSize.Y;
             if (_GameCameraDefinition.Bottom > MapSize.Height)
                 _GameCameraDefinition.Height -= (_GameCameraDefinition.Bottom - MapSize.Height);
-
-
-            //Calculate visible cells
-            // _fov.GetVisibleCells(_GameCameraDefinition);
         }
-
-
-
-
     }
 }

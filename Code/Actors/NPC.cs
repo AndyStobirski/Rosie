@@ -115,7 +115,18 @@ namespace Rosie.Entities
             //RosieGame.AddMessage("Monster moved to {0},{1}", X, Y);
         }
 
+        public string Description()
+        {
 
+            var d = new string[]
+            {
+                this.Name
+                , "It's current state is " + this.script.State.ToString()
+                , "It's hipoints are " + HitPointsCurrent.ToString() + " / " + HitPointsMax.ToString()
+            };
+
+            return String.Join("\r\n", d);
+        }
 
 
         #region Overriden Methods 

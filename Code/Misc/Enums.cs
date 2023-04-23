@@ -4,7 +4,7 @@
     {
         Game,
         MiniMap,
-        IO
+        InputHandlerMode
     }
 
     public enum GameViewSubMode
@@ -19,7 +19,9 @@
         None
         , PlayerTurn
         , EnemyTurn
+        , AwaitingMouseInput
         , Debugging
+        , WaitingMouseClick
     }
 
 
@@ -79,16 +81,18 @@
 
     public enum DisplayInformation
     {
+        None,
         Inventory,
         Direction,
         Drop,
         Equip,
-        ChooseDirection
+        ChooseDirection,
+        SelectCell
     }
 
     public enum CommandType
     {
-        Move, Take, Drop, Equip, Open, Close, StairsMove, MiniMap
+        Move, Take, Drop, Equip, Open, Close, StairsMove, MiniMap, Look
     }
 
     public enum NPC_STATE
@@ -113,12 +117,13 @@
 
     public enum WEAPON_TYPE
     {
-        Sword, Dagger, Hammer, Mace, PoleArm
+        None, Sword, Dagger, Hammer, Mace, PoleArm
     }
 
     public enum WEAPON_SUBTYPE
     {
-        Sword_Small
+        Fists
+            , Sword_Small
             , Sword
             , Sword_Bastard
             , Dagger

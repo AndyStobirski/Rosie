@@ -30,9 +30,7 @@ namespace Rosie.Entities
             var l = EntityData.RandomArmour();
             Inventory.Add(l);
             EquipArmour(l);
-
-            BaseScent = 5;
-
+            BaseScent = 10;
         }
 
 
