@@ -34,13 +34,6 @@ namespace Rosie.Entities
         }
 
 
-        public override event EventHandler<ActorCompeletedTurnEventArgs> ActorCompletedTurn;
-
-        public override void Die()
-        {
-            throw new NotImplementedException();
-        }
-
         public override void Draw()
         {
             throw new NotImplementedException();
@@ -55,12 +48,14 @@ namespace Rosie.Entities
             X += pX;
             Y += pY;
 
-            ActorCompletedTurn?.Invoke(this, new ActorCompeletedTurnEventArgs(oldX, oldY, X, Y, this));
+            RaiseActorCompletedTurn(this, new ActorCompeletedTurnEventArgs(oldX, oldY, X, Y, this));
+
 
         }
 
 
-        public void TakeItem(Item pItem)
+
+        new public void TakeItem(Item pItem)
         {
             if (pItem is GoldCoins)
             {

@@ -154,4 +154,10 @@
             , Plate
     }
 
+    public enum ActorActivityType
+    {
+        Damaged
+            , Died
+            , Moved
+    }
 }

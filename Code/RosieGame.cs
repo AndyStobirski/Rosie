@@ -74,11 +74,12 @@ namespace Rosie
         }
 
 
-        #region The Game mode determines what is displayed
-
+        /// <summary>
+        /// The Game mode determines what is displayed
+        /// </summary>
         public static GameViewMode ViewMode { get; set; }
 
-        #endregion
+
 
         public Tile[,] Map => currentLevel.Map;
 
@@ -244,6 +245,7 @@ namespace Rosie
             //
             player = new Player();
             player.ActorCompletedTurn += Player_ActorMoved;
+            player.ActorActivityOccured += Player_ActorActivityOccured;
 
             GameState = GameStates.PlayerTurn;
 
@@ -272,6 +274,30 @@ namespace Rosie
                 sw.WriteLine("}");
             }
 
+        }
+
+        private void Player_ActorActivityOccured(object sender, Actor.ActorActivity e)
+        {
+            var p = sender as Player;
+
+            switch (e.Activity)
+            {
+                case ActorActivityType.Damaged:
+
+
+                    Game1.AddTextEffect(e.Activity, p.X, p.Y, e.Data.First().ToString(), 0, -1);
+
+
+                    break;
+
+                case ActorActivityType.Died:
+                    throw new Exception("Plater died");
+
+                case ActorActivityType.Moved:
+                    break;
+                default:
+                    throw new Exception("Case not handled");
+            }
         }
 
         /// <summary>
@@ -405,6 +431,9 @@ namespace Rosie
         }
 
         #endregion
+
+
+
 
     }
 }

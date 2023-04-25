@@ -121,7 +121,7 @@ namespace Rosie.Code.Actors
         public void SetTargetWayPoint(WayPoint pWayPoint)
         {
             TargetWayPoint = pWayPoint.ConnectedPoints[RandomWithSeed.Next(pWayPoint.ConnectedPoints.Count)];
-            RosieGame.AddMessage("Monster Target Waypoint {0}", TargetWayPoint.ToString());
+            //RosieGame.AddMessage("Monster Target Waypoint {0}", TargetWayPoint.ToString());
         }
 
         /// <summary>
@@ -151,7 +151,7 @@ namespace Rosie.Code.Actors
                 {
                     IdleCounter = 0;
                     SetTargetWayPoint(TargetWayPoint);
-                    RosieGame.AddMessage("Monster stuck choosing a new wander location");
+                    //RosieGame.AddMessage("Monster stuck choosing a new wander location");
                 }
             }
         }
@@ -163,14 +163,14 @@ namespace Rosie.Code.Actors
 
             SleepCount = 25;
             State = NPC_STATE.Sleeping;
-            RosieGame.AddMessage("Monster feel asleep");
+            //RosieGame.AddMessage("Monster feel asleep");
         }
 
         protected void Sleep()
         {
             if (ScentDetect() && Roller.Roll(d20) > monster.ScentWakeUp)
             {
-                RosieGame.AddMessage("Monster smelt player and woke up");
+                //RosieGame.AddMessage("Monster smelt player and woke up");
                 State = NPC_STATE.Alert;
                 return;
             }
@@ -180,7 +180,7 @@ namespace Rosie.Code.Actors
             if (SleepCount <= 0)
             {
                 State = NPC_STATE.Idle;
-                RosieGame.AddMessage("Monster woke up");
+                //RosieGame.AddMessage("Monster woke up");
             }
         }
 

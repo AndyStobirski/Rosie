@@ -29,6 +29,7 @@ It's barely an alpha and has has the following features:
 * Item effects
 * Clean up movement between level code
 * Add code to increase complexity of levels, variation of monster types related to depth
+* Improve animation effects system - current the effects are a static list in the Game1.cs, and items are added to it directly
 
 ## Long Term
  * Add articles in wiki - note that at the momenet as it's currently in so much flux that there's a chance I might chop up and burn something that has been meticulously documented.

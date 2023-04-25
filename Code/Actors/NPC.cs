@@ -107,7 +107,7 @@ namespace Rosie.Entities
             if (!CanMove)
                 return;
 
-            ActorCompletedTurn?.Invoke(this, new ActorCompeletedTurnEventArgs(X, Y, pX, pY, this));
+            RaiseActorCompletedTurn(this, new ActorCompeletedTurnEventArgs(X, Y, pX, pY, this));
 
             X = pX;
             Y = pY;
@@ -136,26 +136,9 @@ namespace Rosie.Entities
             throw new NotImplementedException();
         }
 
-        public override void Die()
-        {
-            Died?.Invoke(this, new MonsterDiedEventArgs(this));
-        }
 
         #endregion
 
-        public override event EventHandler<ActorCompeletedTurnEventArgs> ActorCompletedTurn;
-
-
-        public event EventHandler<MonsterDiedEventArgs> Died;
-        public class MonsterDiedEventArgs : EventArgs
-        {
-            public NPC monster { get; private set; }
-
-            public MonsterDiedEventArgs(NPC pMonster)
-            {
-                monster = pMonster;
-            }
-        }
     }
 }
 

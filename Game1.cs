@@ -1,12 +1,14 @@
 ﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
+using Rosie.Animation;
 using Rosie.Code;
 using Rosie.Code.Misc;
 using Rosie.Code.sensedata;
 using Rosie.Entities;
 using Rosie.Misc;
 using System;
+using System.Collections.Generic;
 using System.Linq;
 
 namespace Rosie
@@ -17,24 +19,57 @@ namespace Rosie
         private readonly GraphicsDeviceManager _graphics;
         private SpriteBatch _spriteBatch;
         private readonly FrameCounter _frameCounter = new FrameCounter();
-        SpriteFont _font;
-        InputHandler _InputHandler;
-        Texture2D pixel;
 
+
+        /// <summary>
+        /// Game font
+        /// </summary>
+        SpriteFont _font;
+
+
+        /// <summary>
+        /// Used for drawing borders and t'ing
+        /// </summary>
+        Texture2D _pixel;
+
+
+        /// <summary>
+        /// Handles user input and passes commands to the Rosie game instance
+        /// </summary>
+        InputHandler _InputHandler;
+
+        /// <summary>
+        /// Graphics loaded here
+        /// </summary>
         private Texture2D _tiles;
 
+        /// <summary>
+        /// Game instance
+        /// </summary>
         RosieGame _Rosie;
 
         //  Monitor user input
-        KeyboardState newKeyboardState;
-        KeyboardState oldKeyboardState;
-        MouseState newMouseState;
-        MouseState oldMouseState;
+        KeyboardState _newKeyboardState;
+        KeyboardState _oldKeyboardState;
+        MouseState _newMouseState;
+        MouseState _oldMouseState;
 
         /// <summary>
         /// The map cell the mouse pointer is over
         /// </summary>
         Point _MouseOverMapCell;
+
+        /// <summary>
+        /// List of animation effects to play
+        /// </summary>
+        public static List<Animation.Effect> _Effects = new List<Animation.Effect>();
+
+        /// <summary>
+        /// Holds the value gameTime.TotalGameTime.TotalMilliseconds, set in the update method
+        /// </summary>
+        private static double TotalMilliseconds;
+
+        Point MouseCoords;
 
         public Game1()
         {
@@ -48,6 +83,38 @@ namespace Rosie
 
         }
 
+        /// <summary>
+        /// Add a text effect
+        /// </summary>
+        /// <param name="pEffectType"></param>
+        /// <param name="pX"></param>
+        /// <param name="pY"></param>
+        /// <param name="pText"></param>
+        /// <param name="pMoveX"></param>
+        /// <param name="pMoveY"></param>
+        public static void AddTextEffect(ActorActivityType pEffectType, int pX, int pY, string pText, int pMoveX, int pMoveY)
+        {
+            switch (pEffectType)
+            {
+                case ActorActivityType.Damaged:
+
+                    //pX and pY are the map coordinates of the creature being damaged
+                    //we need to converted them into appropriate screen coordinates
+
+                    var x = (pX * Camera.TileSize.Width) - (Camera.GameCameraDefinition.X * Camera.TileSize.Width) + Camera.GameCameraOffset.X;
+                    var y = (pY * Camera.TileSize.Height) - (Camera.GameCameraDefinition.Y * Camera.TileSize.Height) + Camera.GameCameraOffset.Y;
+
+                    _Effects.Add(new EffectText(x, y, pText, pMoveX, pMoveY, TotalMilliseconds));
+
+
+                    break;
+                case ActorActivityType.Died:
+                    break;
+                case ActorActivityType.Moved:
+                    break;
+            }
+        }
+
         protected override void Initialize()
         {
             _graphics.IsFullScreen = false;
@@ -57,8 +124,8 @@ namespace Rosie
 
             _spriteBatch = new SpriteBatch(GraphicsDevice);
 
-            pixel = new Texture2D(GraphicsDevice, 1, 1);
-            pixel.SetData(new[] { Color.White });
+            _pixel = new Texture2D(GraphicsDevice, 1, 1);
+            _pixel.SetData(new[] { Color.White });
 
             _InputHandler = new InputHandler();
             _InputHandler.GameCommandIssued += _InputHandler_GameCommandIssued;
@@ -92,19 +159,22 @@ namespace Rosie
 
         protected override void Update(GameTime gameTime)
         {
-            newKeyboardState = Keyboard.GetState();
-            newMouseState = Mouse.GetState();
+
+            TotalMilliseconds = gameTime.TotalGameTime.TotalMilliseconds;
+
+            float deltaTime = (float)gameTime.ElapsedGameTime.TotalSeconds;
+            _newKeyboardState = Keyboard.GetState();
+            _newMouseState = Mouse.GetState();
             var mouseState = Mouse.GetState();
 
+            MouseCoords = new Point(mouseState.X, mouseState.Y);
 
-
-
-            _Rosie.ShiftDown = newKeyboardState.IsKeyDown(Keys.LeftShift) || newKeyboardState.IsKeyDown(Keys.RightShift);
-            _Rosie.NumLock = newKeyboardState.NumLock;
-            _Rosie.CapsLock = newKeyboardState.CapsLock;
+            _Rosie.ShiftDown = _newKeyboardState.IsKeyDown(Keys.LeftShift) || _newKeyboardState.IsKeyDown(Keys.RightShift);
+            _Rosie.NumLock = _newKeyboardState.NumLock;
+            _Rosie.CapsLock = _newKeyboardState.CapsLock;
 
             //  Detect left mouse click
-            if (newMouseState.LeftButton == ButtonState.Released && oldMouseState.LeftButton == ButtonState.Pressed)
+            if (_newMouseState.LeftButton == ButtonState.Released && _oldMouseState.LeftButton == ButtonState.Pressed)
             {
                 _Rosie.MouseClick(mouseState.X, mouseState.Y);
             }
@@ -125,10 +195,6 @@ namespace Rosie
                 _MouseOverMapCell = new Point(-1, -1);
             }
 
-
-
-
-
             if (_Rosie.GameState == GameStates.PlayerTurn)
             {
 
@@ -145,18 +211,28 @@ namespace Rosie
                 //
                 //  Detect keyup
                 //
-                foreach (var key in from Keys key in oldKeyboardState.GetPressedKeys()
-                        .Where(k => newKeyboardState.IsKeyUp(k))
-                                    where newKeyboardState.IsKeyUp(key)
+                foreach (var key in from Keys key in _oldKeyboardState.GetPressedKeys()
+                        .Where(k => _newKeyboardState.IsKeyUp(k))
+                                    where _newKeyboardState.IsKeyUp(key)
                                     select key)
                 {
                     _InputHandler.GetUserKeyPress((int)key);
                 }
 
-                if (newMouseState.LeftButton == ButtonState.Released && oldMouseState.LeftButton == ButtonState.Pressed)
+                if (_newMouseState.LeftButton == ButtonState.Released && _oldMouseState.LeftButton == ButtonState.Pressed)
                 {
                     _Rosie.MouseClick(mouseState.X, mouseState.Y);
                 }
+
+                //
+                //  Update the effects
+                //
+                foreach (var effect in _Effects)
+                {
+                    effect.Update(deltaTime);
+                }
+
+                _Effects.RemoveAll(e => e.Expired(gameTime.TotalGameTime.TotalMilliseconds));
 
 
             }
@@ -167,8 +243,8 @@ namespace Rosie
 
             base.Update(gameTime);
 
-            oldKeyboardState = newKeyboardState;
-            oldMouseState = newMouseState;
+            _oldKeyboardState = _newKeyboardState;
+            _oldMouseState = _newMouseState;
         }
 
 
@@ -180,6 +256,7 @@ namespace Rosie
         protected override void Draw(GameTime gameTime)
         {
             if (RosieGame.currentLevel == null) return;
+
 
             GraphicsDevice.Clear(Color.Black);
 
@@ -194,10 +271,12 @@ namespace Rosie
                     var fps = string.Format("FPS: {0}", _frameCounter.AverageFramesPerSecond);
                     _spriteBatch.DrawString(_font, fps, new Vector2(1, 1), Color.White);
 
+                    _spriteBatch.DrawString(_font, "mouse:" + MouseCoords.X.ToString() + "," + MouseCoords.Y.ToString(), new Vector2(300, 1), Color.White);
 
                     _spriteBatch.DrawString(_font, string.Format("CAPS: {0}, NUM: {1}, SHIFT: {2}", _Rosie.CapsLock, _Rosie.NumLock, _Rosie.ShiftDown), new Vector2(_graphics.PreferredBackBufferWidth - 300, 1), Color.White);
 
                     DrawGame();
+                    DrawEffects();
                     break;
 
                 case GameViewMode.MiniMap:
@@ -220,7 +299,27 @@ namespace Rosie
         }
 
 
+        /// <summary>
+        /// Draw the conents of the effects lists
+        /// </summary>
+        protected void DrawEffects()
+        {
+            foreach (var effect in _Effects)
+            {
+                if (effect is EffectText)
+                {
 
+                    _spriteBatch.DrawString(_font, effect.Text, effect.Current, effect.Colour);
+                }
+                else if (effect is EffectSprite)
+                {
+
+                    var sprite = effect as EffectSprite;
+
+                    _spriteBatch.Draw(_tiles, effect.Current, new Rectangle(256, 64, 32, 32), effect.Colour);
+                }
+            }
+        }
 
         protected void DrawPlayerStats()
         {
@@ -242,7 +341,7 @@ namespace Rosie
 
             //Check if mouse inside the camera area
             //and set the position based on tile size
-            if (newMouseState.LeftButton == ButtonState.Released && oldMouseState.LeftButton == ButtonState.Pressed && _MouseOverMapCell.X != -1 && _MouseOverMapCell.Y != -1)
+            if (_newMouseState.LeftButton == ButtonState.Released && _oldMouseState.LeftButton == ButtonState.Pressed && _MouseOverMapCell.X != -1 && _MouseOverMapCell.Y != -1)
             {
                 return true;
             }
@@ -324,7 +423,7 @@ namespace Rosie
             Color col = Color.White;
 
             //top line
-            _spriteBatch.Draw(pixel
+            _spriteBatch.Draw(_pixel
                 , new Rectangle(Camera.CameraBorder.X
                     , Camera.CameraBorder.Y
                     , Camera.CameraBorder.Width
@@ -332,7 +431,7 @@ namespace Rosie
                 , col);
 
             //bottom line
-            _spriteBatch.Draw(pixel
+            _spriteBatch.Draw(_pixel
                 , new Rectangle(Camera.CameraBorder.X
                     , Camera.CameraBorder.Y + Camera.CameraBorder.Height
                     , Camera.CameraBorder.Width
@@ -340,7 +439,7 @@ namespace Rosie
                 , col);
 
             //left line
-            _spriteBatch.Draw(pixel
+            _spriteBatch.Draw(_pixel
                 , new Rectangle(Camera.CameraBorder.X
                     , Camera.CameraBorder.Y
                     , 1
@@ -348,7 +447,7 @@ namespace Rosie
                 , col);
 
             //right line
-            _spriteBatch.Draw(pixel
+            _spriteBatch.Draw(_pixel
                 , new Rectangle(Camera.CameraBorder.Width + Camera.CameraBorder.X
                     , Camera.GameCameraOffset.Y
                     , 1
@@ -502,10 +601,10 @@ namespace Rosie
                 int current = (int)(pCurrent * 1.0 / pMax * Camera.TileSize.Width);
 
                 //max hit points
-                _spriteBatch.Draw(pixel, new Rectangle(pTargetRect.X, pTargetRect.Y - barHeight, Camera.TileSize.Width, barHeight), Color.Red);
+                _spriteBatch.Draw(_pixel, new Rectangle(pTargetRect.X, pTargetRect.Y - barHeight, Camera.TileSize.Width, barHeight), Color.Red);
 
                 //current hitpoints
-                _spriteBatch.Draw(pixel, new Rectangle(pTargetRect.X, pTargetRect.Y - barHeight, current, barHeight), Color.Green);
+                _spriteBatch.Draw(_pixel, new Rectangle(pTargetRect.X, pTargetRect.Y - barHeight, current, barHeight), Color.Green);
 
 
             }
@@ -575,7 +674,7 @@ namespace Rosie
             Vector2 textSize = _font.MeasureString(_InputHandler.DisplayMessage);
 
             //draw black background
-            _spriteBatch.Draw(pixel, new Rectangle(0, 0, _graphics.PreferredBackBufferWidth, (int)textSize.Y + drawOrigin.Y * 2), Color.Black);
+            _spriteBatch.Draw(_pixel, new Rectangle(0, 0, _graphics.PreferredBackBufferWidth, (int)textSize.Y + drawOrigin.Y * 2), Color.Black);
 
             // draw the text
             _spriteBatch.DrawString(_font, _InputHandler.DisplayMessage, new Vector2(drawOrigin.X, drawOrigin.Y), Color.White);
@@ -584,7 +683,7 @@ namespace Rosie
             Color col = Color.White;
 
             //top line
-            _spriteBatch.Draw(pixel
+            _spriteBatch.Draw(_pixel
                 , new Rectangle(0
                     , (int)textSize.Y + drawOrigin.Y * 2
                     , _graphics.PreferredBackBufferWidth
@@ -592,7 +691,7 @@ namespace Rosie
                 , col);
 
             //bottom line
-            _spriteBatch.Draw(pixel
+            _spriteBatch.Draw(_pixel
                 , new Rectangle(0
                     , (int)textSize.Y + drawOrigin.Y * 2 - 2
                     , _graphics.PreferredBackBufferWidth

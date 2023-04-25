@@ -54,7 +54,11 @@ namespace Rosie.Entities
             HitPointsCurrent += pValue;
             if (HitPointsCurrent < 0)
             {
-                Die();
+                RaiseActorActorActivity(this, ActorActivityType.Died, null);
+            }
+            else
+            {
+                RaiseActorActorActivity(this, ActorActivityType.Damaged, pValue);
             }
         }
 
@@ -62,7 +66,7 @@ namespace Rosie.Entities
 
         public abstract void Draw();
 
-        public abstract void Die();
+
 
         public void TakeItem(Item item)
         {
@@ -140,7 +144,26 @@ namespace Rosie.Entities
         }
 
 
-        public abstract event EventHandler<ActorCompeletedTurnEventArgs> ActorCompletedTurn;
+
+        #region ActorActivityOccured
+        public class ActorActivity : EventArgs
+        {
+            public ActorActivityType Activity { get; set; }
+            public object[] Data { get; set; }
+        }
+        public event EventHandler<ActorActivity> ActorActivityOccured;
+        protected void RaiseActorActorActivity(Actor pSource, ActorActivityType pActivity, params object[] pData)
+        {
+            ActorActivityOccured?.Invoke(pSource, new ActorActivity() { Data = pData, Activity = pActivity });
+        }
+        #endregion
+
+        protected void RaiseActorCompletedTurn(Actor pSource, ActorCompeletedTurnEventArgs pArgs)
+        {
+            ActorCompletedTurn?.Invoke(pSource, pArgs);
+        }
+
+        public event EventHandler<ActorCompeletedTurnEventArgs> ActorCompletedTurn;
         public class ActorCompeletedTurnEventArgs : EventArgs
         {
             public ActorCompeletedTurnEventArgs(int pOldX, int pOldY, int pNewX, int pNewY, Actor pInhabitant)
