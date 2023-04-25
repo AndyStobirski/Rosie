@@ -62,7 +62,9 @@ namespace Rosie
         /// <summary>
         /// List of animation effects to play
         /// </summary>
-        public static List<Animation.Effect> _Effects = new List<Animation.Effect>();
+        private static Queue<Animation.Effect> _Effects = new Queue<Animation.Effect>();
+
+        private static Animation.Effect CurrentEffect;
 
         /// <summary>
         /// Holds the value gameTime.TotalGameTime.TotalMilliseconds, set in the update method
@@ -104,7 +106,7 @@ namespace Rosie
                     var x = (pX * Camera.TileSize.Width) - (Camera.GameCameraDefinition.X * Camera.TileSize.Width) + Camera.GameCameraOffset.X;
                     var y = (pY * Camera.TileSize.Height) - (Camera.GameCameraDefinition.Y * Camera.TileSize.Height) + Camera.GameCameraOffset.Y;
 
-                    _Effects.Add(new EffectText(x, y, pText, pMoveX, pMoveY, TotalMilliseconds));
+                    _Effects.Enqueue(new EffectText(x, y, pText, pMoveX, pMoveY, TotalMilliseconds));
 
 
                     break;
@@ -161,8 +163,40 @@ namespace Rosie
         {
 
             TotalMilliseconds = gameTime.TotalGameTime.TotalMilliseconds;
-
             float deltaTime = (float)gameTime.ElapsedGameTime.TotalSeconds;
+
+
+            //
+            //  Play the animation queue one item at a time
+            //  and returning to prevent player input whilst
+            //  they play out
+            //  
+
+            if (CurrentEffect == null && _Effects.Count > 0)
+            {
+                CurrentEffect = _Effects.Dequeue();
+            }
+
+            if (CurrentEffect != null)
+            {
+                CurrentEffect.Update(deltaTime);
+                if (CurrentEffect.Expired(gameTime.TotalGameTime.TotalMilliseconds))
+                {
+                    CurrentEffect = null;
+                    if (_Effects.Count > 0)
+                    {
+                        CurrentEffect = _Effects.Dequeue();
+                    }
+                }
+
+                if (CurrentEffect != null)
+                    return;
+            }
+
+
+
+
+
             _newKeyboardState = Keyboard.GetState();
             _newMouseState = Mouse.GetState();
             var mouseState = Mouse.GetState();
@@ -224,15 +258,7 @@ namespace Rosie
                     _Rosie.MouseClick(mouseState.X, mouseState.Y);
                 }
 
-                //
-                //  Update the effects
-                //
-                foreach (var effect in _Effects)
-                {
-                    effect.Update(deltaTime);
-                }
 
-                _Effects.RemoveAll(e => e.Expired(gameTime.TotalGameTime.TotalMilliseconds));
 
 
             }
@@ -304,21 +330,18 @@ namespace Rosie
         /// </summary>
         protected void DrawEffects()
         {
-            foreach (var effect in _Effects)
+
+            if (CurrentEffect is EffectText)
             {
-                if (effect is EffectText)
-                {
 
-                    _spriteBatch.DrawString(_font, effect.Text, effect.Current, effect.Colour);
-                }
-                else if (effect is EffectSprite)
-                {
-
-                    var sprite = effect as EffectSprite;
-
-                    _spriteBatch.Draw(_tiles, effect.Current, new Rectangle(256, 64, 32, 32), effect.Colour);
-                }
+                _spriteBatch.DrawString(_font, CurrentEffect.Text, CurrentEffect.Current, CurrentEffect.Colour);
             }
+            else if (CurrentEffect is EffectSprite)
+            {
+
+                _spriteBatch.Draw(_tiles, CurrentEffect.Current, new Rectangle(256, 64, 32, 32), CurrentEffect.Colour);
+            }
+
         }
 
         protected void DrawPlayerStats()
