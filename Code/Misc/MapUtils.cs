@@ -145,7 +145,19 @@ namespace Rosie.Code.Misc
                     , RandomWithSeed.Next(room.Top, room.Bottom)
                     );
 
-            } while (!(Map[pLocation.X, pLocation.Y] is Floor) && !Map[pLocation.X, pLocation.Y].Passable());
+
+                if (Map[pLocation.X, pLocation.Y] is Floor)
+                {
+                    var f = Map[pLocation.X, pLocation.Y] as Floor;
+                    if (f.Inhabitant is null && f.Solid == 0)
+                    {
+                        return;
+                    }
+                }
+
+
+
+            } while (true);
 
         }
 

@@ -62,7 +62,21 @@ namespace Rosie.Entities
             }
         }
 
-        public abstract void Move(int pX, int pY);
+        /// <summary>
+        /// Move the actor to the specified coordinates, raising an event for when it happens
+        /// </summary>
+        /// <param name="pX">X moved to</param>
+        /// <param name="pY">Y moved to</param>
+        public void Move(int pX, int pY)
+        {
+
+            RaiseActorActorActivity(this, ActorActivityType.Moved, X, Y, pX, pY);
+
+            X = pX;
+            Y = pY;
+
+            //RosieGame.AddMessage("Monster moved to {0},{1}", X, Y);
+        }
 
         public abstract void Draw();
 
@@ -158,25 +172,7 @@ namespace Rosie.Entities
         }
         #endregion
 
-        protected void RaiseActorCompletedTurn(Actor pSource, ActorCompeletedTurnEventArgs pArgs)
-        {
-            ActorCompletedTurn?.Invoke(pSource, pArgs);
-        }
 
-        public event EventHandler<ActorCompeletedTurnEventArgs> ActorCompletedTurn;
-        public class ActorCompeletedTurnEventArgs : EventArgs
-        {
-            public ActorCompeletedTurnEventArgs(int pOldX, int pOldY, int pNewX, int pNewY, Actor pInhabitant)
-            {
-                Before = new Point(pOldX, pOldY);
-                After = new Point(pNewX, pNewY);
-                Inhabitant = pInhabitant;
-            }
-
-            public Actor Inhabitant { get; private set; }
-            public Point Before { get; private set; }
-            public Point After { get; private set; }
-        }
 
     }
 }

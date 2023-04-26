@@ -39,19 +39,6 @@ namespace Rosie.Entities
             throw new NotImplementedException();
         }
 
-        public override void Move(int pX, int pY)
-        {
-
-            int oldX = X;
-            int oldY = Y;
-
-            X += pX;
-            Y += pY;
-
-            RaiseActorCompletedTurn(this, new ActorCompeletedTurnEventArgs(oldX, oldY, X, Y, this));
-
-
-        }
 
 
 

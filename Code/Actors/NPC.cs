@@ -97,23 +97,7 @@ namespace Rosie.Entities
 
 
 
-        /// <summary>
-        /// Move the monster to the specified coordinates, raising an event for when it happens
-        /// </summary>
-        /// <param name="pX"></param>
-        /// <param name="pY"></param>
-        public override void Move(int pX, int pY)
-        {
-            if (!CanMove)
-                return;
 
-            RaiseActorCompletedTurn(this, new ActorCompeletedTurnEventArgs(X, Y, pX, pY, this));
-
-            X = pX;
-            Y = pY;
-
-            //RosieGame.AddMessage("Monster moved to {0},{1}", X, Y);
-        }
 
         public string Description()
         {

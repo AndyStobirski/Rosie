@@ -94,7 +94,7 @@ namespace Rosie
         /// <param name="pText"></param>
         /// <param name="pMoveX"></param>
         /// <param name="pMoveY"></param>
-        public static void AddTextEffect(ActorActivityType pEffectType, int pX, int pY, string pText, int pMoveX, int pMoveY)
+        public static void AddTextEffect(ActorActivityType pEffectType, int pX, int pY, string pText, int pMoveX, int pMoveY, Color pColour)
         {
             switch (pEffectType)
             {
@@ -106,7 +106,7 @@ namespace Rosie
                     var x = (pX * Camera.TileSize.Width) - (Camera.GameCameraDefinition.X * Camera.TileSize.Width) + Camera.GameCameraOffset.X;
                     var y = (pY * Camera.TileSize.Height) - (Camera.GameCameraDefinition.Y * Camera.TileSize.Height) + Camera.GameCameraOffset.Y;
 
-                    _Effects.Enqueue(new EffectText(x, y, pText, pMoveX, pMoveY, TotalMilliseconds));
+                    _Effects.Enqueue(new EffectText(x, y, pText, pMoveX, pMoveY, TotalMilliseconds, pColour));
 
 
                     break;
@@ -156,7 +156,24 @@ namespace Rosie
             _tiles = Content.Load<Texture2D>("rltiles-2d");
         }
 
+        /// <summary>
+        /// Draw text with a coloured border
+        /// </summary>
+        /// <param name="position"></param>
+        /// <param name="textColor"></param>
+        /// <param name="borderColor"></param>
+        protected void SpriteBatchDrawStringWithBorder(Vector2 position, Color textColor, Color borderColor, string pText)
+        {
 
+            // Draw the text with the border
+            _spriteBatch.DrawString(_font, pText, position + new Vector2(-1, -1), borderColor);
+            _spriteBatch.DrawString(_font, pText, position + new Vector2(-1, 1), borderColor);
+            _spriteBatch.DrawString(_font, pText, position + new Vector2(1, -1), borderColor);
+            _spriteBatch.DrawString(_font, pText, position + new Vector2(1, 1), borderColor);
+
+            // Draw the text without the border
+            _spriteBatch.DrawString(_font, pText, position, textColor);
+        }
 
 
         protected override void Update(GameTime gameTime)
@@ -297,7 +314,9 @@ namespace Rosie
                     var fps = string.Format("FPS: {0}", _frameCounter.AverageFramesPerSecond);
                     _spriteBatch.DrawString(_font, fps, new Vector2(1, 1), Color.White);
 
-                    _spriteBatch.DrawString(_font, "mouse:" + MouseCoords.X.ToString() + "," + MouseCoords.Y.ToString(), new Vector2(300, 1), Color.White);
+
+
+                    _spriteBatch.DrawString(_font, String.Format("mouse: {0},{1} / {2},{3}", MouseCoords.X.ToString(), MouseCoords.Y.ToString(), _MouseOverMapCell.X, _MouseOverMapCell.Y), new Vector2(300, 1), Color.White);
 
                     _spriteBatch.DrawString(_font, string.Format("CAPS: {0}, NUM: {1}, SHIFT: {2}", _Rosie.CapsLock, _Rosie.NumLock, _Rosie.ShiftDown), new Vector2(_graphics.PreferredBackBufferWidth - 300, 1), Color.White);
 
@@ -334,7 +353,9 @@ namespace Rosie
             if (CurrentEffect is EffectText)
             {
 
-                _spriteBatch.DrawString(_font, CurrentEffect.Text, CurrentEffect.Current, CurrentEffect.Colour);
+                SpriteBatchDrawStringWithBorder(CurrentEffect.Current, CurrentEffect.Colour, Color.White, CurrentEffect.Text);
+
+                //_spriteBatch.DrawString(_font, CurrentEffect.Text, CurrentEffect.Current, CurrentEffect.Colour);
             }
             else if (CurrentEffect is EffectSprite)
             {
@@ -579,7 +600,7 @@ namespace Rosie
                 //RosieGame.SelectedTile is the currently selected tile
                 //but in order to draw it on the camera view we need to translate it
 
-                Point p = new Point(RosieGame.MouseOverTile.X, RosieGame.MouseOverTile.Y);
+                Point p = new Point(_MouseOverMapCell.X, _MouseOverMapCell.Y);
                 p.X -= Camera.GameCameraDefinition.X;
                 p.Y -= Camera.GameCameraDefinition.Y;
 

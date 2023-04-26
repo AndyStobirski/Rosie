@@ -244,7 +244,6 @@ namespace Rosie
             //  Player
             //
             player = new Player();
-            player.ActorCompletedTurn += Player_ActorMoved;
             player.ActorActivityOccured += Player_ActorActivityOccured;
 
             GameState = GameStates.PlayerTurn;
@@ -283,18 +282,23 @@ namespace Rosie
             switch (e.Activity)
             {
                 case ActorActivityType.Damaged:
-
-
-                    Game1.AddTextEffect(e.Activity, p.X, p.Y, e.Data.First().ToString(), 0, -1);
-
-
+                    Game1.AddTextEffect(e.Activity, p.X, p.Y, e.Data.First().ToString(), 0, -1, Color.DarkOrange);
                     break;
 
                 case ActorActivityType.Died:
                     throw new Exception("Plater died");
 
                 case ActorActivityType.Moved:
+                    var coords = e.Data.Select(n => (int)n).ToArray();
+
+                    Map[coords[0], coords[1]].Inhabitant = null;
+                    Map[coords[2], coords[3]].Inhabitant = sender as Player;
+
+                    GameState = GameStates.EnemyTurn;
+                    Camera.CalculateGameCameraDefinition();
+                    CalculateFieldOfVision();
                     break;
+
                 default:
                     throw new Exception("Case not handled");
             }
@@ -381,22 +385,7 @@ namespace Rosie
             }
         }
 
-        /// <summary>
-        /// Raise an event that activity has occured within the game
-        /// </summary>
-        /// <param name="sender"></param>
-        /// <param name="e"></param>
-        private void Player_ActorMoved(object sender, Actor.ActorCompeletedTurnEventArgs e)
-        {
 
-            Map[e.Before.X, e.Before.Y].Inhabitant = null;
-            Map[e.After.X, e.After.Y].Inhabitant = e.Inhabitant;
-
-            GameState = GameStates.EnemyTurn;
-            Camera.CalculateGameCameraDefinition();
-            CalculateFieldOfVision();
-
-        }
 
 
         #region mouse / key handling

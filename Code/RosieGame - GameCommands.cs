@@ -32,7 +32,7 @@ namespace Rosie
                     dir = GetVectorFromDirection(data.First());
                     if (MapUtils.IsWalkable(player.X + dir.X, player.Y + dir.Y))
                     {
-                        player.Move(dir.X, dir.Y);
+                        player.Move(player.X + dir.X, player.Y + dir.Y);
                     }
                     else if (MapUtils.ContainsMonster(player.X + dir.X, player.Y + dir.Y))
                     {

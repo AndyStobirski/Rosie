@@ -8,7 +8,7 @@ namespace Rosie.Animation
     /// </summary>
     public class EffectText : Effect
     {
-        public EffectText(int pX, int pY, string pText, int pMoveX, int pMoveY, double pElapsedTime)
+        public EffectText(int pX, int pY, string pText, int pMoveX, int pMoveY, double pElapsedTime, Color pColour)
         {
 
             Current = new(pX, pY);
@@ -19,8 +19,8 @@ namespace Rosie.Animation
             Direction = new Vector2(pMoveX, pMoveY);
             LifeSpan = 500;
             LiveTo = pElapsedTime + LifeSpan;
-            Colour = Color.Red;
-            Speed = 64;
+            Colour = pColour;
+            Speed = 32;
 
 
         }

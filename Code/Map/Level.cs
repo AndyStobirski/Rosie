@@ -55,11 +55,6 @@ namespace Rosie.Code.Map
 
         public Guid Guid { get; set; }
 
-        public void Monster_ActorMoved(object sender, Actor.ActorCompeletedTurnEventArgs e)
-        {
-            Map[e.Before.X, e.Before.Y].Inhabitant = null;
-            Map[e.After.X, e.After.Y].Inhabitant = e.Inhabitant;
-        }
 
         public Level()
         {
@@ -129,16 +124,17 @@ namespace Rosie.Code.Map
             //
             for (int ctr = 0; ctr < pMaxMonsters; ctr++)
             {
+                m = EntityData.RandomNPC();
+
                 MapUtils.GetRandomRoomPoint(out location, out wp);
 
-                m = EntityData.RandomNPC();
+
                 m.PlaceNPC(location.X, location.Y, wp);
 
 
                 m.Name = GibberishGenerator.GenerateName();
                 m.script.SetTargetWayPoint(wp);
                 m.WeaponPrimary = EntityData.RandomWeapon();
-                m.ActorCompletedTurn += Monster_ActorMoved;
 
                 m.ActorActivityOccured += M_ActorActivityOccured;
 
@@ -172,7 +168,6 @@ namespace Rosie.Code.Map
             foreach (var a in EntityData.Armours)
             {
                 var b = EntityData.RandomArmour();
-
                 var p = GetRandomEmptyRoomPoint();
                 b.SetLocation(p.X, p.Y);
                 AddItem(b);
@@ -192,13 +187,10 @@ namespace Rosie.Code.Map
             switch (e.Activity)
             {
                 case ActorActivityType.Damaged:
-
-                    Game1.AddTextEffect(e.Activity, m.X, m.Y, e.Data.First().ToString(), 0, -1);
-
+                    Game1.AddTextEffect(e.Activity, m.X, m.Y, e.Data.First().ToString(), 0, -1, Color.Red);
                     break;
 
                 case ActorActivityType.Died:
-
                     var monster = sender as NPC;
                     RosieGame.AddMessage(MessageStrings.Monster_Die, monster.ID);
                     player.ExperiencePoints += monster.ExperienceValue;
@@ -208,6 +200,12 @@ namespace Rosie.Code.Map
                     break;
 
                 case ActorActivityType.Moved:
+
+                    //  e.Data - before X, before Y, current X, current Y
+                    var coords = e.Data.Select(n => (int)n).ToArray();
+
+                    Map[coords[0], coords[1]].Inhabitant = null;
+                    Map[coords[2], coords[3]].Inhabitant = sender as NPC;
                     break;
 
                 default:
