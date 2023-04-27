@@ -56,7 +56,7 @@ namespace Rosie.Code
             State = InputState.WaitingForStartKey;
 
             //move
-            var com = new Command(CommandType.Move,
+            var com = new Command(CommandType.Move, true,
                  keys.keypad1, keys.keypad2, keys.keypad3
                 , keys.keypad4, keys.keypad5, keys.keypad6
                 , keys.keypad7, keys.keypad8, keys.keypad9
@@ -64,44 +64,44 @@ namespace Rosie.Code
             commands.Add(com);
 
             //take
-            com = new Command(CommandType.Take, keys.keyT);
+            com = new Command(CommandType.Take, true, keys.keyT);
             commands.Add(com);
 
             //inventory
-            com = new Command(CommandType.Drop, keys.keyI);
+            com = new Command(CommandType.Drop, true, keys.keyI);
             com.AddStep(new Step() { InfoToDisplay = DisplayInformation.Inventory });
             commands.Add(com);
 
             //drop
-            com = new Command(CommandType.Drop, keys.keyD);
+            com = new Command(CommandType.Drop, true, keys.keyD);
             com.AddStep(new Step() { InfoToDisplay = DisplayInformation.Drop });
             commands.Add(com);
 
             //equip
-            com = new Command(CommandType.Equip, keys.keyE);
+            com = new Command(CommandType.Equip, true, keys.keyE);
             com.AddStep(new Step() { InfoToDisplay = DisplayInformation.Equip });
             commands.Add(com);
 
             //open
-            com = new Command(CommandType.Open, keys.keyO);
+            com = new Command(CommandType.Open, true, keys.keyO);
             com.AddStep(new Step() { InfoToDisplay = DisplayInformation.ChooseDirection });
             commands.Add(com);
 
             //close
-            com = new Command(CommandType.Close, keys.keyC);
+            com = new Command(CommandType.Close, true, keys.keyC);
             com.AddStep(new Step() { InfoToDisplay = DisplayInformation.ChooseDirection });
             commands.Add(com);
 
             //Use stairs
-            com = new Command(CommandType.StairsMove, keys.keyS);
+            com = new Command(CommandType.StairsMove, true, keys.keyS);
             commands.Add(com);
 
             //Minimap
-            com = new Command(CommandType.MiniMap, keys.keyM);
+            com = new Command(CommandType.MiniMap, true, keys.keyM);
             commands.Add(com);
 
             //Look
-            com = new Command(CommandType.Look, keys.keyL);
+            com = new Command(CommandType.Look, false, keys.keyL);
             com.AddStep(new Step() { InfoToDisplay = DisplayInformation.SelectCell, Input = InputType.MouseClick });
             commands.Add(com);
 
@@ -128,8 +128,8 @@ namespace Rosie.Code
         {
             if (pKey == (int)keys.escape)
             {
-                RosieGame.ViewMode = GameViewMode.Game;
                 State = InputState.WaitingForStartKey;
+                GameCommandIssued?.Invoke(this, new GameCommandEventArgs(CommandType.Escape, false, null));
             }
 
 
@@ -171,7 +171,7 @@ namespace Rosie.Code
                 //so raise an event
                 State = InputState.WaitingForStartKey;
                 RosieGame.ViewMode = GameViewMode.Game;
-                GameCommandIssued?.Invoke(this, new GameCommandEventArgs(CurrentCommand.commandType, CurrentData.ToArray()));
+                GameCommandIssued?.Invoke(this, new GameCommandEventArgs(CurrentCommand.commandType, CurrentCommand.ConsumeTurn, CurrentData.ToArray()));
 
             }
             else
@@ -248,14 +248,17 @@ namespace Rosie.Code
         public event EventHandler<GameCommandEventArgs> GameCommandIssued;
         public class GameCommandEventArgs : EventArgs
         {
-            public GameCommandEventArgs(CommandType command, params int[] data)
+            public GameCommandEventArgs(CommandType command, bool pConsumeTurn, params int[] data)
             {
                 Command = command;
                 Data = data;
+                ConsumeTurn = pConsumeTurn;
             }
 
             public CommandType Command { private set; get; }
             public int[] Data { private set; get; }
+
+            public bool ConsumeTurn { private set; get; }
         }
     }
 
@@ -266,17 +269,19 @@ namespace Rosie.Code
     /// </summary>
     public class Command
     {
-        public Command(CommandType pCommandType, params keys[] pKeys)
+        public Command(CommandType pCommandType, bool pConsumeTurn, params keys[] pKeys)
         {
             commandType = pCommandType;
             Trigger = pKeys;
+            ConsumeTurn = pConsumeTurn;
         }
 
-        public Command(CommandType pCommandType, keys[] trigger, List<Step> pSteps)
+        public Command(CommandType pCommandType, keys[] trigger, List<Step> pSteps, bool pConsumeTurn)
         {
             commandType = pCommandType;
             Trigger = trigger;
             Steps = pSteps;
+            ConsumeTurn = pConsumeTurn;
         }
 
         public CommandType commandType { get; private set; }
@@ -285,6 +290,11 @@ namespace Rosie.Code
         /// Triggers the command
         /// </summary>
         public keys[] Trigger { get; set; }
+
+        /// <summary>
+        /// Does the action consume a game turn
+        /// </summary>
+        public bool ConsumeTurn { get; private set; }
 
         /// <summary>
         /// The steps which comprise the command

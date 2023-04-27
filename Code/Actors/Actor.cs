@@ -52,7 +52,7 @@ namespace Rosie.Entities
         public void ModifyCurrentHitPoints(int pValue)
         {
             HitPointsCurrent += pValue;
-            if (HitPointsCurrent < 0)
+            if (HitPointsCurrent <= 0)
             {
                 RaiseActorActorActivity(this, ActorActivityType.Died, null);
             }

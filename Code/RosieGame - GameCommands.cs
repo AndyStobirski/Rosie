@@ -4,6 +4,7 @@ using Rosie.Code.Items;
 using Rosie.Code.Misc;
 using Rosie.Entities;
 using System;
+using System.Collections.Generic;
 using System.Linq;
 
 
@@ -19,8 +20,9 @@ namespace Rosie
         /// </summary>
         /// <param name="command"></param>
         /// <param name="data"></param>
+        /// <param name="pConsumeTurn">If true, the command consumes a turn</param>
         /// <exception cref="NotImplementedException"></exception>
-        public void GameCommand(CommandType command, int[] data)
+        public void GameCommand(CommandType command, int[] data, bool pConsumeTurn)
         {
 
             Point dir = Point.Zero;
@@ -126,8 +128,12 @@ namespace Rosie
 
             }
 
-            CalculateFieldOfVision();
-            GameState = GameStates.EnemyTurn;
+
+            if (pConsumeTurn)
+            {
+                CalculateFieldOfVision();
+                GameState = GameStates.EnemyTurn;
+            }
         }
 
 
@@ -181,7 +187,11 @@ namespace Rosie
         {
             var thing = Map[pX, pY];
 
-            RosieGame.AddMessage(thing.Description());
+            List<String> lines = new();
+
+
+
+            lines.Add(thing.Description());
 
             if (thing is Tile)
             {
@@ -189,20 +199,29 @@ namespace Rosie
 
                 if (t.Inhabitant != null)
                 {
-                    RosieGame.AddMessage(MessageStrings.See_YouSee + (t.Inhabitant as NPC).Description());
+                    if (lines.Any())
+                        lines.Add("");
+
+                    lines.Add(MessageStrings.See_YouSee + (t.Inhabitant as NPC).Description());
+
                 }
 
                 if (t.Items.Any())
                 {
-                    RosieGame.AddMessage(MessageStrings.See_YouSee);
+                    if (lines.Any())
+                        lines.Add("");
+
+                    lines.Add(MessageStrings.See_YouSee);
 
                     foreach (var item in t.Items)
                     {
-                        RosieGame.AddMessage(item.Description());
+                        lines.Add(" * " + item.Description());
                     }
                 }
             }
 
+            if (lines.Any())
+                PopupWindow = string.Join("\n", lines);
 
         }
 

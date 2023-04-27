@@ -26,12 +26,10 @@ namespace Rosie
         /// </summary>
         SpriteFont _font;
 
-
         /// <summary>
         /// Used for drawing borders and t'ing
         /// </summary>
         Texture2D _pixel;
-
 
         /// <summary>
         /// Handles user input and passes commands to the Rosie game instance
@@ -73,6 +71,9 @@ namespace Rosie
 
         Point MouseCoords;
 
+        private int _screenWidth => _graphics.PreferredBackBufferWidth;
+        private int _screenHeight => _graphics.PreferredBackBufferHeight;
+
         public Game1()
         {
 
@@ -107,11 +108,13 @@ namespace Rosie
                     var y = (pY * Camera.TileSize.Height) - (Camera.GameCameraDefinition.Y * Camera.TileSize.Height) + Camera.GameCameraOffset.Y;
 
                     _Effects.Enqueue(new EffectText(x, y, pText, pMoveX, pMoveY, TotalMilliseconds, pColour));
-
-
                     break;
+
+
                 case ActorActivityType.Died:
                     break;
+
+
                 case ActorActivityType.Moved:
                     break;
             }
@@ -144,8 +147,19 @@ namespace Rosie
         /// <param name="e"></param>
         private void _InputHandler_GameCommandIssued(object sender, InputHandler.GameCommandEventArgs e)
         {
-            //isue command to game
-            _Rosie.GameCommand(e.Command, e.Data);
+
+            if (e.Command == CommandType.Escape)
+            {
+                RosieGame.ViewMode = GameViewMode.Game;
+                _Rosie.PopupWindow = null;
+
+            }
+            else
+            {
+
+                //isue command to game
+                _Rosie.GameCommand(e.Command, e.Data, e.ConsumeTurn);
+            }
 
         }
 
@@ -211,7 +225,9 @@ namespace Rosie
             }
 
 
-
+            //
+            //
+            //
 
 
             _newKeyboardState = Keyboard.GetState();
@@ -300,11 +316,9 @@ namespace Rosie
         {
             if (RosieGame.currentLevel == null) return;
 
-
             GraphicsDevice.Clear(Color.Black);
 
             _spriteBatch.Begin();
-
 
             switch (RosieGame.ViewMode)
             {
@@ -314,14 +328,13 @@ namespace Rosie
                     var fps = string.Format("FPS: {0}", _frameCounter.AverageFramesPerSecond);
                     _spriteBatch.DrawString(_font, fps, new Vector2(1, 1), Color.White);
 
-
-
                     _spriteBatch.DrawString(_font, String.Format("mouse: {0},{1} / {2},{3}", MouseCoords.X.ToString(), MouseCoords.Y.ToString(), _MouseOverMapCell.X, _MouseOverMapCell.Y), new Vector2(300, 1), Color.White);
 
                     _spriteBatch.DrawString(_font, string.Format("CAPS: {0}, NUM: {1}, SHIFT: {2}", _Rosie.CapsLock, _Rosie.NumLock, _Rosie.ShiftDown), new Vector2(_graphics.PreferredBackBufferWidth - 300, 1), Color.White);
 
                     DrawGame();
                     DrawEffects();
+                    DrawPopupMessage();
                     break;
 
                 case GameViewMode.MiniMap:
@@ -343,6 +356,35 @@ namespace Rosie
             base.Draw(gameTime);
         }
 
+        /// <summary>
+        /// Draw the popup
+        /// </summary>
+        protected void DrawPopupMessage()
+        {
+            if (_Rosie.PopupWindow != null)
+            {
+                //get dimensions of the text to be drawn
+                Vector2 textSize = _font.MeasureString(_Rosie.PopupWindow);
+
+                int w = 400;
+                int h = 400;
+
+                if (textSize.X > w)
+                    w = (int)textSize.X;
+
+                if (textSize.Y > h)
+                    h = (int)textSize.Y;
+
+                int x = (_screenWidth / 2) - (w / 2);
+                int y = (_screenHeight / 2) - (h / 2);
+
+                DrawFillRectangle(x, y, w, h, Color.White, Color.Black);
+
+
+                _spriteBatch.DrawString(_font, _Rosie.PopupWindow, new Vector2(x + 5, y + 5), Color.White);
+
+            }
+        }
 
         /// <summary>
         /// Draw the conents of the effects lists
@@ -392,6 +434,52 @@ namespace Rosie
             else
                 return false;
         }
+
+
+
+        protected void DrawFillRectangle(int pX, int pY, int pWidth, int pHeight, Color pLineColour, Color pFillColour)
+        {
+            //background
+            _spriteBatch.Draw(_pixel
+               , new Rectangle(pX
+                   , pY
+                   , pWidth
+                   , pHeight)
+               , pFillColour);
+
+            //top line
+            _spriteBatch.Draw(_pixel
+                , new Rectangle(pX
+                    , pY
+                    , pWidth
+                    , 1)
+                , pLineColour);
+
+            //bottom line
+            _spriteBatch.Draw(_pixel
+                , new Rectangle(pX
+                    , pY + pHeight
+                    , pWidth
+                    , 1)
+                , pLineColour);
+
+            //left line
+            _spriteBatch.Draw(_pixel
+                , new Rectangle(pX
+                    , pY
+                    , 1
+                    , pHeight)
+                , pLineColour);
+
+            //right line
+            _spriteBatch.Draw(_pixel
+                , new Rectangle(pX + pWidth
+                    , pY
+                    , 1
+                    , pHeight)
+                , pLineColour);
+        }
+
 
         #region Map Drawing Code
 

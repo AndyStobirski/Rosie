@@ -79,6 +79,10 @@ namespace Rosie
         /// </summary>
         public static GameViewMode ViewMode { get; set; }
 
+        /// <summary>
+        /// If not null
+        /// </summary>
+        public string PopupWindow { get; set; }
 
 
         public Tile[,] Map => currentLevel.Map;

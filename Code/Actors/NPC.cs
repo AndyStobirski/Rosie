@@ -1,5 +1,4 @@
-﻿using Microsoft.Xna.Framework;
-using Rosie.Code.Actors;
+﻿using Rosie.Code.Actors;
 using Rosie.Code.Environment;
 using Rosie.Code.GameData;
 using Rosie.Code.Misc;
@@ -36,22 +35,16 @@ namespace Rosie.Entities
 
         public int HearSoundThreshold { get; set; } = 8;
 
+        public string NPCType { get; private set; }
+
+
+
         /// <summary>
-        /// Constructor 
+        /// Set the initial location and waypoint
         /// </summary>
-        /// <param name="pP">Monster location</param>
-        public NPC(Point pP, Script pNPCScript)
-        {
-            X = pP.X;
-            Y = pP.Y;
-            VisionRange = 5;
-            Name = "Monster";
-            ExperienceValue = 10;
-
-            script = pNPCScript;
-            script.setMonster(this);
-        }
-
+        /// <param name="pX"></param>
+        /// <param name="pY"></param>
+        /// <param name="PWayPoint"></param>
         public void PlaceNPC(int pX, int pY, WayPoint PWayPoint)
         {
             X = pX;
@@ -63,7 +56,7 @@ namespace Rosie.Entities
         {
             SubType = data.SubType;
             Type = data.Type;
-            Name = data.Name;
+            NPCType = data.Name;
             Speed = data.Speed;
             HitPointsCurrent = HitPointsMax = data.MaxHitPoint;
             Gfx = data.Gfx;
@@ -94,35 +87,22 @@ namespace Rosie.Entities
             script.Act();
         }
 
-
-
-
-
-
         public string Description()
         {
 
             var d = new string[]
             {
-                this.Name
+                this.NPCType + " (first name " + this.Name + ")"
                 , "It's current state is " + this.script.State.ToString()
                 , "It's hipoints are " + HitPointsCurrent.ToString() + " / " + HitPointsMax.ToString()
             };
 
             return String.Join("\r\n", d);
         }
-
-
-        #region Overriden Methods 
-
         public override void Draw()
         {
             throw new NotImplementedException();
         }
-
-
-        #endregion
-
     }
 }
 

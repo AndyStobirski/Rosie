@@ -92,7 +92,7 @@
 
     public enum CommandType
     {
-        Move, Take, Drop, Equip, Open, Close, StairsMove, MiniMap, Look
+        Escape, Move, Take, Drop, Equip, Open, Close, StairsMove, MiniMap, Look
     }
 
     public enum NPC_STATE
