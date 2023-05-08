@@ -43,11 +43,12 @@ It's barely an alpha and has has the following features:
 (needs a lot more expansion)
 Game structure
 * RosieGame.cs - is the main container for the game
+* InputHandler.cs - gathers keystrokes and when they match registered commands passed them to RosieGame.cs
 * Player.cs - class representing the player (inherits from Actor.cs)
 * Monster.cs - class representing monster (inherits from Actor.cs)
 * Level.cs - contains levels level map, list of monsters
 * Generator.cs - base class which is inherited by the level generators: CaveGenerator.cs, CorridorCaveGenerator.cs, IslandGenerator.cs, MapGenerator.cs
-* Item.cs is the base class for: Armour.cs, Weapon.cs, GoldCoins.cs
+* Item.cs is the base class for dungeon items e.g. Armour.cs, Weapon.cs, GoldCoins.cs
 * Roller.cs and Roll.cs - the former is class to represent dice rolls e.g. 2d4 and the latter rolls the dice
 * Scheduler.cs - determines which actors move on each turn
 

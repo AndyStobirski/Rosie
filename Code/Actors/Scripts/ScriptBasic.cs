@@ -1,7 +1,7 @@
 ﻿using Rosie.Code.Misc;
 using Rosie.Misc;
 
-namespace Rosie.Code.Actors
+namespace Rosie.Code.Actors.Scripts
 {
     /// <summary>
     /// This script allows wandering between rooms, sleeping, moving towards 

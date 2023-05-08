@@ -8,7 +8,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 
-namespace Rosie.Code.Actors
+namespace Rosie.Code.Actors.Scripts
 {
     /// <summary>
     /// An abstract class for monster behaviour which contains primitive functions that can be
@@ -38,7 +38,7 @@ namespace Rosie.Code.Actors
         protected int IdleCounter = 0;
 
         /// <summary>
-        /// When this value is exceed, and the NPC is wandering choose a new direction
+        /// When this value is exceedeed, and the NPC is wandering but it's chosem route is block, choose a new direction
         /// </summary>
         protected int IdleThreshHold = 3;
 
@@ -47,7 +47,7 @@ namespace Rosie.Code.Actors
         /// <summary>
         /// How long does it sleep foor
         /// </summary>
-        protected int SleepCount { get; set; }
+        protected int SleepDuration { get; set; }
 
 
         /// <summary>
@@ -132,7 +132,7 @@ namespace Rosie.Code.Actors
             if (!monster.CanMove)
                 return;
 
-            if ((monster.X == TargetWayPoint.X && monster.Y == TargetWayPoint.Y))
+            if (monster.X == TargetWayPoint.X && monster.Y == TargetWayPoint.Y)
             {
                 SetTargetWayPoint(TargetWayPoint);
             }
@@ -161,7 +161,7 @@ namespace Rosie.Code.Actors
             if (!monster.CanSleep)
                 return;
 
-            SleepCount = 25;
+            SleepDuration = Roller.Roll(d20) + 3;
             State = NPC_STATE.Sleeping;
             //RosieGame.AddMessage("Monster feel asleep");
         }
@@ -175,9 +175,9 @@ namespace Rosie.Code.Actors
                 return;
             }
 
-            SleepCount--;
+            SleepDuration--;
 
-            if (SleepCount <= 0)
+            if (SleepDuration <= 0)
             {
                 State = NPC_STATE.Idle;
                 //RosieGame.AddMessage("Monster woke up");
@@ -202,7 +202,7 @@ namespace Rosie.Code.Actors
 
 
         /// <summary>
-        /// Can detect scent move towards it
+        /// Can detect scent, move towards it
         /// </summary>
         protected void ScentTrack()
         {
@@ -219,7 +219,7 @@ namespace Rosie.Code.Actors
                                 .Where(p => MapUtils.IsCellValid(p.X, p.Y))
                                 .Select(p => map[p.X, p.Y])
                                 .Where(m => m.SenseData.Any())
-                                .FirstOrDefault(m => ((m.SenseData.First()) as Scent).ScentValue == (scent.ScentValue + 1));
+                                .FirstOrDefault(m => (m.SenseData.First() as Scent).ScentValue == scent.ScentValue + 1);
 
 
             if (surrounding == null)
@@ -236,7 +236,7 @@ namespace Rosie.Code.Actors
 
 
 
-        protected void Swap<T>(ref T lhs, ref T rhs) { T temp; temp = lhs; lhs = rhs; rhs = temp; }
+        protected static void Swap<T>(ref T lhs, ref T rhs) { T temp; temp = lhs; lhs = rhs; rhs = temp; }
 
         /// <summary>
         /// Plot a brasenham line from (x0, y0) to (x1, y1)
@@ -246,16 +246,16 @@ namespace Rosie.Code.Actors
         /// <param name="x1">The end x</param>
         /// <param name="y1">The end y</param>
         /// <param name="plot">The plotting function (if this returns false, the algorithm stops early)</param>
-        protected bool LineOfSight(int x0, int y0, int x1, int y1, ref List<Point> pLine)
+        protected static bool LineOfSight(int x0, int y0, int x1, int y1, ref List<Point> pLine)
         {
             pLine = new List<Point>();
 
             Point p = new Point();
 
             bool steep = Math.Abs(y1 - y0) > Math.Abs(x1 - x0);
-            if (steep) { Swap<int>(ref x0, ref y0); Swap<int>(ref x1, ref y1); }
-            if (x0 > x1) { Swap<int>(ref x0, ref x1); Swap<int>(ref y0, ref y1); }
-            int dX = (x1 - x0), dY = Math.Abs(y1 - y0), err = (dX / 2), ystep = (y0 < y1 ? 1 : -1), y = y0;
+            if (steep) { Swap(ref x0, ref y0); Swap(ref x1, ref y1); }
+            if (x0 > x1) { Swap(ref x0, ref x1); Swap(ref y0, ref y1); }
+            int dX = x1 - x0, dY = Math.Abs(y1 - y0), err = dX / 2, ystep = y0 < y1 ? 1 : -1, y = y0;
 
             for (int x = x0; x <= x1; ++x)
             {
@@ -281,7 +281,7 @@ namespace Rosie.Code.Actors
         /// <param name="pX"></param>
         /// <param name="pY"></param>
         /// <returns></returns>
-        protected bool IsSeeThrough(int pX, int pY)
+        protected static bool IsSeeThrough(int pX, int pY)
         {
             var Map = RosieGame.currentLevel.Map;
 

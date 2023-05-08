@@ -1,10 +1,10 @@
 ﻿using Rosie.Code.Misc;
 
-namespace Rosie.Code.Actors
+namespace Rosie.Code.Actors.Scripts
 {
     /// <summary>
     /// The most simple script, attempt to move towards and attack the player
-    /// if they can be seen
+    /// if they can be seen else do nothing
     /// </summary>
     public class ScriptZombie : Script
     {

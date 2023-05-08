@@ -16,12 +16,8 @@
 
     public enum GameStates
     {
-        None
-        , PlayerTurn
+        PlayerTurn
         , EnemyTurn
-        , AwaitingMouseInput
-        , Debugging
-        , WaitingMouseClick
     }
 
 
@@ -97,7 +93,7 @@
 
     public enum NPC_STATE
     {
-        Combat, Alert, Exploring, Sleeping, Idle, TrackScent
+        Combat, Alert, Exploring, Sleeping, Idle, TrackScent, Fleeing
 
     }
 

@@ -1,4 +1,4 @@
-﻿using Rosie.Code.Actors;
+﻿using Rosie.Code.Actors.Scripts;
 using Rosie.Code.Environment;
 using Rosie.Code.GameData;
 using Rosie.Code.Misc;
@@ -27,6 +27,8 @@ namespace Rosie.Entities
         /// Probability will sleep
         /// </summary>
         public int SleepProb { get; set; } = 15;
+
+
 
         /// <summary>
         /// Probability of player scent waking the sleeper

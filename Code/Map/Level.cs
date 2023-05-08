@@ -131,10 +131,16 @@ namespace Rosie.Code.Map
 
                 m.PlaceNPC(location.X, location.Y, wp);
 
+                m.Inventory = new();
 
                 m.Name = GibberishGenerator.GenerateName();
                 m.script.SetTargetWayPoint(wp);
                 m.WeaponPrimary = EntityData.RandomWeapon();
+                m.Inventory.Add(m.WeaponPrimary);
+
+                m.ArmourEquiped = EntityData.RandomArmour();
+                m.Inventory.Add(m.ArmourEquiped);
+
 
                 m.ActorActivityOccured += M_ActorActivityOccured;
 

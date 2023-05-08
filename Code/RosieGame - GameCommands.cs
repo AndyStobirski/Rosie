@@ -189,8 +189,6 @@ namespace Rosie
 
             List<String> lines = new();
 
-
-
             lines.Add(thing.Description());
 
             if (thing is Tile)
@@ -202,7 +200,15 @@ namespace Rosie
                     if (lines.Any())
                         lines.Add("");
 
-                    lines.Add(MessageStrings.See_YouSee + (t.Inhabitant as NPC).Description());
+                    var n = t.Inhabitant as NPC;
+
+                    lines.Add(MessageStrings.See_YouSee + n.Description());
+
+                    if (n.Inventory != null && n.Inventory.Any())
+                    {
+                        lines.Add("It is carrying: ");
+                        lines.AddRange(n.Inventory.Select(x => x.Description()));
+                    }
 
                 }
 

@@ -7,6 +7,9 @@ using System.ComponentModel;
 
 namespace Rosie.Map
 {
+    /// <summary>
+    /// Base class for generators
+    /// </summary>
     public abstract class Generator
     {
         protected Point[] Directions { get; set; } = new Point[]

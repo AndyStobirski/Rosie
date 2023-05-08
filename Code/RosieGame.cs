@@ -54,7 +54,7 @@ namespace Rosie
         /// </summary>
         public int TurnCounter { get; set; }
 
-        public bool DislayOdourCloud { get; set; } = false;
+        public bool DislayOdourCloud { get; set; } = true;
 
         /// <summary>
         /// Player vision is calculated here

@@ -1,11 +1,11 @@
 ﻿using Rosie.Code.Misc;
 using Rosie.Misc;
 
-namespace Rosie.Code.Actors
+namespace Rosie.Code.Actors.Scripts
 {
     /// <summary>
     /// This script allows wandering between rooms, sleeping, moving towards 
-    /// and attacking the player on sight, scebnt tracking
+    /// and attacking the player on sight, scennt tracking
     /// </summary>
     public class ScriptBasic1 : Script
     {
