@@ -2,7 +2,9 @@
 
 namespace Rosie.Code.TextGenerators
 {
-
+    /// <summary>
+    /// Random text generating utilities
+    /// </summary>
     class GibberishGenerator
     {
 
@@ -12,45 +14,77 @@ namespace Rosie.Code.TextGenerators
 
         private static string[] vowelPairs = { "ai", "au", "ea", "ee", "ei", "eu", "ia", "ie", "io", "iu", "oa", "oe", "oi", "ou", "ua", "ue", "ui", "uo" };
 
-        public static string GenerateName()
+        /// <summary>
+        /// Generate a nonsense name
+        /// </summary>
+        /// <returns></returns>
+        public static string GenerateName(int pMinSyllables = 1, int pMaxSyllables = 4)
         {
-            return Generate(true, 1, 1);
+            return Word(true, pMinSyllables, pMaxSyllables);
         }
 
-        public static string Generate(bool capitalizeFirstLetter, int pMinLength, int pMaxLength)
+        /// <summary>
+        /// Generate a string of nonsense
+        /// </summary>
+        /// <param name="pCapitalizeFirstLetter">Bool</param>
+        /// <param name="pMinWords"></param>
+        /// <param name="pMaxWords"></param>
+        /// <param name="pMinSyllables">minimum syllables per word</param>
+        /// <param name="pMaxSyllables">maximum syllables per word</param>
+        /// <returns></returns>
+        public static string Sentence(bool pCapitalizeFirstLetter, int pMinWords, int pMaxWords, int pMinSyllables = 1, int pMaxSyllables = 4)
         {
             string sentence = "";
-            int wordCount = RandomWithSeed.Next(pMinLength, pMaxLength);
+            int wordCount = RandomWithSeed.Next(pMinWords, pMaxWords);
             for (int i = 0; i < wordCount; i++)
             {
-                int syllableCount = RandomWithSeed.Next(1, 4); // Random number of syllables between 1 and 3
-                for (int j = 0; j < syllableCount; j++)
-                {
-                    if (j % 2 == 0)
-                    {
-                        sentence += nonVowelSyllables[RandomWithSeed.Next(nonVowelSyllables.Length)];
-                    }
-                    else
-                    {
-                        if (RandomWithSeed.Next(2) == 0)
-                        {
-                            sentence += vowelPairs[RandomWithSeed.Next(vowelPairs.Length)];
-                        }
-                        else
-                        {
-                            sentence += syllables[RandomWithSeed.Next(syllables.Length)];
-                        }
-                    }
-                }
+                sentence += Word(false, pMinSyllables, pMaxSyllables);
                 sentence += " ";
             }
             sentence = sentence.TrimEnd();
-            if (capitalizeFirstLetter)
+            if (pCapitalizeFirstLetter)
             {
                 sentence = char.ToUpper(sentence[0]) + sentence.Substring(1);
             }
             return sentence;
         }
-    }
 
+        /// <summary>
+        /// Construct a word
+        /// </summary>
+        /// <param name="pCapitalizeFirstLetter">Bool</param>
+        /// <param name="pMinSyllables">minimum syllables</param>
+        /// <param name="pMaxSyllables">maximum syllables</param>
+        /// <returns>Word</returns>
+        public static string Word(bool pCapitalizeFirstLetter, int pMinSyllables, int pMaxSyllables)
+        {
+            string word = "";
+
+            int syllableCount = RandomWithSeed.Next(pMinSyllables, pMaxSyllables); 
+            for (int j = 0; j < syllableCount; j++)
+            {
+                if (j % 2 == 0)
+                {
+                    //frequently throw in nonvowels to make the word look normal
+                    word += nonVowelSyllables[RandomWithSeed.Next(nonVowelSyllables.Length)];
+                }
+                else
+                {
+                    if (RandomWithSeed.Next(2) == 0)//toss a coin
+                    {
+                        word += vowelPairs[RandomWithSeed.Next(vowelPairs.Length)];
+                    }
+                    else
+                    {
+                        word += syllables[RandomWithSeed.Next(syllables.Length)];
+                    }
+                }
+            }
+            if (pCapitalizeFirstLetter)
+            {
+                word = char.ToUpper(word[0]) + word.Substring(1);
+            }
+            return word;
+        }
+    }
 }
