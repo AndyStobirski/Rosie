@@ -2,6 +2,9 @@
 
 namespace Rosie.Code.GameData
 {
+    /// <summary>
+    /// Used to define an NPC, passed into the class constructor
+    /// </summary>
     public class NPCDatum
     {
         public NPCDatum(NPC_Type type, NPC_SubType substype, string name, int speed, int maxHitPoint, string script, int gfx, int XP)

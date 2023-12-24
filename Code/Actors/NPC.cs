@@ -54,6 +54,10 @@ namespace Rosie.Entities
             script.SetTargetWayPoint(PWayPoint);
         }
 
+        /// <summary>
+        /// Constructor
+        /// </summary>
+        /// <param name="data">Data required to configure the NPC</param>
         public NPC(NPCDatum data)
         {
             SubType = data.SubType;

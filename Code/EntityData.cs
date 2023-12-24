@@ -7,7 +7,7 @@ using System.Collections.Generic;
 namespace Rosie.Code
 {
     /// <summary>
-    /// Data for items is stored here
+    /// Data for dungeon contents are stored here
     /// </summary>
     public static class EntityData
     {
@@ -37,11 +37,11 @@ namespace Rosie.Code
         public static List<NPCDatum> NPCs { get; private set; } = new()
         {
             new NPCDatum(NPC_Type.Undead, NPC_SubType.Skeleton, "Skeleton", 10,10,"ScriptZombie",(int)GFXValues.MONSTER_SKELETON, 10)
-            ,new NPCDatum(NPC_Type.Alive, NPC_SubType.Orc, "Orc", 10,10,"ScriptBasic",(int)GFXValues.MONSTER_ORC, 10)
-            ,new NPCDatum(NPC_Type.Alive, NPC_SubType.Orc, "Orc Knight", 10,10,"ScriptBasic1",(int)GFXValues.MONSTER_ORCKNIGHT, 20)
-            ,new NPCDatum(NPC_Type.Alive, NPC_SubType.Orc, "Orc Warrior", 10,10,"ScriptBasic1",(int)GFXValues.MONSTER_ORCWARRIOR, 50)
-            ,new NPCDatum(NPC_Type.Alive, NPC_SubType.Amphibian, "Giant Frog", 10,10,"ScriptBasic",(int)GFXValues.MONSTER_GIANTFROG, 50)
-       ,new NPCDatum(NPC_Type.Alive, NPC_SubType.Insect, "Giant Spider", 10,10,"ScriptZombie",(int)GFXValues.MONSTER_GIANTSPIDER, 50)
+            , new NPCDatum(NPC_Type.Alive, NPC_SubType.Orc, "Orc", 10,10,"ScriptBasic",(int)GFXValues.MONSTER_ORC, 10)
+            , new NPCDatum(NPC_Type.Alive, NPC_SubType.Orc, "Orc Knight", 10,10,"ScriptBasic1",(int)GFXValues.MONSTER_ORCKNIGHT, 20)
+            , new NPCDatum(NPC_Type.Alive, NPC_SubType.Orc, "Orc Warrior", 10,10,"ScriptBasic1",(int)GFXValues.MONSTER_ORCWARRIOR, 50)
+            , new NPCDatum(NPC_Type.Alive, NPC_SubType.Amphibian, "Giant Frog", 10,10,"ScriptBasic",(int)GFXValues.MONSTER_GIANTFROG, 50)
+            , new NPCDatum(NPC_Type.Alive, NPC_SubType.Insect, "Giant Spider", 10,10,"ScriptZombie",(int)GFXValues.MONSTER_GIANTSPIDER, 50)
             , new NPCDatum(NPC_Type.Undead, NPC_SubType.Skeleton, "Flying Skull", 5,10,"ScriptZombie",(int)GFXValues.MONSTER_FLYINGSKULL, 10)
             , new NPCDatum(NPC_Type.Alive, NPC_SubType.Insect, "Fire Ant", 5,10,"ScriptZombie",(int)GFXValues.MONSTER_FIREANT, 10)
         };

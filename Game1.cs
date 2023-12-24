@@ -15,6 +15,56 @@ namespace Rosie
 {
     public class Game1 : Game
     {
+
+
+        /// <summary>
+        /// Constructor
+        /// </summary>
+        public Game1()
+        {
+
+            _graphics = new GraphicsDeviceManager(this);
+            Content.RootDirectory = "Content";
+            IsMouseVisible = true;
+
+            //Hardcode the frame rate
+            TargetElapsedTime = TimeSpan.FromSeconds(1d / 30d);
+
+        }
+        /// <summary>
+        /// Inherited class method
+        /// </summary>
+        protected override void Initialize()
+        {
+            _graphics.IsFullScreen = false;
+            _graphics.PreferredBackBufferWidth = 1200;
+            _graphics.PreferredBackBufferHeight = 1200;
+            _graphics.ApplyChanges();
+
+            _spriteBatch = new SpriteBatch(GraphicsDevice);
+
+            _pixel = new Texture2D(GraphicsDevice, 1, 1);
+            _pixel.SetData(new[] { Color.White });
+
+            _InputHandler = new InputHandler();
+            _InputHandler.GameCommandIssued += _InputHandler_GameCommandIssued;
+
+            RandomWithSeed.SetSeed("ifov-wfum-ougt");
+
+            base.Initialize();
+        }
+
+        /// <summary>
+        /// Inherited class method 
+        /// </summary>
+        protected override void LoadContent()
+        {
+            _font = Content.Load<SpriteFont>("Pixel");
+            _Rosie = new RosieGame();
+            _tiles = Content.Load<Texture2D>("rltiles-2d");
+        }
+
+
         //  MonoGame
         private readonly GraphicsDeviceManager _graphics;
         private SpriteBatch _spriteBatch;
@@ -69,22 +119,14 @@ namespace Rosie
         /// </summary>
         private static double TotalMilliseconds;
 
+        /// <summary>
+        /// Mouse coordinates over game window 
+        /// </summary>
         Point MouseCoords;
 
         private int _screenWidth => _graphics.PreferredBackBufferWidth;
         private int _screenHeight => _graphics.PreferredBackBufferHeight;
 
-        public Game1()
-        {
-
-            _graphics = new GraphicsDeviceManager(this);
-            Content.RootDirectory = "Content";
-            IsMouseVisible = true;
-
-            //Hardcode the frame rate
-            TargetElapsedTime = TimeSpan.FromSeconds(1d / 30d);
-
-        }
 
         /// <summary>
         /// Add a text effect
@@ -120,28 +162,9 @@ namespace Rosie
             }
         }
 
-        protected override void Initialize()
-        {
-            _graphics.IsFullScreen = false;
-            _graphics.PreferredBackBufferWidth = 1200;
-            _graphics.PreferredBackBufferHeight = 1200;
-            _graphics.ApplyChanges();
-
-            _spriteBatch = new SpriteBatch(GraphicsDevice);
-
-            _pixel = new Texture2D(GraphicsDevice, 1, 1);
-            _pixel.SetData(new[] { Color.White });
-
-            _InputHandler = new InputHandler();
-            _InputHandler.GameCommandIssued += _InputHandler_GameCommandIssued;
-
-            RandomWithSeed.SetSeed("ifov-wfum-ougt");
-
-            base.Initialize();
-        }
 
         /// <summary>
-        /// The input handler has completed a 
+        /// An event raised by the input handler when it recognises a sequence
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
@@ -156,19 +179,12 @@ namespace Rosie
             }
             else
             {
-
                 //isue command to game
                 _Rosie.GameCommand(e.Command, e.Data, e.ConsumeTurn);
             }
 
         }
 
-        protected override void LoadContent()
-        {
-            _font = Content.Load<SpriteFont>("Pixel");
-            _Rosie = new RosieGame();
-            _tiles = Content.Load<Texture2D>("rltiles-2d");
-        }
 
         /// <summary>
         /// Draw text with a coloured border
@@ -226,7 +242,7 @@ namespace Rosie
 
 
             //
-            //
+            //  Begin handling game input
             //
 
 
@@ -291,14 +307,9 @@ namespace Rosie
                     _Rosie.MouseClick(mouseState.X, mouseState.Y);
                 }
 
-
-
-
             }
             else if (_Rosie.GameState == GameStates.EnemyTurn)
                 _Rosie.Tick();
-
-
 
             base.Update(gameTime);
 
@@ -350,14 +361,13 @@ namespace Rosie
             }
 
 
-
             _spriteBatch.End();
 
             base.Draw(gameTime);
         }
 
         /// <summary>
-        /// Draw the popup
+        /// Draw the contents of the PopupWindow if not null
         /// </summary>
         protected void DrawPopupMessage()
         {

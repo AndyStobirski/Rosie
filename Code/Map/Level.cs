@@ -102,7 +102,7 @@ namespace Rosie.Code.Map
 
 
         /// <summary>
-        /// Set up monsters on the 
+        /// Initialise the level
         /// </summary>
         public void InitLevel(Player pPlayer, int pMaxMonsters)
         {

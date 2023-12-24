@@ -27,7 +27,7 @@ namespace Rosie
         #region Keymodifiers
 
         // The state of the keyboard modifiers as set in the MonoGame parent class
-        // we need these as keypress reporting isn't great, e.g. A reports as ascii 
+        // we need these as keypress reporting isn't great, e.g. A report of ascii 
         // code 65 regardless of capslock or shift state, doesn't reflect the code 
         // being 65 or 97
 
@@ -54,6 +54,9 @@ namespace Rosie
         /// </summary>
         public int TurnCounter { get; set; }
 
+        /// <summary>
+        /// Draw the odour club in the game, debug purposes only
+        /// </summary>
         public bool DislayOdourCloud { get; set; } = true;
 
         /// <summary>
@@ -61,165 +64,9 @@ namespace Rosie
         /// </summary>
         public RecursiveShadowcast _fov;
 
-        /// <summary>
-        /// Calculate the field of vision, the visible cells that the player can see
-        /// </summary>
-        private void CalculateFieldOfVision()
-        {
-
-            //_fov.CalculateDistanceMap(7, player.X, player.Y, player.VisionRange + 5);
-            //_fov.OutputMask();
-
-            _fov.CastLight(Camera.GameCameraDefinition, player.X, player.Y, player.VisionRange);
-        }
-
 
         /// <summary>
-        /// The Game mode determines what is displayed
-        /// </summary>
-        public static GameViewMode ViewMode { get; set; }
-
-        /// <summary>
-        /// If not null
-        /// </summary>
-        public string PopupWindow { get; set; }
-
-
-        public Tile[,] Map => currentLevel.Map;
-
-
-        List<Level> levels = new List<Level>();
-
-        /// <summary>
-        /// Why static? So this can be easily accessed by the class Monster
-        /// They're nested quite deeply, and rather than pass variables through
-        /// a series of constructors
-        /// </summary>
-        static public Level currentLevel;
-
-        static private int _maxLevel;
-        public int MaxLevel
-        {
-            get
-            {
-
-                if (currentLevelIndex > _maxLevel)
-                    _maxLevel = currentLevelIndex;
-
-                return _maxLevel;
-            }
-        }
-
-        /// <summary>
-        /// Current level index
-        /// </summary>
-        public int currentLevelIndex => levels.IndexOf(currentLevel);
-
-        /// <summary>
-        /// Why static? So this can be easily accessed by the class Monster
-        /// They're nested quite deeply, and rather than pass variables through
-        /// a series of constructors
-        /// </summary>
-        static public Player player;
-
-
-
-        public static void AddMessage(string pMessageBody, params object[] pArgs)
-        {
-            Messages.Insert(0, string.Format(pMessageBody, pArgs));
-        }
-
-
-        public GameStates GameState { get; set; }
-
-
-        public Level CreateNewLevel()
-        {
-            var level = mapGenerator.Build(50, 50);
-            return level;
-        }
-
-        /// <summary>
-        /// Get the required level, creating it if necessary
-        /// </summary>
-        /// <param name="pLevelIndex"></param>
-        public void GetLevel(int pLevelIndex)
-        {
-
-            if (levels.Count == 0)
-            {
-                currentLevel = CreateNewLevel();
-                levels.Add(currentLevel);
-                currentLevel.InitLevel(player, 50);
-                player.X = currentLevel.StairCase_Up.X;
-                player.Y = currentLevel.StairCase_Up.Y;
-
-            }
-            else if (pLevelIndex == -1)
-            {
-
-                if ((currentLevelIndex + pLevelIndex) >= 0)
-                {
-
-                    RosieGame.AddMessage(MessageStrings.Stairs_Up);
-
-                    currentLevel = levels[currentLevelIndex + pLevelIndex];
-
-                    //moving up
-                    player.X = currentLevel.StairCase_Down.X;
-                    player.Y = currentLevel.StairCase_Down.Y;
-                }
-                else
-                {
-                    RosieGame.AddMessage(MessageStrings.Stairs_CantLeave);
-                }
-            }
-            else if (pLevelIndex == 1)
-            {
-
-                if ((currentLevelIndex + pLevelIndex) > levels.Count() - 1)
-                {
-
-                    levels.Add(CreateNewLevel());
-                    currentLevel = levels.Last();
-                    currentLevel.InitLevel(player, 5);
-                }
-                else
-                {
-                    currentLevel = levels[currentLevelIndex + pLevelIndex];
-                }
-
-                //moving down
-                player.X = currentLevel.StairCase_Up.X;
-                player.Y = currentLevel.StairCase_Up.Y;
-            }
-
-
-            PlacePlayerInCurrentLevel(player.X, player.Y);
-        }
-
-        /// <summary>
-        /// The player has entered the current level
-        /// </summary>
-        /// <param name="pX"></param>
-        /// <param name="pY"></param>
-        public void PlacePlayerInCurrentLevel(int pX, int pY)
-        {
-            player.X = pX;
-            player.Y = pY;
-            currentLevel.Map[pX, pY].Inhabitant = player;
-            _fov = new RecursiveShadowcast(Map);
-            MapUtils.MakeMapVisible();
-            Camera.CalculateGameCameraDefinition();
-            CalculateFieldOfVision();
-
-
-
-        }
-
-
-        /// <summary>
-        /// Constructor
+        /// Constructor for the entire game, it all starts here
         /// </summary>
         public RosieGame()
         {
@@ -279,6 +126,177 @@ namespace Rosie
 
         }
 
+        /// <summary>
+        /// Calculate the field of vision, the visible cells that the player can see
+        /// </summary>
+        private void CalculateFieldOfVision()
+        {
+
+            //_fov.CalculateDistanceMap(7, player.X, player.Y, player.VisionRange + 5);
+            //_fov.OutputMask();
+
+            _fov.CastLight(Camera.GameCameraDefinition, player.X, player.Y, player.VisionRange);
+        }
+
+
+        /// <summary>
+        /// The Game mode determines what is displayed on the main screen
+        /// </summary>
+        public static GameViewMode ViewMode { get; set; }
+
+        /// <summary>
+        /// If not null, this will be drawn by the game
+        /// </summary>
+        public string PopupWindow { get; set; }
+
+
+        public Tile[,] Map => currentLevel.Map;
+
+
+        List<Level> levels = new List<Level>();
+
+        /// <summary>
+        /// Why static? So this can be easily accessed by the class Monster
+        /// They're nested quite deeply, and rather than pass variables through
+        /// a series of constructors
+        /// </summary>
+        static public Level currentLevel;
+
+        static private int _maxLevel;
+        public int MaxLevel
+        {
+            get
+            {
+
+                if (currentLevelIndex > _maxLevel)
+                    _maxLevel = currentLevelIndex;
+
+                return _maxLevel;
+            }
+        }
+
+        /// <summary>
+        /// Current level index
+        /// </summary>
+        public int currentLevelIndex => levels.IndexOf(currentLevel);
+
+        /// <summary>
+        /// The player class!
+        /// Why static? So this can be easily accessed by the class Monster
+        /// They're nested quite deeply, and rather than pass variables through
+        /// a series of constructors
+        /// </summary>
+        static public Player player;
+
+
+        /// <summary>
+        /// Add an entry to the message list
+        /// </summary>
+        /// <param name="pMessageBody"></param>
+        /// <param name="pArgs"></param>
+        public static void AddMessage(string pMessageBody, params object[] pArgs)
+        {
+            Messages.Insert(0, string.Format(pMessageBody, pArgs));
+        }
+
+        /// <summary>
+        /// Determines what is being displayed
+        /// </summary>
+        public GameStates GameState { get; set; }
+
+        /// <summary>
+        /// Generate a new random level
+        /// </summary>
+        /// <returns></returns>
+        public Level CreateNewLevel()
+        {
+            var level = mapGenerator.Build(50, 50);
+            return level;
+        }
+
+        /// <summary>
+        /// Set the current level to the one specified by the parameter
+        /// </summary>
+        /// <param name="pLevelIndex">Index of level required</param>
+        public void GetLevel(int pLevelIndex)
+        {
+
+            if (levels.Count == 0)  //no levels present, create on
+            {
+                currentLevel = CreateNewLevel();
+                levels.Add(currentLevel);
+                currentLevel.InitLevel(player, 50);
+                player.X = currentLevel.StairCase_Up.X;
+                player.Y = currentLevel.StairCase_Up.Y;
+
+            }
+            else if (pLevelIndex == -1) // go up a flor
+            {
+
+                if ((currentLevelIndex + pLevelIndex) >= 0)
+                {
+
+                    RosieGame.AddMessage(MessageStrings.Stairs_Up);
+
+                    currentLevel = levels[currentLevelIndex + pLevelIndex];
+
+                    // Play the player on the new levels staircase
+                    player.X = currentLevel.StairCase_Down.X;
+                    player.Y = currentLevel.StairCase_Down.Y;
+                }
+                else
+                {
+                    RosieGame.AddMessage(MessageStrings.Stairs_CantLeave);
+                }
+            }
+            else if (pLevelIndex == 1)  // go down a floor
+            {
+
+                if ((currentLevelIndex + pLevelIndex) > levels.Count() - 1)
+                {
+
+                    levels.Add(CreateNewLevel());
+                    currentLevel = levels.Last();
+                    currentLevel.InitLevel(player, 5);
+                }
+                else
+                {
+                    currentLevel = levels[currentLevelIndex + pLevelIndex];
+                }
+
+                // Play the player on the new levels staircase
+                player.X = currentLevel.StairCase_Up.X;
+                player.Y = currentLevel.StairCase_Up.Y;
+            }
+
+
+            PlacePlayerInCurrentLevel(player.X, player.Y);
+        }
+
+        /// <summary>
+        /// The player has entered the current level
+        /// </summary>
+        /// <param name="pX">X Location</param>
+        /// <param name="pY">Y Location</param>
+        public void PlacePlayerInCurrentLevel(int pX, int pY)
+        {
+            player.X = pX;
+            player.Y = pY;
+            currentLevel.Map[pX, pY].Inhabitant = player;
+            _fov = new RecursiveShadowcast(Map);
+            MapUtils.MakeMapVisible();
+            Camera.CalculateGameCameraDefinition();
+            CalculateFieldOfVision();
+        }
+
+
+
+        /// <summary>
+        /// This event is called from the player class, and is used to notify the game when the play does stuff
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        /// <exception cref="Exception"></exception>
         private void Player_ActorActivityOccured(object sender, Actor.ActorActivity e)
         {
             var p = sender as Player;

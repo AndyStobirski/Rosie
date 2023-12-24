@@ -121,7 +121,7 @@ namespace Rosie.Code
         }
 
         /// <summary>
-        /// Check if provided key press if known the input manager
+        /// Check if provided key press if known to the input manager
         /// </summary>
         /// <param name="pKey"></param>
         public void GetUserKeyPress(int pKey)
